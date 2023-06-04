@@ -4,7 +4,6 @@ import pathlib
 import sys
 import tempfile
 
-import pytest
 
 from loguru import logger
 
@@ -149,12 +148,6 @@ def local_tests():
 
 def run_test(maybe_module):
     prev = sys.argv
-
-    def pytests():
-        sys.argv = prev
-        pytest.main(
-            ["-o", 'console_output_style="classic"', str(pathlib.Path(__file__).parent)]
-        )
 
     def mtests():
         sys.argv = prev

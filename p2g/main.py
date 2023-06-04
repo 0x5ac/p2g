@@ -93,6 +93,36 @@ def setup_logger(opt):
     logger.info("Logging on {opt['--loglevel']} {logfile}")
 
 
+def do_gen(opts):
+    gbl.config.in_pytest = False
+
+    src_name = opts["<srcfile>"]
+    src_path = pathlib.Path(src_name)
+    job_name = src_path.stem
+
+    out_name = "-"
+
+    if opts["--job"] != "<srcfilename>":
+        job_name = opts["--job"]
+
+    if opts["--function"] != "<srcfilename>":
+        func_name = opts["--function"]
+
+    if opts["--out"] != "<stdout>":
+        out_name = opts["--out"]
+
+    try:
+        res = walk.compile2g(func_name, src_path, job_name=job_name, in_pytest=False)
+        lib.write_nl_lines(res, out_name)
+        return 0
+    except err.CompilerError as exn:
+        exn.report_error(absolute_lines=True)
+        return 1
+    except FileNotFoundError as exn:
+        print(exn, file=sys.stderr)
+        return 1
+
+
 def main(argv=None):
     opts = docopt.docopt(DOC, argv)
 
@@ -134,33 +164,4 @@ def main(argv=None):
 
     elif opts["test"]:  # for debug
         debug.run_test(opts["<srcfile>"])
-
-
-def do_gen(opts):
-    gbl.config.in_pytest = False
-
-    src_name = opts["<srcfile>"]
-    src_path = pathlib.Path(src_name)
-    job_name = src_path.stem
-
-    out_name = "-"
-
-    if opts["--job"] != "<srcfilename>":
-        job_name = opts["--job"]
-
-    if opts["--function"] != "<srcfilename>":
-        func_name = opts["--function"]
-
-    if opts["--out"] != "<stdout>":
-        out_name = opts["--out"]
-
-    try:
-        res = walk.compile2g(func_name, src_path, job_name=job_name, in_pytest=False)
-        lib.write_nl_lines(res, out_name)
-        return 0
-    except err.CompilerError as exn:
-        exn.report_error(absolute_lines=True)
-        return 1
-    except FileNotFoundError as exn:
-        print(exn, file=sys.stderr)
-        return 1
+    return 0

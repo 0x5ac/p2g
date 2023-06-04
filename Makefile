@@ -88,16 +88,17 @@ release:
 
 
 test-standard:
-	$(V)	$(PYTEST) p2g -m 'not forcefail'
+	$(V)	$(PYTEST) 
 
+#  p2g/tests/test_error.py -m forcefail )
+FF=
 # force some errors, kick the tyres.
 test-fails:
 	$(V) echo FAIL  > $(GOLDEN)/error_xfail_force_fail.nc
 	$(V) echo XFAIL > $(GOLDEN)/meta_simple_xfail1.nc
 	$(TITLE) Test things which should fail
-	$(V) - $(PYTEST) p2g/tests/test_error.py -m forcefail   > /dev/null 2> /dev/null
-	$(V) 
-
+	$(PYTEST) p2g/tests/test_error.py -m forcefail  > err 2>&1 || (exit 0)
+ 
 
 test-cli:
 	$(COVERAGE) run --append -m  p2g --debug test  > /dev/null 2> /dev/null

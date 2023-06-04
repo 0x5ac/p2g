@@ -55,13 +55,13 @@ class Constant(ConstantBase):
     _value: int | float
     is_numeric_constant = True
 
-    @property
-    def value(self):
-        return self._value
-
     def __init__(self, value: int | float):
         super().__init__(opinfo.const_opinfo)
         self._value = value
+
+    @property
+    def value(self):
+        return self._value
 
     def same(self, other: "Constant"):
         return isinstance(other, Constant) and other.value == self._value

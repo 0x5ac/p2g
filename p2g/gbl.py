@@ -40,13 +40,13 @@ class PerTranslation:
     varrefs: typing.Dict
     last_node: typing.Any
 
+    def __init__(self):
+        self.reset()
+
     def next_bss(self, size):
         addr = self.ebss
         self.ebss += size
         return addr
-
-    def __init__(self):
-        self.reset()
 
     def reset(self):
         self.varrefs = {}

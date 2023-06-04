@@ -17,7 +17,6 @@ from .coords import Const
 from .coords import Fixed
 from .coords import Var
 from .goto import goto
-
 from .main import main
 from .ptest import check_golden
 from .ptest import check_golden_nodec
@@ -31,7 +30,6 @@ from .stat import dprint
 from .symbol import Symbols
 from .vector import ConstVec
 from .vector import Vec
-
 # ruff: noqa: F401
 # noqa: F401
 from .version import __version__

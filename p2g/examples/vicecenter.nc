@@ -47,17 +47,17 @@
 ( quickly move probe to find left edge )
   #106= 5.6667                    (     [abs[stop_search - start_search] / sch.delta][di.cur_axis] + 1,)
   #104= -3.5                      ( cursor[di.cur_axis] = start_search[di.cur_axis])
-L1000                             ( while its > 0:                )
-  IF [#106 LE 0.] GOTO 1002
+L2000                             ( while its > 0:                )
+  IF [#106 LE 0.] GOTO 2002
   G01 G90 F650. x#104 y#105       (     st.[cursor]               )
   G01 G90 G31 M79 F100. z-0.1     (     st.fast_probe[z=sch.search_depth])
-  IF [#5063 LT -0.075] GOTO 1001  (     if SKIP_POS.z < sch.search_depth + sch.iota:)
+  IF [#5063 LT -0.075] GOTO 2001  (     if SKIP_POS.z < sch.search_depth + sch.iota:)
   #104= #104 - 0.75               (     cursor.xy += delta        )
   #106= #106 - 1.                 (     its -= 1                  )
-  GOTO 1000
-L1002
+  GOTO 2000
+L2002
   #3000= 101.                     ( search for left failed        )
-L1001                             (     st.alarm[f"search for {di.name} failed"])
+L2001                             (     st.alarm[f"search for {di.name} failed"])
 ( back off a bit to the left, then slowly probe  )
 ( rightwards for precise measurement.            )
   #104= #104 - 0.1                ( cursor.xy += sch.backoff * di.dxdy)
@@ -74,17 +74,17 @@ L1001                             (     st.alarm[f"search for {di.name} failed"]
 ( quickly move probe to find near edge )
   #106= 6.                        (     [abs[stop_search - start_search] / sch.delta][di.cur_axis] + 1,)
   #105= -2.                       ( cursor[di.cur_axis] = start_search[di.cur_axis])
-L1003                             ( while its > 0:                )
-  IF [#106 LE 0.] GOTO 1005
+L2003                             ( while its > 0:                )
+  IF [#106 LE 0.] GOTO 2005
   G01 G90 F650. x#104 y#105       (     st.[cursor]               )
   G01 G90 G31 M79 F100. z-0.1     (     st.fast_probe[z=sch.search_depth])
-  IF [#5063 LT -0.075] GOTO 1004  (     if SKIP_POS.z < sch.search_depth + sch.iota:)
+  IF [#5063 LT -0.075] GOTO 2004  (     if SKIP_POS.z < sch.search_depth + sch.iota:)
   #105= #105 - 0.4                (     cursor.xy += delta        )
   #106= #106 - 1.                 (     its -= 1                  )
-  GOTO 1003
-L1005
+  GOTO 2003
+L2005
   #3000= 101.                     ( search for near failed        )
-L1004                             (     st.alarm[f"search for {di.name} failed"])
+L2004                             (     st.alarm[f"search for {di.name} failed"])
 ( back off a bit to the near, then slowly probe  )
 ( farwards for precise measurement.              )
   #105= #105 - 0.1                ( cursor.xy += sch.backoff * di.dxdy)
@@ -101,17 +101,17 @@ L1004                             (     st.alarm[f"search for {di.name} failed"]
 ( quickly move probe to find far edge )
   #106= 6.                        (     [abs[stop_search - start_search] / sch.delta][di.cur_axis] + 1,)
   #105= 2.                        ( cursor[di.cur_axis] = start_search[di.cur_axis])
-L1006                             ( while its > 0:                )
-  IF [#106 LE 0.] GOTO 1008
+L2006                             ( while its > 0:                )
+  IF [#106 LE 0.] GOTO 2008
   G01 G90 F650. x#104 y#105       (     st.[cursor]               )
   G01 G90 G31 M79 F100. z-0.1     (     st.fast_probe[z=sch.search_depth])
-  IF [#5063 LT -0.075] GOTO 1007  (     if SKIP_POS.z < sch.search_depth + sch.iota:)
+  IF [#5063 LT -0.075] GOTO 2007  (     if SKIP_POS.z < sch.search_depth + sch.iota:)
   #105= #105 + 0.4                (     cursor.xy += delta        )
   #106= #106 - 1.                 (     its -= 1                  )
-  GOTO 1006
-L1008
+  GOTO 2006
+L2008
   #3000= 101.                     ( search for far failed         )
-L1007                             (     st.alarm[f"search for {di.name} failed"])
+L2007                             (     st.alarm[f"search for {di.name} failed"])
 ( back off a bit to the far, then slowly probe  )
 ( nearwards for precise measurement.            )
   #105= #105 + 0.1                ( cursor.xy += sch.backoff * di.dxdy)
@@ -129,17 +129,17 @@ L1007                             (     st.alarm[f"search for {di.name} failed"]
 ( quickly move probe to find right edge )
   #106= 5.6667                    (     [abs[stop_search - start_search] / sch.delta][di.cur_axis] + 1,)
   #104= 3.5                       ( cursor[di.cur_axis] = start_search[di.cur_axis])
-L1009                             ( while its > 0:                )
-  IF [#106 LE 0.] GOTO 1011
+L2009                             ( while its > 0:                )
+  IF [#106 LE 0.] GOTO 2011
   G01 G90 F650. x#104 y#105       (     st.[cursor]               )
   G01 G90 G31 M79 F100. z-0.1     (     st.fast_probe[z=sch.search_depth])
-  IF [#5063 LT -0.075] GOTO 1010  (     if SKIP_POS.z < sch.search_depth + sch.iota:)
+  IF [#5063 LT -0.075] GOTO 2010  (     if SKIP_POS.z < sch.search_depth + sch.iota:)
   #104= #104 + 0.75               (     cursor.xy += delta        )
   #106= #106 - 1.                 (     its -= 1                  )
-  GOTO 1009
-L1011
+  GOTO 2009
+L2011
   #3000= 101.                     ( search for right failed       )
-L1010                             (     st.alarm[f"search for {di.name} failed"])
+L2010                             (     st.alarm[f"search for {di.name} failed"])
 ( back off a bit to the right, then slowly probe  )
 ( leftwards for precise measurement.              )
   #104= #104 + 0.1                ( cursor.xy += sch.backoff * di.dxdy)

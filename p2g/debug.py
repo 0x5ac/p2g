@@ -4,9 +4,7 @@ import pathlib
 import sys
 import tempfile
 
-
 from loguru import logger
-
 
 from p2g import err
 from p2g import gbl

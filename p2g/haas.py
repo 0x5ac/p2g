@@ -1,5 +1,7 @@
 import p2g
+
 from p2g import axis
+
 
 NAME = "HAAS NGC"
 ORIGIN = [0, 0, 0]

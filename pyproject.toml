@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "p2g"
-version = "0.1.74"
+version = "0.1.75"
 description = "Transpile python into cnc gcode."
 authors = ["sac <sac@0x5ac.com>"]
 readme = "README.rst"

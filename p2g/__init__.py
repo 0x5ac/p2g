@@ -30,6 +30,7 @@ from .stat import dprint
 from .symbol import Symbols
 from .vector import ConstVec
 from .vector import Vec
+
 # ruff: noqa: F401
 # noqa: F401
 from .version import __version__

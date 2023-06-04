@@ -73,7 +73,7 @@ bump: bump-inc | bump-install
 bump-install:
 	echo __version__ = '"'$(shell poetry version -s)'"'  > p2g/version.py
 	git tag $$(poetry version -s)
-	git commit -a -m \\"bumped $$(poetry version -s)\\"
+	git commit -a -m "bumped $$(poetry version -s)"
 .PHONY:
 bump-inc:
 	poetry version patch

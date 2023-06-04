@@ -65,10 +65,9 @@ p2g/doc/%.rst: p2g/doc/%.org
 
 ######################################################################
 # release:
-
+VERSION := $(shell poetry version -s )
 bump:
 	poetry version patch
-	$(eval VERSION := $(shell poetry version -s ))
 	echo __version__ = '"'$(VERSION)'"'  > p2g/version.py
 	git tag $$(poetry version -s)
 	git commit -a -m \\"bumped $$(poetry version -s)\\"

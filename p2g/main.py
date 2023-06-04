@@ -55,7 +55,7 @@ Options:
     --function=<name>        Function to compile, [default: <last function in file>]
     --debug                  Enter debugging code. [default: False]
     --recursive              Notify when called by self. [default: False]
-    --logfile=<logfile>      Turn on logger.and send to <logfile> [default: p2g.log]
+    --logfile=<logfile>      Turn on logger.and send to <logfile> [default: <stdout>]
     --loglevel=<loglevel>    Set logger.level [default: ERROR]
     --break                  Breakpoint on error.
 """
@@ -75,29 +75,31 @@ def do_examples():
 
 
 def setup_logger(opt):
-    if gbl.config.debug:
-        opt["--loglevel"] = "DEBUG"
-    if logfile := opt["--logfile"]:
-        logger.remove()
+    loglevel = opt["--loglevel"]
 
-        if logfile == "-":
-            logfile = sys.stdout
-        logger.add(
-            logfile,
-            level=opt["--loglevel"],
-            format="{message}",
-        )
-        logger.info("Logging on")
+    if gbl.config.debug:
+        loglevel = "DEBUG"
+
+    logfile = opt["--logfile"]
+    if logfile == "<stdout>":
+        logfile = sys.stdout
+
+    logger.remove()
+    logger.add(
+        logfile,
+        level=loglevel,
+        format="{message}",
+    )
+    logger.info("Logging on {opt['--loglevel']} {logfile}")
 
 
 def main(argv=None):
-    logger.info(argv)
     opts = docopt.docopt(DOC, argv)
 
     gbl.config.debug = opts["--debug"]
 
     setup_logger(opts)
-
+    logger.info(argv)
     if opts["--out"] == "<stdout>":
         opts["--out"] = "-"
     if opts["--break"]:  # no cover
@@ -152,5 +154,9 @@ def do_gen(opts):
     try:
         res = walk.compile2g(func_name, src_path, job_name=job_name, in_pytest=False)
         lib.write_nl_lines(res, out_name)
+        sys.exit(0)
     except err.CompilerError as exn:
         exn.report_error(absolute_lines=True)
+    except FileNotFoundError as exn:
+        print(exn)
+    sys.exit(1)

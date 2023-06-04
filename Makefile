@@ -66,12 +66,18 @@ p2g/doc/%.rst: p2g/doc/%.org
 ######################################################################
 # release:
 VERSION := $(shell poetry version -s )
-bump:
-	poetry version patch
+.PHONY: 
+bump: bump-inc | bump-install
+
+.PHONY:
+bump-install:
 	echo __version__ = '"'$(VERSION)'"'  > p2g/version.py
 	git tag $$(poetry version -s)
 	git commit -a -m \\"bumped $$(poetry version -s)\\"
-
+.PHONY:
+bump-inc:
+	poetry version patch
+	grep "^version" pyproject.toml 
 build:
 	cp p2g/doc/readme.rst README.rst
 	poetry build 

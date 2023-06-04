@@ -3,7 +3,7 @@
 
 
 name = "p2g"
-version = "0.1.86"
+version = "0.1.88"
 description = "Transpile python into cnc gcode."
 authors = ["sac <sac@0x5ac.com>"]
 readme = "README.rst"
@@ -25,7 +25,7 @@ packages = [
 
 ]
 
-[tool.poetry_bumpversion.file."p2g/__init__.py"]
+
 [tool.poetry.dependencies]
 
 python = "^3.10"

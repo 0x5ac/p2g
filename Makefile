@@ -90,8 +90,7 @@ release:
 test-standard:
 	$(V)	$(PYTEST) 
 
-#  p2g/tests/test_error.py -m forcefail )
-FF=
+
 # force some errors, kick the tyres.
 test-fails:
 	$(V) echo FAIL  > $(GOLDEN)/error_xfail_force_fail.nc

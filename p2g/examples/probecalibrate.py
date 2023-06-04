@@ -1,7 +1,6 @@
 #! /usr/bin/env python
 import sys
-
-from . import defs
+import defs
 import p2g as pg
 
 

@@ -1,0 +1,542 @@
+
+
+#from rosettea gcode
+
+Variable Number Type of Variable Function
+#0 Null #0 is read only and its value is always “null” that means “no value”.
+#1-#33 Local Variables Local variables are used to pass arguments to macros and as temporary scratch storage.
+#100-#499 Input Variables The value of these variables can be set by the user through the GUI and the value in the table will
+never be changed by the controller.
+#500-#3999 Program Variables The value of these variables can be read/write by G-code programs and are initialized with #0
+before executing a program.
+#4000-#4999 Shared Variables
+The value of these variables is shared between the GUI interface and the controller.
+The result is that if during a program one of these variables is changed the user can see the
+updated final value in the table.
+#5000-#5999 System Variables Updated run time by the compiler
+#6000-#6999 Protected Variables Variables that can be modified by the user only before compilation and that are password protected.
+A G-code program can only read these variables and not write them.
+2.1 System variables description
+System Variable Meaning
+Current Position Variables Current Position variables Meaning
+5001-5006 Current TCP position X  C See position information table
+5081-5086 Current TCP position when restarting X - C
+5091-5093 Last stop position X, Y, Z [inches or mm depending on parameter 5106]
+5094-5096 Last stop position A, B, C
+Active G-codes Variables Active G-codes Variables Meaning
+5100 Sequence number of lines executed
+5101 Group 01: G0, G1, G2, G3, G38.X, G73, G80, G81, G82, G83, G84, G85, G86, G87, G88, G89
+5102 Group 02: G17, G18, G19
+5103 Group 03: G90, G91
+5104 Group 04: G90.1, G91.1
+5105 Group 05: G93, G94
+5106 Group 06: G20, G21
+5107 Group 07: G40, G41, G41.1, G42, G42.1
+5108 Group 08: G43, G43.1, G43.2, G43.4, G43.7, G49
+5110 Group 10: G98, G99
+5111 Group 11: G50, G51
+5112 Group 12: G54, G55, G56, G57, G58, G59, G59.1, G59.2, G59.3
+5113 Group 13: G61, G61.1, G64
+5116 Group 16: G68, G69
+5117 Group 17: G15, G16
+Other codes Other codes meaning
+5120 Interpolated-Grouprd axes mask. Value is a bitmask where bit 1 represents X axis, bit 2 Y axis, ..
+5127 Active jerk [%]
+5128 Active max acceleration [mm/s^2 or inches/s^2] (0 means use the maximum acceleration)
+5129 Active max deceleration [mm/s^2 or inches/s^2] (0 means use the maximum deceleration)
+5130 Active feed rate (F)
+5131 Active spindle speed (S)
+5132 Selected tool (T)
+5133 Selected slot
+5134 Current tool
+5135 Current slot
+5136 Active feed rate override mode, P argument of M50
+5137 Active spindle speed override mode, P argument of M51
+5138 Active traverse rate: target speed during G0 commands. 0 means use the maximum possible speed.
+[mm/s^2 or inches/s^2]
+5140 Tolerance set with G64 P
+5141 Points removal threshold set with G64 Q
+5148 While a modal macro is active it stores how many times a modal macro (G66) has been called.
+RosettaCNC G-code language
+20/75
+System Variable Meaning
+Current Position Variables Current Position variables Meaning
+5149 Executing sub-program. Flag set to 1 while G-code is executing a sub-program called from the main
+program.
+Active M-codes Active M-codes meaning
+5150 M0, M2, M30, M47, M60
+5151 M3, M4, M5
+5152 M6, M106
+5153 M7, M9
+5154 M8, M9
+G28, G28.1 Variables G28, G28.1 Variables Meaning
+5161 G28.1 position X
+5162 G28.1 position Y
+5163 G28.1 position Z
+5164 G28.1 position A
+5165 G28.1 position B
+5166 G28.1 position C
+G30, G30.1 Variables G30, G30.1 Variables Meaning
+5181 G30.1 position X
+5182 G30.1 position Y
+5183 G30.1 position Z
+5184 G30.1 position A
+5185 G30.1 position B
+5186 G30.1 position C
+WCS Offsets Variables WCS Offsets Variables Meaning
+5201 - 5206 G52 offset X - C
+5210 G92 enabled (0 ÷ 1)
+5211 - 5216 G92 offset X - C
+WCS Variables WCS Variables Meaning
+5220 Coord. System number
+5221 - 5226 Coord. System 1 X  C
+5241 - 5246 Coord. System 2 X  C
+5261 - 5266 Coord. System 3 X  C
+5281 - 5286 Coord. System 4 X  C
+5301 - 5306 Coord. System 5 X  C
+5321 - 5326 Coord. System 6 X  C
+5341 - 5346 Coord. System 7 X  C
+5361 - 5366 Coord. System 8 X  C
+5381 - 5386 Coord. System 9 X  C
+Tool Variables Tool Variables Meaning
+5400 Current tool id
+5401 Current tool offset X
+5402 Current tool offset Y
+5403 Current tool offset Z / Current tool length
+5410 Current tool diameter
+5411 Current tool type
+5412 Current tool parameter 1
+5413 Current tool parameter 2
+5414 Current tool parameter 3
+5420 Tool compensation offset X (Set using G43, G43.1, G43.2, G43.4, G43.7, G49)
+5421 Tool compensation offset Y (Set using G43, G43.1, G43.2, G43.4, G43.7, G49)
+5422 Tool compensation offset Z (Set using G43, G43.1, G43.2, G43.4, G43.7, G49)
+5423 Tool compensation offset A (Set using G43, G43.1, G43.2, G43.4, G43.7, G49)
+5424 Tool compensation offset B (Set using G43, G43.1, G43.2, G43.4, G43.7, G49)
+5425 Tool compensation offset C (Set using G43, G43.1, G43.2, G43.4, G43.7, G49)
+5426 The id of the tool used for RTCP compensation (G43.4/G43.7)
+Scaling & Rotation Variables Scaling and Rotation Variables Meaning
+5501 G51 scaling factor X
+5502 G51 scaling factor Y
+5503 G51 scaling factor Z
+5504 G51 offset X
+5505 G51 offset Y
+5506 G51 offset Z
+5510 G68 rotation plane
+RosettaCNC G-code language
+21/75
+System Variable Meaning
+Current Position Variables Current Position variables Meaning
+5511 G68 rotation XY
+5512 G68 rotation XZ
+5513 G68 rotation YZ
+5514 G68 offset X
+5515 G68 offset Y
+5516 G68 offset Z
+Runtime External Variables Runtime External Variables Meaning
+5700 Probe state at the end of a G38.X. Values: 1 probing procedure succeeded, -1 failed: sensor not tripped
+before reaching the target position, -2 failed: sensor already tripped
+5701 - 5706 Probed position loaded at the end of a G38.X with respect to the active WCS See position information
+table
+571mak	1 - 5716 Probed position X - C loaded at the end of a G38.X with respect to machine coordinates See position
+information table
+5720 Return value for M66
+5721 Return value for M109 and M120
+5722 Status of the last M66 (0 → Success, 1 → Failure)
+5730-5734 User input values from M109 or M120
+5735-5739 User input values from M109 or M120
+5740-5744 Input values for M166 and M167
+5745-5749 Input values for M166 and M167
+5750-5754 Input values for M166 and M167
+5755-5759 Input values for M166 and M167
+Parameters Related Variables Parameters Related Variables (Set using G10 L100 P<param> V<value>)
+5800 The motion mode used when G66 is enabled (0 → G0; 1 → G1)
+5801 Rotary axis modulus used for the rollover
+5802 Axis A rotary mode (see Rotary axis options)
+5803 Axis B rotary mode (see Rotary axis options)
+5804 Axis C rotary mode (see Rotary axis options)
+Restart related position variables Meaning
+5091-5096 Last stop positions. X,Y and Z in inches or mm depending on parameter 5106 and A,B,C in deg
+
+
+######################################################################\
+######################################################################
+######################################################################
+
+CENTROID
+
+Index Description Returns R/W
+1-3 Macro arguments A-C
+The floating point value if defined by
+a G65 call, 0.0 otherwise.
+These can be used as private, local
+variables in any program or
+subprogram except in custom macro
+M functions. In custom macro M
+functions, the macro arguments are
+passed in by reference.
+R/W
+4-6 Macro arguments I-K (1st set) R/W
+7-9 Macro arguments D-F or 2nd set of I-K R/W
+10 3rd I (G is invalid) R/W
+11 Macro argument H or 3rd J R/W
+12 3rd K (L is invalid) R/W
+13 Macro argument M or 4th I R/W
+14 4th J (N is invalid) R/W
+15 4th K (O is invalid) R/W
+16 5th I (P is invalid) R/W
+17-18 Macro argument Q-R or 5th J-K R/W
+19-21 Macro arguments S,T,U or 6th set of I-K R/W
+22-24 Macro arguments V,W,X or 7th set of I-K R/W
+25-27 Macro arguments Y,Z or 8th set of I-K R/W
+28-30 9th set of I-K R/W
+31-33 10th set of I-K R/W
+100 - 149 User variables Floating-point value. Initialized to
+0.0 at start of job processing
+R/W
+150  159 Nonvolatile user variables Floating-point value saved in
+cncm.job.xml file.
+R/W
+300-399 User string variables. These variables retain their
+values until the CNC software is exited
+String Literal R/W
+2400, 2401-2418 Active WCS, WCS #1-18 CSR angles
+Floating point value
+R/W
+2500, 2501-2518 Active WCS, WCS #1-18 Axis 1 values R/W
+2600, 2601-2618 Active WCS, WCS #1-18 Axis 2 values R/W
+2700, 2701-2718 Active WCS, WCS #1-18 Axis 3 values R/W
+2800, 2801-2818 Active WCS, WCS #1-18 Axis 4 values R/W
+2900, 2901-2918 Active WCS, WCS #1-18 Axis 5 values R/W
+3000, 3001-3018 Active WCS, WCS #1-18 Axis 6 values R/W
+3100, 3101-3118 Active WCS, WCS #1-18 Axis 7 values R/W
+3200, 3201-3218 Active WCS, WCS #1-18 Axis 8 values R/W
+3901 Parts Cut (Part #) R/W
+3902 Parts Required (Part Cnt) R/W
+4001 Move mode 0.0 (rapid) or 1.0 (feed) R
+4003 Positioning mode 90.0 (abs) or 91.0 (inc) R
+4006 Units of measure 20.0 (inches) or 21.0 (metric) R
+4014 WCS 54.0-71.0 (WCS#1-18) R
+4109 Feedrate (F) Floating point value R
+4119 Spindle Speed (S) R
+4120 Tool Number (T) R
+4121 Current height offset number (H) R
+4122 Current diameter offset number (D, mill only) R
+4201 Job processing state 0 = normal, 1 = graph R
+4202 Job Search mode 0 = search mode off
+1 = searching for line number
+2 = searching for block number N__
+3 = searching for Tool number
+4 = resuming job
+R
+5021-5028 Machine Position (X=5021, Y=5022, etc.) Floating point value R
+5041-5048 Current Position (X=5041, Y=5042, etc.) R
+9000-9399 Parameter values 0  399 See Chapter 14 R
+9900-9999 Parameter values 900  999 See Chapter 14 R
+10000 Mill: Height offset amount, active H Floating point value R/W
+M-Series Operator’s Manual 9/14/16 11-5
+Index Description Returns R/W
+10001-10200 Mill: Height offset amount, H001  H200 Floating point value R/W
+11000 Mill: Diameter offset amount, active D Floating point value R/W
+11001-11200 Mill: Diameter offset amount, D001  D200 Floating point value R/W
+12000 Mill: Tool H number, active tool (T) 0 - 200 R/W
+12001-12200 Mill: Tool H number, tools 1 - 200 0 - 200 R/W
+13000 Mill: Tool D number, active tool (T) 0 - 200 R/W
+13001-13200 Mill: Tool D number, tools 1 - 200 0 - 200 R/W
+14000 Mill: Tool coolant, active tool (T) 7, 8, 9 R/W
+14001-14200 Mill: Tool coolant, tools 1  200 7, 8, 9 R/W
+15000 Mill: Tool spindle direction, active tool (T) 3, 4, 5 R/W
+15001-15200 Mill: Tool spindle direction, tools 1 - 200 3, 4, 5 R/W
+16000 Mill: Tool spindle speed, active tool (T) Floating point value R/W
+16001-16200 Mill: Tool spindle speed, tools 1 - 200 Floating point value R/W
+17000 Mill: Tool bin number, active tool (T) Floating point value R/W
+17001-17200 Mill: Tool bin number, tools 1 - 200 Floating point value R/W
+18000 Mill: Tool putback, active tool (T) Floating point value R/W
+18001-18200 Mill: Tool putback, tools 1  200 Floating point value R/W
+19000 Tool Life Data: Tool T1 Tool Type 0 = Drill, 1 = End Mill R/W
+19001 Tool Life Data: Tool T1 Total Life Floating point value R/W
+19002 Tool Life Data: Tool T1 Used Life Floating point value R/W
+19003 Tool Life Data: Tool T1 Units 0 = Cycles, 1 = Inch/mm distance R/W
+19004 Tool Life Data: Tool T1 Update Mode 0 = Manual, 1 = Auto R/W
+19005-19009 Tool Life Data for Tool T2 see 19000-19004 above R/W
+19010-19014 Tool Life Data for Tool T3 see above R/W
+19015-19999 Tool Life Data for Tools T4 through T200 see above R/W
+20001-20008 max_rate for axes 1-8 R
+20101-20108 label for axes 1-8 R
+20201-20208 slow_jog for axes 1-8 R
+20301-20308 fast_jog for axes 1-8 R
+20401-20408 screw_pitch for axes 1-8 R/W
+20501-20508 lash_comp for axes 1-8 R
+20601-20608 counts_per_unit for axes 1-8 R
+20701-20708 accel_time for axes 1-8 R
+20801-20808 deadstart_velocity for axes 1-8 R
+20901-20908 delta_vmax for axes 1-8 R
+21001-21008 counts_per_turn for axes 1-8 R
+21101-21108 minus_limit for axes 1-8 R
+21201-21208 plus_limit for axes 1-8 R
+21301-21308 minus_home for axes 1-8 R
+21401-21408 plus_home for axes 1-8 R
+21501-21508 reversed for axes 1-8 R
+21601-21608 laser_comp for axes 1-8 R
+21701-21708 proportional for axes 1-8 R
+21801-21808 integration_limit for axes 1-8 R
+21901-21908 kg for axes 1-8 R
+22001-22008 integral for axes 1-8 R
+22101-22108 kv1 for axes 1-8 R
+22201-22208 derivative for axes 1-8 R
+22301-22308 ka for axes 1-8 R
+22401-22408 num_motor_poles for axes 1-8 R
+22501-22508 drive_current for axes 1-8 R
+22601-22608 drive_offset_angle for axes 1-8 R
+22701-22708 pwm_kp for axes 1-8 R
+22801-22808 pwm_ki for axes 1-8 R
+22901-22908 pwm_kd for axes 1-8 R
+23001-23008 abrupt_kp for axes 1-8 R
+23101-23108 feed_forward_kp for axes 1-8 R
+M-Series Operator’s Manual 9/14/16 11-6
+Index Description Returns R/W
+23201-23208 max_error (PID) for axes 1-8 R
+23301-23308 min_error (PID) for axes 1-8 R
+23401-23408 at_index_pulse for axes 1-8 R
+23501-23508 travel_minus for axes 1-8 R/W
+23601-23608 travel_plus for axes 1-8 R/W
+23701-23708 axis_home_set for axes 1-8 R
+23801-23808 abs_position (in encoder counts) for axes 1-8 R
+23901-23908 PID_out for axes 1-8 R
+24001-24008 reference set for axes 1-8 R
+24101-24108 Axis reference value for axes 1-8 R
+24201-24208 tilt table level offsets for axes 1-8 R
+24301-24308 dsp positions for axes 1-8 R
+24401-24408 abs_position (in encoder counts) for axes 1-8 R
+24501-24508 dsp positon in local cooridinates for axes 1-8 R
+24601-24608 local probing +limit position for axes 1-8 R
+24701-24708 local probing -limit position for axes 1-8 R
+24801-24808 probe stylus compensation amount for axes 1-8 R
+24901-24908 servo controlled axis indicator for axes 1-8 0 = no, 1 = yes R
+25000 DRO_display_units R
+25001 default_units_of_measure R
+25002 PLC_type R
+25003 console_type R
+25004 jog_panel_optional R
+25005 min_spin_high R
+25006 max_spin_high R
+25007 home_at_powerup R
+25008 screen_blank_time R
+25009 Displayed / Calculated spindle speed. If parameter
+78 =1 and spindle encoder is mounted.
+R
+25010 current spindle position (in counts) R
+25011 dsp_time (in seconds) R
+25012 time (in seconds) R
+25013 clear max/min PID errors R
+25014 software type (Mill/Lathe) R
+25015 feedrate override R
+25016 spindle override R
+25017 OS Windows/LINUX = 2; other OS = 1.0 R
+25018 CNC series number (11 for CNC11) R
+25019 Software version number R
+25020 Software Beta revision number R
+25021 Digitizing boundary hit hit = 1, not hit = 0 R
+25022 last M115/116/125/126 probe trip 1 = tripped, 0 = not tripped R
+25023 Drive type 0 = Standard, 1 = Legacy DC,
+2 = Legacy AC
+R
+25101-25108 Encoder counts away from index pulse for axes 1-8 Counts away from index pulse.
+Values less than 0 means that index
+pulse is not detected yet.
+R
+26001-26008 dsp mechanical machine positions for axes 1-8 R
+26101-26108 dsp mechanical local positions for axes 1-8 R
+26201-26208 local + travel limit position for axes 1-8 R
+26301-26308 local - travel limit position for axes 1-8 R
+26401-26404 Axis 1 reference points 1-4 R
+26501-26504 Axis 2 reference points 1-4 R
+26601-26604 Axis 3 reference points 1-4 R
+26701-26704 Axis 4 reference points 1-4 R
+26801-26804 Axis 5 reference points 1-4 R
+26901-26904 Axis 6 reference points 1-4 R
+M-Series Operator’s Manual 9/14/16 11-7
+Index Description Returns R/W
+27001-27004 Axis 7 reference points 1-4 R
+27101-27104 Axis 8 reference points 1-4 R
+27201-27208 ACDC drive estimated brake wattage for axes 1-8 R
+27301-27308 Real motor encoder positions for axes 1-8 Motor encoder positions that accounts
+for lash, MPG, and scale offsets.
+(Note that these can be different from
+what is displayed as Abs Pos in the
+PID menu.)
+R
+27401-27408 Scale encoder positions for axes 1-8 R
+29000-31999 User variables. These variables retain their values
+until the CNC software is exited.
+Floating point value R/W
+50001-51312 PLC Inputs 1-1312 Jog Panel is on INP1057-1312 R
+60001-61312 PLC Outputs 1-1312 Jog Panel is on OUT1057-1312 R
+70001-71024 PLC Memory Bits 1-1024 R
+80001-89999 Reserved R
+90001-90064 Timer 1-64 status bits R
+91001-91064 Reserved R
+92001-92064 Reserved R
+93001-93256 Stage 1-256 status bits R
+94001-94256 Fast Stage 1-256 status bits R
+95001-95256 Reserved R
+96001-96044 W1-W44 (32-bit signed integers) R
+97001-97022* DW1-DW22 (64-bit signed integers) R
+98001-98044 FW1-FW44 (32-bit floats) R
+99001-99022 DFW1-DFW22 (64-bit floats) R
+* Since user or system variables are turned into (double) floating point
+
+
+
+
+######################################################################
+
+from cnc data
+
+
+Variable Description Variable Description
+#1 A #119 Common Variable
+#2 B #120 Common Variable
+#3 C #121 Common Variable
+#4 I #122 Common Variable
+#5 J #123 Common Variable
+#6 K #124 Common Variable
+#7 D #125 Common Variable
+#8 E #126 Common Variable
+#9 F #127 Common Variable
+#10 #128 Common Variable
+#11 H #129 Common Variable
+#12 #130 Common Variable
+#13 M #131 Common Variable
+#14 #132 Common Variable
+#15 #133 Common Variable
+#16 #134 Common Variable
+#17 Q #135 Common Variable
+#18 R #136 Common Variable
+#19 S #137 Common Variable
+#20 T #138 Common Variable
+#21 U #139 Common Variable
+#22 V #140 Common Variable
+#23 W #141 Common Variable
+#24 X #142 Common Variable
+#25 Y #143 Common Variable
+#26 Z #144 Common Variable
+#145 Common Variable
+#100 Common Variable #146 Common Variable
+#101 Common Variable #147 Common Variable
+#102 Common Variable #148 Common Variable
+#103 Common Variable #149 Common Variable
+#104 Common Variable
+#105 Common Variable
+#106 Common Variable
+#107 Common Variable
+#108 Common Variable All of these are variables are cleared either on
+#109 Common Variable reset, at the end of the program or at power off.
+#110 Common Variable
+#111 Common Variable
+#112 Common Variable
+#113 Common Variable
+#114 Common Variable
+#115 Common Variable
+#116 Common Variable
+#117 Common Variable
+#118 Common Variable
+Variable List > Variable List
+www.cncdata.co.uk 45
+Variable Description Variable Description
+#500 Common Variable #1013 PMC Bit Read
+#501 Common Variable #1014 PMC Bit Read
+#502 Common Variable #1015 PMC Bit Read
+#503 Common Variable #1032 PMC Word Read
+#504 Common Variable
+#505 Common Variable #1100 PMC Bit Write
+#506 Common Variable #1101 PMC Bit Write
+#507 Common Variable #1102 PMC Bit Write
+#508 Common Variable #1103 PMC Bit Write
+#509 Common Variable #1104 PMC Bit Write
+#510 Common Variable #1105 PMC Bit Write
+#511 Common Variable #1106 PMC Bit Write
+#512 Common Variable #1107 PMC Bit Write
+#513 Common Variable #1108 PMC Bit Write
+#514 Common Variable #1109 PMC Bit Write
+#515 Common Variable #1110 PMC Bit Write
+#516 Common Variable #1111 PMC Bit Write
+#517 Common Variable #1112 PMC Bit Write
+#518 Common Variable #1113 PMC Bit Write
+#519 Common Variable #1114 PMC Bit Write
+#520 Common Variable #1115 PMC Bit Write
+#521 Common Variable #1132 PMC Word Write
+#522 Common Variable #1133 PMC Double Word Write
+#523 Common Variable
+#524 Common Variable
+#525 Common Variable
+#526 Common Variable
+#527 Common Variable
+#528 Common Variable
+#529 Common Variable
+#530 Common Variable
+#531 Common Variable
+#1000 PMC Bit Read
+#1001 PMC Bit Read
+#1002 PMC Bit Read
+#1003 PMC Bit Read
+#1004 PMC Bit Read
+#1005 PMC Bit Read
+#1006 PMC Bit Read
+#1007 PMC Bit Read
+#1008 PMC Bit Read
+#1009 PMC Bit Read
+#1010 PMC Bit Read
+#1011 PMC Bit Read
+#1012 PMC Bit Read
+Variable List > Variable List
+www.cncdata.co.uk 46
+Variable Description Variable Description
+#3000 Alarm & Stop #4119 Modal S Code
+#3001 Timer (m/s) #4120 Modal T Code
+#3002 Timer (hourly) #4130 Modal P Code
+#3003 Single Block
+#3004 Feed control #5001 Workpiece Position 1st Axis (B)
+#3005 : :
+#3006 Operator Message #5008 Workpiece Position 8th Axis (B)
+#3007 #5021 Machine Position 1st Axis
+#3008 : :
+#3009 #5028 Machine Position 8th Axis
+#3010 #5041 Workpiece Position 1st Axis (C)
+#3011 Date : :
+#3012 Time #5048 Workpiece Position 8th Axis (C)
+#5061 Skip Signal Position 1st Axis
+#3901 Machine Parts : :
+#3902 Required Parts #5068 Skip Signal Position 8th Axis
+#4001 Modal Group 1 #5201 1st Axis EXT Zero Offset
+#4002 Modal Group 2 : :
+#4003 Modal Group 3 #5208 8th Axis EXT Zero Offset
+#4004 Modal Group 4 #5221 1st Axis G54 Zero Offset
+#4005 Modal Group 5 : :
+#4006 Modal Group 6 #5228 8th Axis G54 Zero Offset
+#4007 Modal Group 7 #5241 1st Axis G55 Zero Offset
+#4008 Modal Group 8 : :
+#4009 Modal Group 9 #5248 8th Axis G55 Zero Offset
+#4010 Modal Group 10 #5261 1st Axis G56 Zero Offset
+#4011 Modal Group 11 : :
+#4012 Modal Group 12 #5268 8th Axis G56 Zero Offset
+#4013 Modal Group 13 #5281 1st Axis G57 Zero Offset
+#4014 Modal Group 14 : :
+#4015 Modal Group 15 #5288 8th Axis G57 Zero Offset
+#4016 Modal Group 16 #5301 1st Axis G58 Zero Offset
+#4017 Modal Group 17 : :
+#4018 Modal Group 18 #5308 8th Axis G58 Zero Offset
+#4019 Modal Group 19 #5321 1st Axis G59 Zero Offset
+#4020 Modal Group 20 : :
+#4021 Modal Group 21 #5328 8th Axis G59 Zero Offset
+#4022 Modal Group 22
+#4102 Modal B Code
+#4107 Modal D Code
+#4109 Modal F Code
+#4111 Modal H Code
+#4113 Modal M Code
+#4114 Modal Sequence No
+	#4115 Modal Program No
+
+#4021 Modal Group 21 #5328 8th Axis G59 Zero Offset
+

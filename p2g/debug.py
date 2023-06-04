@@ -49,7 +49,6 @@ def run_one_test(fnname, fndef, args):
     prev_argv = sys.argv
     sys.argv = []
     logger.info(f"starting test {fnname}")
-
     res = fndef(*args)
 
     sys.argv = prev_argv
@@ -101,7 +100,7 @@ def run_all_test_(module_name):
         for key, decorated_fn in todo:
             # too hard for me today
 
-            print("K", module_name, key)
+            print("run", module_name, key)
 
             if not wrap_one_test(key, decorated_fn):
                 pass

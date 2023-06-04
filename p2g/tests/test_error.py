@@ -22,12 +22,14 @@ def fish():
 @p2g.must_be("not the right answer")
 def test_forcefail():
     PROBE.x = 9
+    p2g.com(' "quote escape"')
 
 
 @pytest.mark.forcefail
 @p2g.check_golden()
 def test_forcefail1():
     PROBE.x = 9
+    p2g.com(' "quote escape"')
 
 
 @p2g.must_be(

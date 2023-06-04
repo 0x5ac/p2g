@@ -120,17 +120,17 @@ class StatBase(abc.ABC):
 class Nest:
     first_label: int
     next_label: int
-    axis_names: str
+
     prev: "Nest"
     slist: list[StatBase]
     cur: "Nest" = typing.cast("Nest", None)
 
-    def __init__(self):
+    def __init__(self, in_pytest=False):
         self.prev = Nest.cur
-        if Nest.cur:
+        if not in_pytest and Nest.cur:
             self.first_label = self.prev.first_label + 1000
         else:
-            self.first_label = 0
+            self.first_label = 1000
         Nest.cur = self
         self.next_label = self.first_label
         self.slist = []

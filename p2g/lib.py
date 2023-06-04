@@ -134,8 +134,8 @@ def openw(name):
     if str(name) == "-":
         yield sys.stdout
     else:
-        with open(name, "w", encoding="utf-8") as outf:
-            yield outf
+        with open(name, "w", encoding="utf-8") as w:
+            yield w
 
 
 class SimpleIBuf:
@@ -160,5 +160,5 @@ def openr(name):
     if str(name) == "-" or not str(name):
         yield SimpleIBuf()
     else:
-        with open(name, "r", encoding="utf-8") as inf:
-            yield inf
+        with open(name, "r", encoding="utf-8") as r:
+            yield r

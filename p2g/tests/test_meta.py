@@ -40,6 +40,7 @@ tmp_got_path = golden_dir / "meta_simple_xfail1.got"
 @p2g.check_golden()
 @pytest.mark.xfail()
 def test_simple_xfail1():
+    p2g.com("A comment")
     tmp_path.write_text("BAD", encoding="utf-8")
     CURSOR = p2g.Fixed(addr=100)
     CURSOR.x = 9

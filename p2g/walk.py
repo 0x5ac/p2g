@@ -403,11 +403,11 @@ def compile2g(func_name_arg, srcfile_name, job_name, in_pytest):
     with lib.openr(srcpath) as inf:
         sys.path.insert(0, str(srcpath.parent))
 
-        with stat.Nest() as cursor:
+        with stat.Nest(in_pytest) as cursor:
             axis.NAMES = "xyz"
-
             gbl.iface.reset()
-            logger.debug(f"Starting {func_name_arg}")
+
+            logger.debug(f"Starting {func_name_arg} {cursor.next_label}")
             sourcelines = inf.read()
             node = ast.parse(sourcelines)
             # load everything

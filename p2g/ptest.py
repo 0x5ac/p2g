@@ -134,7 +134,6 @@ def writelines(path, txt):
 
 def make_decorated_source_seed(fn, callow_path, callow_data):
     tofix = ["@p2g.must_be("]
-
     for line in callow_data:
         quotechar = '"'
         if quotechar in line:

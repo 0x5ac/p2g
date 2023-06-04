@@ -151,7 +151,7 @@ def test_typeguard_setup():
     assert "typeguard" in sys.modules.keys()
 
 
-def test_nf(capfd):
+def test_capfd_nf(capfd):
     assert p2g.main(["gen", "nothere.py"]) != 0
     got = capfd.readouterr()
     assert "No such file or directory" in got.err

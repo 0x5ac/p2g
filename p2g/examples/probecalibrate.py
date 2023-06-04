@@ -1,8 +1,7 @@
 #! /usr/bin/env python
 import sys
 
-sys.path.insert(0, "p2g/examples")
-import defs
+from . import defs
 import p2g as pg
 
 

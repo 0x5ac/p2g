@@ -167,6 +167,4 @@ def run_test(maybe_module):
     local_tests()
     mtests()
 
-    pytests()
-
     sys.argv = prev

@@ -74,8 +74,7 @@ bump:
 	git commit -a -m \\"bumped $$(poetry version -s)\\"
 
 build:
-	cp p2g/doc/readme.md README.md
-	cp p2g/doc/readme.md README.md
+	cp p2g/doc/readme.rst README.rst
 	poetry build 
 
 bcheck: build

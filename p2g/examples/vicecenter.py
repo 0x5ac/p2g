@@ -1,10 +1,8 @@
 #! /usr/bin/env python
 
-import csearch
-import defs
-
+from . import csearch
+from . import defs
 import p2g
-
 from p2g.haas import *
 
 

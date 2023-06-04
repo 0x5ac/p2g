@@ -318,10 +318,11 @@ class WalkStatement(walkbase.WalkBase):
             self.ns[n.asname or n.name] = __import__(n.name)
 
     def _visit_importfrom(self, node):
+        breakpoint()
+        modname = node.module or node.names[0].name
         mod = __import__(
-            node.module, None, None, [n.name for n in node.names], node.level
+            modname, globals(), locals(), [n.name for n in node.names], node.level
         )
-
         for n in node.names:
             if n.name == "*":
                 for modname, modguts in mod.__dict__.items():

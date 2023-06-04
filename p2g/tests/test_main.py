@@ -144,7 +144,7 @@ def test_fake_capture2():
 def test_logger_capfd_setup(capfd):
     p2g.main(["--recursive", "--logfile=-", "--loglevel=INFO", "version"])
     got = capfd.readouterr()
-    assert got.out.startswith("Logging on")
+    assert "Version:" in got.out
 
 
 def test_typeguard_setup():

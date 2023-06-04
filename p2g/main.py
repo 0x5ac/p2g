@@ -128,7 +128,10 @@ def main(argv=None):
             opts["--org"],
         )
     elif opts["gen"]:
-        do_gen(opts)
+        retcode = do_gen(opts)
+        if not opts["--recursive"]:
+            return retcode
+
     elif opts["test"]:  # for debug
         debug.run_test(opts["<srcfile>"])
 
@@ -154,9 +157,10 @@ def do_gen(opts):
     try:
         res = walk.compile2g(func_name, src_path, job_name=job_name, in_pytest=False)
         lib.write_nl_lines(res, out_name)
-        sys.exit(0)
+        return 0
     except err.CompilerError as exn:
         exn.report_error(absolute_lines=True)
+        return 1
     except FileNotFoundError as exn:
-        print(exn)
-    sys.exit(1)
+        print(exn, file=sys.stderr)
+        return 1

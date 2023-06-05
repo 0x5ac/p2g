@@ -13,6 +13,42 @@ compilation can be used in the source, classes, dicts, and so on.
 It comes with a set of macro variable definitions for a Haas mill with
 NCD.  And a few example settings for my own VF-3SSYT.
 
+
+* Install:
+
+#+BEGIN_EXAMPLE
+$ pip install p2g
+#+END_EXAMPLE
+maybe:
+#+BEGIN_EXAMPLE
+$ p2g examples
+#+END_EXAMPLE
+or:
+#+BEGIN_EXAMPLE
+$ cat > tst.py <<EOF
+import p2g
+def t():
+  x = p2g.Var(9)
+  for y in range(10):
+    x += y
+EOF
+$ p2g gen tst.py
+#+END_EXAMPLE
+yields 
+#+BEGIN_EXAMPLE
+  O0001                           ( TST                           )
+  #100= 9.                        (   x = Var[9]                  )
+  #102= 0.                        (   for y in range[10]:         )
+L2000
+  IF [#102 GE 10.] GOTO 2002
+  #100= #100 + #102               ( x += y                        )
+  #102= #102 + 1.
+  GOTO 2000
+L2002
+  M30
+#+END_EXAMPLE
+
+
 * A taste.
 #+PROPERTY: header-args :exports both :results output  :python PYTHONPATH=../.. python -m p2g   gen  -
 #+NAME: demo1
@@ -706,7 +742,7 @@ Waiting for a replacement stylus *and* tool setter to arrive, I
 wondered if were possible to replace the hundreds of inscrutible lines
 of Hass WIPS Renishaw G-code with just a few lines of Python?
 
-Probably.
+Maybe.
 
 
 # (org-babel-execute-buffer)

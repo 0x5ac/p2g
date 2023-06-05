@@ -19,7 +19,48 @@ compilation can be used in the source, classes, dicts, and so on.
 It comes with a set of macro variable definitions for a Haas mill with
 NCD.  And a few example settings for my own VF-3SSYT.
 
-2 A taste.
+2 Install:
+----------
+
+::
+
+    $ pip install p2g
+
+maybe:
+
+::
+
+    $ p2g examples
+
+or:
+
+::
+
+    $ cat > tst.py <<EOF
+    import p2g
+    def t():
+      x = p2g.Var(9)
+      for y in range(10):
+        x += y
+    EOF
+    $ p2g gen tst.py
+
+yields 
+
+::
+
+      O0001                           ( TST                           )
+      #100= 9.                        (   x = Var[9]                  )
+      #102= 0.                        (   for y in range[10]:         )
+    L2000
+      IF [#102 GE 10.] GOTO 2002
+      #100= #100 + #102               ( x += y                        )
+      #102= #102 + 1.
+      GOTO 2000
+    L2002
+      M30
+
+3 A taste.
 ----------
 
 .. code:: python
@@ -90,7 +131,7 @@ NCD.  And a few example settings for my own VF-3SSYT.
     L1001                             (     message[ALARM.var, f"too far {sch.name}.", code=101])
       M30
 
-3 Coordinates
+4 Coordinates
 -------------
 
 Describe position, with axis by location, in sequence or by name.
@@ -149,7 +190,7 @@ Describe position, with axis by location, in sequence or by name.
       #105= 30.                       ( p4.c = asin [0.5]             )
       M30
 
-4 Variables
+5 Variables
 -----------
 
 - Give names to macro variables at a known address:
@@ -210,7 +251,7 @@ Example:
       #102= #102 + 333.
       M30
 
-5 Expressions
+6 Expressions
 -------------
 
 Python expressions turn into G-Code as you may expect, save that
@@ -281,7 +322,7 @@ folding is done in degrees.
       #105= [#113 + #114 + 3.] / COS[#115]
       M30
 
-6 Axes
+7 Axes
 ------
 
 Any number of axes are supported, default just being xy and z.
@@ -348,7 +389,7 @@ coordinates to turn up in work offset registers.
     #102= #5243 * 34.
     M30
 
-7 Printing
+8 Printing
 ----------
 
 Turns Python f string prints into G-code DPRNT.  Make sure
@@ -386,7 +427,7 @@ your machine considers to be illegal in a DPRNT string.
     L1002
       M30
 
-8 Notes.
+9 Notes.
 --------
 
 The entire thing is brittle; I've only used it to make code
@@ -512,8 +553,8 @@ for my own limited purposes.
     L1003
       M30
 
-9 HAAS macro var definitions
-----------------------------
+10 HAAS macro var definitions
+-----------------------------
 
 Names predefined in p2g.haas:
 
@@ -814,11 +855,11 @@ Names predefined in p2g.haas:
     | ``PROBE_TYPE``                |   ``200`` | ``#52601 … #52800`` |
     +-------------------------------+-----------+---------------------+
 
-10 Why:
+11 Why:
 -------
 
 Waiting for a replacement stylus **and** tool setter to arrive, I
 wondered if were possible to replace the hundreds of inscrutible lines
 of Hass WIPS Renishaw G-code with just a few lines of Python?
 
-Probably.
+Maybe.

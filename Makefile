@@ -1,4 +1,3 @@
-TITLE=@ echo 
 PR=poetry run
 COVERAGE=$(PR) coverage
 PYTEST=PYTHONPATH=. $(PR) pytest --cov=p2g --cov-append
@@ -12,9 +11,9 @@ P2G_SRC=$(wildcard p2g/*.py)
 
 ######################################################################
 # Build machinary
-
+.PHONY:
 download_poetry:
-	echo 		 "downloading poetry, ^C to stop"
+	echo "downloading poetry, ^C to stop"
 	sleep 3
 	curl -sSL https://install.python-poetry.org | python3 -
 
@@ -100,7 +99,7 @@ test-standard:
 test-fails:
 	$(V) echo FAIL  > $(GOLDEN)/error_xfail_force_fail.nc
 	$(V) echo XFAIL > $(GOLDEN)/meta_simple_xfail1.nc
-	$(TITLE) Test things which should fail
+	echo Test things which should fail
 	$(PYTEST) p2g/tests/test_error.py -m forcefail  > err 2>&1 || (exit 0)
  
 
@@ -131,33 +130,25 @@ newtests:
 ######################################################################
 # linty stuff
 isort:
-	$(TITLE) isort
 	$(V)	isort .
 ssort:
-	$(TITLE) ssort
 	$(V)	echo p2g/*.py | xargs $(PR) ssort
 
 autoflake:
-	$(TITLE) Autoflake
 	$(V) $(PR) autoflake --ignore-init-module-imports  --remove-all-unused-imports  -i -v $(P2G_SRC)
 
 mypy:
-	$(TITLE) mypy
 	$(V) - $(PR) mypy p2g
 
 flake8:
-	$(TITLE) flake8
 	$(V) - $(PR) flake8p p2g | cat
 
 pylint:
-	$(TITLE) pylint
 	$(V) - $(PR) pylint p2g
 
 ruff:
-	$(TITLE) ruff
 	$(V) - NO_COLOR=1 $(PR) ruff check  p2g
 sf:
-	$(TITLE) sf
 	$(V) - python 	/home/sac/w/nih/snakefood/main.py . p2g
 
 
@@ -180,6 +171,8 @@ gold:
 # for the ones which must fail
 	echo fail > p2g/tests/golden/meta_simple_xfail.nc
 	echo fail > p2g/tests/golden/error_force_fail.nc
+
+
 
 
 

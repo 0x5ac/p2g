@@ -66,7 +66,7 @@ def do_examples():
     example_dir = here_dir / "examples"
     examples = example_dir.glob("*.py")
     for src in examples:
-        if "#" in src:
+        if "#" in str(src):
             continue
         print(f"Copying {src}.")
         shutil.copy(src, ".")

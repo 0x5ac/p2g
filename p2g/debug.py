@@ -15,9 +15,11 @@ from p2g import walk
 
 
 # trivial pytest faker
-sys.path.insert(0, ".")
-sys.path.insert(0, "./tests")
-sys.path.insert(0, "..")
+# sys.path.insert(0, ".")
+# $sys.path.insert(0, "./tests")
+# sys.path.insert(0, "..")
+sys.path.insert(0, "p2g/examples")
+sys.path.insert(0, "p2g/tests")
 
 
 def ignore_test(key):

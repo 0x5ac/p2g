@@ -2,10 +2,10 @@ import sys
 
 # isort: skip_file
 # sys.path.insert(0, "./examples")
-# sys.path.insert(0, "..")
+# ys.path.insert(0, "..")
 # sys.path.insert(0, ".")
 # sys.path.insert(0, "../..")
-# sys.path.insert(0, "./p2g/examples")
+sys.path.insert(0, "./p2g/examples")
 # import examples
 # import examples.probecalibrate
 # import examples.vicecenter

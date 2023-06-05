@@ -66,7 +66,8 @@ def do_examples():
     example_dir = here_dir / "examples"
     examples = example_dir.glob("*.py")
     for src in examples:
-        if "#" in str(src):
+        # if I've left crap in directory.
+        if "#" in str(src):  # no cover
             continue
         print(f"Copying {src}.")
         shutil.copy(src, ".")

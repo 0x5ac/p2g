@@ -19,11 +19,11 @@ NCD.  And a few example settings for my own VF-3SSYT.
 #+BEGIN_EXAMPLE
 $ pip install p2g
 #+END_EXAMPLE
-maybe:
+for big show:
 #+BEGIN_EXAMPLE
 $ p2g examples
 #+END_EXAMPLE
-or:
+something smaller:
 #+BEGIN_EXAMPLE
 $ cat > tst.py <<EOF
 import p2g

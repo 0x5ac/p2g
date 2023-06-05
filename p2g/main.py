@@ -39,8 +39,8 @@ Try:
 
    p2g examples
         Copies the examples into the current directory and then runs
-        p2g  vicecenter.py
-        p2g  checkprobe.py
+        p2g  gen vicecenter.py
+        p2g  gen checkprobe.py
 
    p2g stdvars
        Regenerate machine specific definitions.
@@ -66,6 +66,8 @@ def do_examples():
     example_dir = here_dir / "examples"
     examples = example_dir.glob("*.py")
     for src in examples:
+        if "#" in str(src):
+            continue
         print(f"Copying {src}.")
         shutil.copy(src, ".")
     for job in ["vicecenter", "probecalibrate"]:

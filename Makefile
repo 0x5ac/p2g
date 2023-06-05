@@ -5,7 +5,7 @@ GOLDEN=p2g/tests/golden
 OXRST=~/.emacs.d/straight/build/ox-rst/ox-rst.el
 ######################################################################
 
-top: .poetry_and_deps_installed requirements.txt examples 
+top: .poetry_and_deps_installed requirements.txt examples  wip
 
 P2G_SRC=$(wildcard p2g/*.py)
 
@@ -165,15 +165,17 @@ checkdeps:
 
 
 
-# copy test results to goldens
-gold:
-	find tests -name "*.new"  | sed "s/\([^.]*\).new/mv \1.new \1.nc/g" | bash
-# for the ones which must fail
-	echo fail > p2g/tests/golden/meta_simple_xfail.nc
-	echo fail > p2g/tests/golden/error_force_fail.nc
+
+# Build my wips
+DSTDIR=/home/sac/vf3/_nc_
+SRCDIR=/home/sac/vf3/progs/p2g/p2g/examples
+
+wip:   $(DSTDIR)/.mark-probecalibrate
 
 
-
-
+VPATH=$(SRCDIR):$(DSTDIR)
+$(DSTDIR)/.mark-%: %.py
+	poetry run p2g --debug --out="$(DSTDIR)/<time>-$*.nc"  gen $<
+#	touch $@
 
 

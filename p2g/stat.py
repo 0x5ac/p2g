@@ -55,7 +55,7 @@ def clean_comment_chars(txt: str):
 
 def compress_and_clean(line: str):
     guts = clean_comment_chars(line)
-    for too_talky in ["p2g.", "goto", "var."]:
+    for too_talky in ["p2g.", "var."]:
         guts = guts.replace(too_talky, "")
 
     if guts.startswith("    "):
@@ -170,8 +170,10 @@ class CommentLines(StatBase):
         lines = lib.pad_to_same_width(lines)
 
         for line in lines:
-            if line:
+            if line.strip():
                 yield "( " + clean_comment_chars(line) + " )"
+            else:
+                yield ""
 
 
 def add_stat(stat):
@@ -180,11 +182,12 @@ def add_stat(stat):
 
 
 def comment(*lines):
+    add_stat(CommentLines(" "))
     add_stat(CommentLines(lines))
 
 
 def com(*lines):
-    comment(*lines)
+    add_stat(CommentLines(lines))
 
 
 @dataclasses.dataclass

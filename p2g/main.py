@@ -3,6 +3,7 @@ import pathlib
 import shutil
 import sys
 
+import datetime
 import docopt
 
 from loguru import logger
@@ -51,13 +52,20 @@ Options:
     -v --verbose             Make verbose
     --relative-paths         Errors contain paths relative to current directory.
     --relative-lines         Errors contain linenumbers relative to start of function.
-    --job=<name>             Job name, [default: O0001]
+    --job=<pattern>             Job name, [default: O0001]
     --function=<name>        Function to compile, [default: <last function in file>]
     --debug                  Enter debugging code. [default: False]
     --recursive              Notify when called by self. [default: False]
     --logfile=<logfile>      Turn on logger.and send to <logfile> [default: <stdout>]
     --loglevel=<loglevel>    Set logger.level [default: ERROR]
     --break                  Breakpoint on error.
+
+    output pattern may include <time> which will create a decrementing 
+    prefix for the output file which makes looking for the .nc in a 
+    crowded directory simpler.
+
+    eg  --out="~/_nc_/<time>O001-foo.nc" foo.py
+    makes an output of the form ~/_nc_/001234O001-foo.nc
 """
 
 
@@ -93,7 +101,22 @@ def setup_logger(opt):
         level=loglevel,
         format="{message}",
     )
-    logger.info("Logging on {opt['--loglevel']} {logfile}")
+    logger.info(f"Logging on {opt['--loglevel']} {logfile}")
+
+
+def output_file_name(opts):
+    now = datetime.datetime.now()
+    prev_midnight = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    next_midnight = 24 * 60
+    mins_togo = next_midnight - (now - prev_midnight).seconds // 60
+
+    out_name = "-"
+
+    if opts["--out"] != "<stdout>":
+        out_name = opts["--out"]
+
+    out_name = out_name.replace("<time>", f"{mins_togo:05d}")
+    return out_name
 
 
 def do_gen(opts):
@@ -103,20 +126,20 @@ def do_gen(opts):
     src_path = pathlib.Path(src_name)
     job_name = src_path.stem
 
-    out_name = "-"
-
     if opts["--job"] != "<srcfilename>":
         job_name = opts["--job"]
 
-    if opts["--function"] != "<srcfilename>":
-        func_name = opts["--function"]
+    func_name = opts["--function"]
 
-    if opts["--out"] != "<stdout>":
-        out_name = opts["--out"]
+    output_name = opts["--out"]
 
+    logger.info(f"src: {src_path}")
+    logger.info(f"fnc: {func_name}")
+    logger.info(f"job: {job_name}")
+    logger.info(f"output: {output_name}")
     try:
         res = walk.compile2g(func_name, src_path, job_name=job_name, in_pytest=False)
-        lib.write_nl_lines(res, out_name)
+        lib.write_nl_lines(res, output_name)
         return 0
     except err.CompilerError as exn:
         exn.report_error(absolute_lines=True)
@@ -127,14 +150,15 @@ def do_gen(opts):
 
 
 def main(argv=None):
+
     opts = docopt.docopt(DOC, argv)
 
     gbl.config.debug = opts["--debug"]
 
     setup_logger(opts)
     logger.info(argv)
-    if opts["--out"] == "<stdout>":
-        opts["--out"] = "-"
+
+    opts["--out"] = output_file_name(opts)
     if opts["--break"]:  # no cover
         gbl.config.bp_on_error = True
 

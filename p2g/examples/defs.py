@@ -44,9 +44,9 @@ class JobDefs(Symbols):
             self.MACHINE_ABS_ABOVE_SEARCH_ROTARY_LHS_5X8 + m1
         )
 
-        self.FAST_FEED = 650.0
+        self.FAST_FEED = 65.0
         self.SLOW_PROBE_FEED = 10.0
-        self.FAST_PROBE_FEED = 100.0
+        self.FAST_PROBE_FEED = 10.0
 
         probe = goto.probe.mcode(MUST_SKIP).work
         self.slow_probe = probe.feed(self.SLOW_PROBE_FEED)
@@ -66,10 +66,14 @@ class JobDefs(Symbols):
         code(NO_LOOKAHEAD)
 
     def message(self, txt: str, code: int = 101):
+        comment("X")
         message(MESSAGE[0], txt, code=code)
+        comment("X")
 
     def alarm(self, txt: str, code: int = 101):
+        comment("X")
         message(ALARM[0], txt, code=code)
+        comment("X")
 
     def ots_on(self):
         code(OTS_ON)

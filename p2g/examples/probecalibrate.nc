@@ -5,34 +5,46 @@
 ( MACHINE_ABS_ABOVE_OTS       : -1.16,-7.5,-8.    )
 ( MACHINE_ABS_ABOVE_RING      : -16.46,-3.5,-22.7 )
 ( MACHINE_ABS_CLOSE_ABOVE_OTS : -1.16,-7.5,-7.6   )
-( goto                        :   work xyz  650.0 )
+( goto                        :   work xyz  65.0  )
   T02 M06                         ( st.load_tool[defs.Tool.KNOWN_LENGTH])
   M59 P2                          ( st.ots_on[]                   )
   G04 P1.0
   M59 P3
-  G01 G90 F650. z0.               ( st.goto[z=0]                  )
+  G01 G90 G53 F65. z0.            ( st.goto.machine[z=0]          )
+
+( X )
   #3006= 101.                     ( touch OTS, must beep          )
-  G01 G90 G53 F650. x-1.16 y-7.5  ( st.goto.machine.xy_then_z[st.MACHINE_ABS_ABOVE_OTS])
-  G01 G90 G53 F650. z-8.
+
+( X )
+  G01 G90 G53 F65. x-1.16 y-7.5   ( st.goto.machine.xy_then_z[st.MACHINE_ABS_ABOVE_OTS])
+  G01 G90 G53 F65. z-8.
+
+( X )
   #3006= 101.                     ( Make sure tool position looks safe.)
-  G01 G90 G53 F650. z-7.6         ( st.goto.machine[z=st.MACHINE_ABS_CLOSE_ABOVE_OTS.z])
+
+( X )
+  G01 G90 G53 F65. z-7.6          ( st.goto.machine[z=st.MACHINE_ABS_CLOSE_ABOVE_OTS.z])
   G65 P9023 A20. K5. S0.5 D-2.    ( st.ots_calibrate[]            )
 
 ( Calibrate spindle probe. )
   T01 M06                         ( st.load_tool[defs.Tool.PROBE] )
   P9832                           ( st.spindle_probe_on[]         )
+
+( X )
   #3006= 101.                     ( touch probe, must beep        )
 
+( X )
+
 ( test spindle probe with OTS. )
-  G01 G90 G53 F650. z0.           ( st.goto.machine[z=0]          )
-  G01 G90 G53 F650. x-1.16 y-7.5  ( st.goto.machine.xy_then_z[st.MACHINE_ABS_ABOVE_OTS])
-  G01 G90 G53 F650. z-8.
+  G01 G90 G53 F65. z0.            ( st.goto.machine[z=0]          )
+  G01 G90 G53 F65. x-1.16 y-7.5   ( st.goto.machine.xy_then_z[st.MACHINE_ABS_ABOVE_OTS])
+  G01 G90 G53 F65. z-8.
   G65 P9023 A21. T1.              ( st.spindle_probe_find_height[])
 
 ( test spindle probe with ring. )
-  G01 G90 G53 F650. z0.           ( st.goto.machine[z=0]          )
-  G01 G90 G53 F650. x-16.46 y-3.5 ( st.goto.machine.xy_then_z[st.MACHINE_ABS_ABOVE_RING])
-  G01 G90 G53 F650. z-22.7
+  G01 G90 G53 F65. z0.            ( st.goto.machine[z=0]          )
+  G01 G90 G53 F65. x-16.46 y-3.5  ( st.goto.machine.xy_then_z[st.MACHINE_ABS_ABOVE_RING])
+  G01 G90 G53 F65. z-22.7
   G65 P9023 A10.0 D0.7            ( st.spindle_probe_find_radius[])
-  G01 G90 G53 F650. z0.           ( st.goto.machine[z=0]          )
+  G01 G90 G53 F65. z0.            ( st.goto.machine[z=0]          )
   M30

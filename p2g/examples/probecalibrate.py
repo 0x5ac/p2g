@@ -16,7 +16,7 @@ def probecalibrate():
     st.insert_symbol_table()
     st.load_tool(defs.Tool.KNOWN_LENGTH)
     st.ots_on()
-    st.goto(z=0)
+    st.goto.machine(z=0)
     st.message("touch OTS, must beep")
     st.goto.machine.xy_then_z(st.MACHINE_ABS_ABOVE_OTS)
 

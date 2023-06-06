@@ -15,6 +15,7 @@ from p2g import lib
 from p2g import op
 from p2g import scalar
 from p2g import stat
+from p2g import symbol
 from p2g import vector
 from p2g import walkbase
 from p2g import walkexpr
@@ -406,6 +407,7 @@ def compile2g(func_name_arg, srcfile_name, job_name, in_pytest):
         with stat.Nest(in_pytest) as cursor:
             axis.NAMES = "xyz"
             gbl.iface.reset()
+            symbol.Symbols.reset()
 
             logger.debug(f"Starting {func_name_arg} {cursor.next_label}")
             sourcelines = inf.read()
@@ -420,8 +422,12 @@ def compile2g(func_name_arg, srcfile_name, job_name, in_pytest):
                     srcpath,
                     job_name,
                 )
-            res = cursor.to_full_lines()
-            return res
+            # can't use generator 'cause need
+            # mods to varrefs for symbol table
+            res = list(cursor.to_full_lines())
+
+            yield from symbol.table()
+            yield from res
 
 
 class WantInline:

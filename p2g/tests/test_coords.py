@@ -4,6 +4,10 @@ import p2g
 x = p2g.Fixed[10](addr=100)
 
 
+class S:
+    pass
+
+
 @p2g.must_be(
     "Var can't have an address.",
     "p2g/tests/test_coords.py:8:25:27:     v = p2g.Var[10](addr=20)",
@@ -111,7 +115,7 @@ def test_kwargs():
     "  #101= 3.                    ",
 )
 def test_list_init0():
-    st = p2g.Symbols()
+    st = S()
     st.p = p2g.Fixed([1, 2, 3, 4], addr=100)
     st.p[1] = 3
 
@@ -188,7 +192,7 @@ def test_non_kwargs():
     "",
 )
 def test_symtab1():
-    st = p2g.Symbols()
+    st = S()
     st.p = p2g.Fixed[90](addr=100)
     st.q = p2g.Fixed[3](addr=200)
     p = st.p

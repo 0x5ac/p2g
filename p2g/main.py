@@ -48,6 +48,7 @@ Try:
 
 Options:
     -o <file> --out=<file>   Output file, [default: <stdout>]
+    --outdir <dir>           Output directory, [default: .]
     -h --help                This.
     -v --verbose             Make verbose
     --relative-paths         Errors contain paths relative to current directory.
@@ -66,23 +67,38 @@ Options:
 
     eg  --out="~/_nc_/<time>O001-foo.nc" foo.py
     makes an output of the form ~/_nc_/001234O001-foo.nc
+
+    Output directory is used as a prefix for out, as well as output
+    for examples.
 """
 
 
-def do_examples():
+def do_examples(opts):
     here_dir = pathlib.Path(__file__).parent
     example_dir = here_dir / "examples"
-    examples = example_dir.glob("*.py")
+    examples = example_dir.glob("[a-z]*.py")
+
+    outdir = opts["--outdir"]
+    outdir.mkdir(exist_ok=True, parents=True)
+
+    srcnames = []
     for src in examples:
-        # if I've left crap in directory.
-        if "#" in str(src):  # no cover
-            continue
-        print(f"Copying {src}.")
-        shutil.copy(src, ".")
+        dst_name = outdir / src.parts[-1]
+        print(f"Copying {src} {dst_name}")
+        shutil.copy(src, dst_name)
+        srcnames.append(dst_name)
     for job in ["vicecenter", "probecalibrate"]:
-        print(f"Running p2g {job}.py")
-        print(f"  - result in {job}.nc")
-        main(["gen", job + ".py"])
+        top_name = outdir / (job + ".py")
+        out_name = outdir / (job + ".nc")
+        sysargs = [
+            "--out",
+            str(out_name),
+            "gen",
+            str(top_name),
+        ]
+
+        print(f"Running {' '.join(sysargs)}")
+        main(sysargs)
 
 
 def setup_logger(opt):
@@ -113,9 +129,9 @@ def output_file_name(opts):
     out_name = "-"
 
     if opts["--out"] != "<stdout>":
-        out_name = opts["--out"]
+        out_name = opts["--outdir"] / pathlib.Path(opts["--out"])
 
-    out_name = out_name.replace("<time>", f"{mins_togo:05d}")
+    out_name = str(out_name).replace("<time>", f"{mins_togo:05d}")
     return out_name
 
 
@@ -150,11 +166,10 @@ def do_gen(opts):
 
 
 def main(argv=None):
-
     opts = docopt.docopt(DOC, argv)
 
     gbl.config.debug = opts["--debug"]
-
+    opts["--outdir"] = pathlib.Path(opts["--outdir"])
     setup_logger(opts)
     logger.info(argv)
 
@@ -176,7 +191,7 @@ def main(argv=None):
         gbl.config.recursive = True
 
     if opts["examples"]:
-        do_examples()
+        do_examples(opts)
     elif opts["stdvars"]:
         makestdvars.makestdvars(
             opts["--txt"],

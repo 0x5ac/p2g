@@ -22,6 +22,7 @@ def add_some_symbols():
 
 
 @p2g.must_be(
+    "( txyz :  )",
     "(     addr=20,                  )",
     "  #20= 150.",
     "( sa = Fixed[[1, 2, 3.14, 4, 5, 6], addr=40])",
@@ -220,6 +221,7 @@ def test_simple_arrays():
 
 
 @p2g.must_be(
+    "( txyz :  )",
     "( for j in range[7, 10]:        )",
     "  #102= 7.",
     "L1000",

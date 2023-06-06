@@ -6,10 +6,13 @@ from p2g import vector
 
 
 class Symbols:
+    table = None
+
     def __init__(self):
         object.__setattr__(self, "guts", {})
         object.__setattr__(self, "revguts", {})
         object.__setattr__(self, "read", set())
+        Symbols.table = self
 
     # after init run, clear out all use counts to
     # reset incorrect uswage info made by aliasing refs.
@@ -23,7 +26,6 @@ class Symbols:
 
         # go through table of all known macro names,
         # find out if used, and print nicely.
-
         for key, value in self.guts.items():
             if not show_all_names and key not in self.read:
                 continue
@@ -60,3 +62,16 @@ class Symbols:
         # keep the most original version of an alias.
         if newv not in self.revguts:
             self.revguts[newv] = key
+
+    @classmethod
+    def reset(cls):
+        cls.table = None
+
+
+def table():
+    if Symbols.table:
+        return Symbols.table.table_of_macro_vars(
+            gbl.iface.varrefs,
+            False,
+        )
+    return []

@@ -103,8 +103,8 @@ def test_function2_capfd_tmpdir(capfd, tmpdir):
     assert "No such function" in tfun.err
 
 
-def test_cli_examples():
-    p2g.main("examples")
+def test_cli_examples(tmpdir):
+    p2g.main(["--outdir", tmpdir, "examples"])
 
 
 def test_capfd_tmpdir_stdout(capfd, tmpdir):

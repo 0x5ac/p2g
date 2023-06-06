@@ -22,12 +22,13 @@ class Tool(enum.IntEnum):
 class JobDefs(Symbols):
     def __init__(self):
         super().__init__()
-        self.MACHINE_ABS_ABOVE_OTS = Const(x=-1.16, y=-7.5, z=-8.0)
+        self.MACHINE_ABS_ABOVE_OTS = Const(x=-1.16, y=-7.5, z=-7.5)
+        self.MACHINE_ABS_CLOSE_ABOVE_OTS = Const(x=-1.16, y=-7.5, z=-7.8)
         self.MACHINE_ABS_ABOVE_RING = Const(x=-16.46, y=-3.5, z=-22.7)
         self.MACHINE_ABS_ABOVE_ROTARY = Const(x=-12.5214, y=-12.9896, z=-7.0)
         self.MACHINE_ABS_ABOVE_SEARCH_ROTARY_LHS_5X8 = Const(x=-15.5, y=-17.50, z=-14.0)
         self.MACHINE_ABS_ABOVE_VICE = Const(x=-28.0, y=-10.0, z=-16.00)
-        self.MACHINE_ABS_CLOSE_ABOVE_OTS = Const(x=-1.16, y=-7.5, z=-7.6)
+
         self.MACHINE_ABS_CLOSE_ABOVE_TOOL_TOUCH = Const(
             x=-1.16,
             y=-7.5,

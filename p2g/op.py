@@ -130,7 +130,7 @@ class Unop(scalar.Scalar):
         res = []
 
         if self.opfo.pyn == "#":
-            gbl.iface.add_varref(self.child)
+            gbl.iface.add_varref(self.child, err.state.last_pos)
 
         outer_prec = self.opfo.prec
 

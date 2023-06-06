@@ -75,7 +75,6 @@ class StatBase(abc.ABC):
     def to_line_lhs(self) -> list[str]:
         raise AssertionError
 
-    @lib.g2l
     def to_full_lines(self, blockstate):
         comtxt = self._comtxt
         if not comtxt:
@@ -144,7 +143,7 @@ class Nest:
     def add_stat(cls, stat):
         Nest.cur.slist.append(stat)
 
-    @lib.g2l
+    #    @lib.g2l
     def to_full_lines(self):
         class BS:
             prev_comtxt = ""

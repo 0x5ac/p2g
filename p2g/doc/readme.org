@@ -441,11 +441,87 @@ L1002
 #+end_example
 
 
+
+
+
+* Symbol Tables.
+
+Names created in the ~p2g.Symbol~class are also used to make a
+symbol table. 
+
+#+NAME: stest
+#+BEGIN_SRC python
+    import p2g
+
+    # define st as an instance of p2g.Symbols
+    st = p2g.Symbols()
+    x1 = -7
+
+    # fill with data.
+    st.MACHINE_ABS_ABOVE_OTS = p2g.Const(x=x1, y=8, z=9)
+    st.MACHINE_ABS_ABOVE_SEARCH_ROTARY_LHS_5X8 = p2g.Const(100, 101, 102)
+    st.MACHINE_ABS_ABOVE_VICE = p2g.Const(x=17, y=18, z=19)
+    st.RAW_ANALOG = p2g.Fixed[10](addr=1080)
+    st.fish = 10
+    st.not_used = 12
+
+    def stest():
+        p2g.comment("Only used symbols are in output table.")
+        p2g.Var(st.MACHINE_ABS_ABOVE_OTS)
+        p2g.Var(st.MACHINE_ABS_ABOVE_VICE * st.fish)
+        v1 = p2g.Var()
+        v1 += st.RAW_ANALOG[7]
+#+END_SRC  
+
+#+RESULTS: stest
+#+begin_example
+( MACHINE_ABS_ABOVE_OTS  : -7.,8.,9.   )
+( MACHINE_ABS_ABOVE_VICE : 17.,18.,19. )
+( RAW_ANALOG             : #1080[10]   )
+( fish                   : 10          )
+  O0001                           ( -                             )
+
+( Only used symbols are in output table. )
+  #100= -7.                       ( Var [st.MACHINE_ABS_ABOVE_OTS])
+  #101= 8.
+  #102= 9.
+  #103= 170.                      ( Var [st.MACHINE_ABS_ABOVE_VICE * st.fish])
+  #104= 180.
+  #105= 190.
+  #106= #106 + #1087              ( v1 += st.RAW_ANALOG[7]        )
+  M30
+#+end_example
+
+
+* Notes.
+Nice things:
+#+BEGIN_SRC python
+
+  from p2g import *
+  from p2g.haas import *
+
+  class X():
+           def __init__(self, a,b):
+                 self.a = a
+                 self.b = b
+           def adjust(self, tof):
+                 self.a += tof.x
+                 self.b += tof.y
+
+  def cool():
+        com ("You can do surprising things.")
+        p = X(12,34)
+
+        p.adjust(TOOL_OFFSET)
+        tmp = Var(p.a, p.b)
+#+END_SRC
+
 * Notes.
 
 The entire thing is brittle; I've only used it to make code
 for my own limited purposes. 
 
+Nice things:
 #+BEGIN_SRC python
 
   from p2g import *

@@ -64,15 +64,15 @@ class JobDefs(Table):
         code(PROBE_ON)
         code(NO_LOOKAHEAD)
 
-    def message(self, txt: str, code: int = 101):
-        comment("X")
-        message(MESSAGE[0], txt, code=code)
-        comment("X")
+    def pause(self, txt: str):
+        comment()
+        message(MESSAGE, txt)
+        comment()
 
-    def alarm(self, txt: str, code: int = 101):
-        comment("X")
-        message(ALARM[0], txt, code=code)
-        comment("X")
+    def alarm(self, txt: str):
+        comment()
+        message(ALARM, txt)
+        comment()
 
     def ots_on(self):
         code(OTS_ON)

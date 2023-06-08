@@ -76,14 +76,17 @@ class StatBase(abc.ABC):
         raise AssertionError
 
     def to_full_lines(self, blockstate):
+        breakpoint()
         comtxt = self._comtxt
-        if not comtxt:
+        # no comment, make one from source.
+        if comtxt is None:
             comtxt = err.src_code_from_node_place(self.pos)
-        comtxt = compress_and_clean(comtxt)
-        if comtxt == blockstate.prev_comtxt:
-            comtxt = ""
-        else:
-            blockstate.prev_comtxt = comtxt
+        if comtxt != "":
+            comtxt = compress_and_clean(comtxt)
+            if comtxt == blockstate.prev_comtxt:
+                comtxt = ""
+
+        blockstate.prev_comtxt = comtxt
 
         for code_txt, com_txt in itertools.zip_longest(
             self.to_line_lhs(),
@@ -246,7 +249,7 @@ class Set(StatBase):
     lhs: nd.EBase
     rhs: nd.EBase
 
-    def __init__(self, lhs: nd.EBase, rhs: nd.EBase, comtxt: str = ""):
+    def __init__(self, lhs: nd.EBase, rhs: nd.EBase, comtxt=None):
         super().__init__(comtxt)
         assert isinstance(lhs, nd.EBase)
         self.lhs = lhs
@@ -259,12 +262,12 @@ class Set(StatBase):
         yield f"{NORMAL_PREFIX}{lhs}= {rhs}"
 
 
-def append_set(dst, src, comtxt=""):
+def append_set(dst, src, comtxt=None):
     if not lib.same(dst, src):
         add_stat(Set(dst, src, comtxt))
 
 
-def code(txt, comtxt: str = ""):
+def code(txt, comtxt=None):
     if isinstance(txt, str):
         add_stat(Code(txt, comtxt))
         return

@@ -11,17 +11,11 @@
   M59 P3
   G01 G90 G53 F65. z0.            ( st.goto.machine[z=0]          )
 
-( X )
   #3006= 101.                     ( touch OTS, must beep          )
-
-( X )
   G01 G90 G53 F65. x-1.16 y-7.5   ( st.goto.machine.xy_then_z[st.MACHINE_ABS_ABOVE_OTS])
   G01 G90 G53 F65. z-7.5
 
-( X )
   #3006= 101.                     ( Make sure tool position looks safe.)
-
-( X )
   G01 G90 G53 F65. z-7.8          ( st.goto.machine[z=st.MACHINE_ABS_CLOSE_ABOVE_OTS.z])
   G65 P9023 A20. K5. S0.5 D-2.    ( st.ots_calibrate[]            )
 
@@ -29,10 +23,7 @@
   T01 M06                         ( st.load_tool[defs.Tool.PROBE] )
   P9832                           ( st.spindle_probe_on[]         )
 
-( X )
   #3006= 101.                     ( touch probe, must beep        )
-
-( X )
 
 ( test spindle probe with OTS. )
   G01 G90 G53 F65. z0.            ( st.goto.machine[z=0]          )

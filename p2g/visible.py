@@ -17,8 +17,9 @@ def base_addr(new_base=None):
     return gbl.iface.ebss
 
 
-def message(var, txt: str, *, code: int):
-    stat.append_set(var, scalar.wrap_scalar(code), txt)
+def message(dst, txt: str):
+    breakpoint()
+    stat.code(f"{dst[0]} = 101 ( {txt} )", "")
 
 
 def as_address(src):

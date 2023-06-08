@@ -1,3 +1,72 @@
+( tlc                    :  #100.x  #101.y         )
+( brc                    :  #102.x  #103.y         )
+( cursor                 :  #104.x  #105.y         )
+( its                    :  #106.x                 )
+( its                    :  #106.x                 )
+( its                    :  #106.x                 )
+( its                    :  #106.x                 )
+( error                  :  #106.x  #107.y         )
+( PROBE_R                :  #556.x  #557.y         )
+( MACHINE_POS            : #5021.x #5022.y #5023.z )
+( SKIP_POS               : #5061.x #5062.y #5063.z )
+( WCS                    : #5241.x #5242.y #5243.z )
+( MACHINE_ABS_ABOVE_VICE : -28.,-10.,-16.          )
+( above                  : -28.,-13.,-16.          )
+( backoff                : 0.1,0.1,0.1             )
+( delta                  : 0.,-0.4                 )
+( search_depth           : -0.1                    )
+( amax                   : 14.,8.,3.               )
+( delta                  : 0.75,0.                 )
+( indent                 : 1.4,0.8,0.3             )
+( skim_distance          : 0.3                     )
+( amin                   : 7.,4.,-5.               )
+( delta                  : 0.75,0.4                )
+( delta                  : -0.75,0.                )
+( delta                  : 0.,0.4                  )
+( iota                   : 0.025,0.025,0.025       )
+( start_search           : -3.5,0.                 )
+( start_search           : 0.,-2.                  )
+( start_search           : 0.,2.                   )
+( start_search           : 3.5,0.                  )
+( stop_search            : -7.,0.                  )
+( stop_search            : 0.,-4.                  )
+( stop_search            : 0.,4.                   )
+( stop_search            : 7.,0.                   )
+( xy                     : 7.,4.                   )
+( xy                     : 14.,8.                  )
+( xy                     : #104,#105               )
+( xy                     : #104,#105               )
+( xy                     : #104,#105               )
+( xy                     : 0.1,0.1                 )
+( xy                     : #104,#105               )
+( xy                     : 1.4,0.8                 )
+( xy                     : 7.,4.                   )
+( xy                     : 14.,8.                  )
+( xy                     : #104,#105               )
+( xy                     : #104,#105               )
+( xy                     : #104,#105               )
+( xy                     : 0.1,0.1                 )
+( xy                     : #104,#105               )
+( xy                     : 1.4,0.8                 )
+( xy                     : 7.,4.                   )
+( xy                     : 14.,8.                  )
+( xy                     : #104,#105               )
+( xy                     : #104,#105               )
+( xy                     : #104,#105               )
+( xy                     : 0.1,0.1                 )
+( xy                     : #104,#105               )
+( xy                     : 1.4,0.8                 )
+( xy                     : 7.,4.                   )
+( xy                     : 14.,8.                  )
+( xy                     : #104,#105               )
+( xy                     : #104,#105               )
+( xy                     : #104,#105               )
+( xy                     : 0.1,0.1                 )
+( xy                     : #104,#105               )
+( xy                     : 1.4,0.8                 )
+( xy                     : #5241,#5242             )
+( xy                     : #106,#107               )
+( xyz                    : #5021,#5022,#5023       )
   O0001                           ( VICECENTER                    )
 
 ( Find center of plate in vice, )
@@ -31,10 +100,7 @@
   G01 G90 G31 M79 F10. z-5.       ( st.fast_probe[z=sch.amin.z]   )
   #5243= #5023                    ( st.WCS.z = MACHINE_POS.z      )
 
-( X )
   #3006= 101.                     ( check g55                     )
-
-( X )
 
 ( now work.z should be 0 at surface )
 ( and work.xy roughly middle        )
@@ -56,10 +122,7 @@ L2000                             ( while its > 0:                )
   GOTO 2000
 L2002
 
-( X )
   #3000= 101.                     ( search for left failed        )
-
-( X )
 L2001                             (     st.alarm[f"search for {di.name} failed"])
 
 ( back off a bit to the left, then slowly probe  )
@@ -90,10 +153,7 @@ L2003                             ( while its > 0:                )
   GOTO 2003
 L2005
 
-( X )
   #3000= 101.                     ( search for near failed        )
-
-( X )
 L2004                             (     st.alarm[f"search for {di.name} failed"])
 
 ( back off a bit to the near, then slowly probe  )
@@ -124,10 +184,7 @@ L2006                             ( while its > 0:                )
   GOTO 2006
 L2008
 
-( X )
   #3000= 101.                     ( search for far failed         )
-
-( X )
 L2007                             (     st.alarm[f"search for {di.name} failed"])
 
 ( back off a bit to the far, then slowly probe  )
@@ -159,10 +216,7 @@ L2009                             ( while its > 0:                )
   GOTO 2009
 L2011
 
-( X )
   #3000= 101.                     ( search for right failed       )
-
-( X )
 L2010                             (     st.alarm[f"search for {di.name} failed"])
 
 ( back off a bit to the right, then slowly probe  )
@@ -193,8 +247,5 @@ L2010                             (     st.alarm[f"search for {di.name} failed"]
   #5243= #5063                    ( st.WCS.z = SKIP_POS.z         )
   G01 G90 G53 F65. z-16.          ( st.goto.machine[z=sch.above.z])
 
-( X )
   #3000= 103.                     (  what changed                 )
-
-( X )
   M30                             ( st.alarm[" what changed", 103])

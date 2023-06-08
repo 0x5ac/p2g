@@ -19,10 +19,10 @@ def probecalibrate():
     st.load_tool(defs.Tool.KNOWN_LENGTH)
     st.ots_on()
     st.goto.machine(z=0)
-    st.message("touch OTS, must beep")
+    st.pause("touch OTS, must beep")
     st.goto.machine.xy_then_z(st.MACHINE_ABS_ABOVE_OTS)
 
-    st.message("Make sure tool position looks safe.")
+    st.pause("Make sure tool position looks safe.")
     st.goto.machine(z=st.MACHINE_ABS_CLOSE_ABOVE_OTS.z)
     st.ots_calibrate()
 
@@ -31,7 +31,7 @@ def probecalibrate():
     st.load_tool(defs.Tool.PROBE)
     st.spindle_probe_on()
 
-    st.message("touch probe, must beep")
+    st.pause("touch probe, must beep")
 
     comment("test spindle probe with OTS.")
     st.goto.machine(z=0)

@@ -13,8 +13,8 @@ class Table:
     print = False
 
     # store in this way to keep multiple definitions.
-    name_to_thing = collections.defaultdict(set)
-    addrs_used = set()
+    name_to_thing: typing.Dict[str, typing.Set] = collections.defaultdict(set)
+    addrs_used: typing.Set[int] = set()
     # Called for every store to a name, so remember when a vector is
     # given an association.
 

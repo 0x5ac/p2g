@@ -32,9 +32,6 @@ class Scalar(nd.EBase):
     def to_float(self):
         return None
 
-    def __int__(self) -> int:
-        raise TypeError
-
     def everything(self):
         yield self
 
@@ -45,6 +42,9 @@ class Scalar(nd.EBase):
 
     def __lt__(self, _other):
         pass
+
+    def __int__(self) -> int:
+        raise TypeError
 
 
 class ConstantBase(Scalar):

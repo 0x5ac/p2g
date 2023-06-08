@@ -18,8 +18,7 @@ def base_addr(new_base=None):
 
 
 def message(dst, txt: str):
-    breakpoint()
-    stat.code(f"{dst[0]} = 101 ( {txt} )", "")
+    stat.code(f"{dst[0]} = 101 ( {txt} )", "<no comment>")
 
 
 def as_address(src):

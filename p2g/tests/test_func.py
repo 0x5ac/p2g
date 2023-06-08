@@ -217,7 +217,6 @@ def test_unpack1():
 
 
 @p2g.must_be(
-    '( dprint[f"this is {x:5.2f}"]   )',
     "DPRNT[this*is*19.00]",
 )
 def test_dprint2():
@@ -228,7 +227,6 @@ def test_dprint2():
 @p2g.must_be(
     "( xc = Var[12]                  )",
     "  #100= 12.",
-    '( dprint[f"this is {xc:5.2f}"]  )',
     "DPRNT[this*is*[#100][52]]",
 )
 def test_dprint3():
@@ -239,7 +237,6 @@ def test_dprint3():
 @p2g.must_be(
     "( xc = Var[12]                  )",
     "  #100= 12.",
-    '( dprint[f"this is {xc:5.2f}"]  )',
     "DPRNT[this*is*[#100+#100][52]]",
 )
 def test_dprint4():

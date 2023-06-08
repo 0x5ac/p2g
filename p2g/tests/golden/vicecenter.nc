@@ -1,3 +1,72 @@
+( tlc                    :  #100.x  #101.y         )
+( brc                    :  #102.x  #103.y         )
+( cursor                 :  #104.x  #105.y         )
+( its                    :  #106.x                 )
+( its                    :  #106.x                 )
+( its                    :  #106.x                 )
+( its                    :  #106.x                 )
+( error                  :  #106.x  #107.y         )
+( PROBE_R                :  #556.x  #557.y         )
+( MACHINE_POS            : #5021.x #5022.y #5023.z )
+( SKIP_POS               : #5061.x #5062.y #5063.z )
+( WCS                    : #5241.x #5242.y #5243.z )
+( MACHINE_ABS_ABOVE_VICE : -28.,-10.,-16.          )
+( above                  : -28.,-13.,-16.          )
+( backoff                : 0.1,0.1,0.1             )
+( delta                  : 0.,-0.4                 )
+( search_depth           : -0.1                    )
+( amax                   : 14.,8.,3.               )
+( delta                  : 0.75,0.                 )
+( indent                 : 1.4,0.8,0.3             )
+( skim_distance          : 0.3                     )
+( amin                   : 7.,4.,-5.               )
+( delta                  : 0.75,0.4                )
+( delta                  : -0.75,0.                )
+( delta                  : 0.,0.4                  )
+( iota                   : 0.025,0.025,0.025       )
+( start_search           : -3.5,0.                 )
+( start_search           : 0.,-2.                  )
+( start_search           : 0.,2.                   )
+( start_search           : 3.5,0.                  )
+( stop_search            : -7.,0.                  )
+( stop_search            : 0.,-4.                  )
+( stop_search            : 0.,4.                   )
+( stop_search            : 7.,0.                   )
+( xy                     : 7.,4.                   )
+( xy                     : 14.,8.                  )
+( xy                     : #104,#105               )
+( xy                     : #104,#105               )
+( xy                     : #104,#105               )
+( xy                     : 0.1,0.1                 )
+( xy                     : #104,#105               )
+( xy                     : 1.4,0.8                 )
+( xy                     : 7.,4.                   )
+( xy                     : 14.,8.                  )
+( xy                     : #104,#105               )
+( xy                     : #104,#105               )
+( xy                     : #104,#105               )
+( xy                     : 0.1,0.1                 )
+( xy                     : #104,#105               )
+( xy                     : 1.4,0.8                 )
+( xy                     : 7.,4.                   )
+( xy                     : 14.,8.                  )
+( xy                     : #104,#105               )
+( xy                     : #104,#105               )
+( xy                     : #104,#105               )
+( xy                     : 0.1,0.1                 )
+( xy                     : #104,#105               )
+( xy                     : 1.4,0.8                 )
+( xy                     : 7.,4.                   )
+( xy                     : 14.,8.                  )
+( xy                     : #104,#105               )
+( xy                     : #104,#105               )
+( xy                     : #104,#105               )
+( xy                     : 0.1,0.1                 )
+( xy                     : #104,#105               )
+( xy                     : 1.4,0.8                 )
+( xy                     : #5241,#5242             )
+( xy                     : #106,#107               )
+( xyz                    : #5021,#5022,#5023       )
 
 ( Find center of plate in vice, )
 (  result in [#5241]            )
@@ -37,11 +106,8 @@
 ( st.WCS.z = MACHINE_POS.z      )
   #5243= #5023
 
-( X )
-( check g55                     )
-  #3006= 101.
+  (# 3006) = 101 ( check g55 )
 
-( X )
 
 ( now work.z should be 0 at surface )
 ( and work.xy roughly middle        )
@@ -73,11 +139,8 @@ L1000
   GOTO 1000
 L1002
 
-( X )
-( search for left failed        )
-  #3000= 101.
+  (# 3000) = 101 ( search for left failed )
 
-( X )
 (     st.alarm[f"search for {di.name} failed"])
 L1001
 
@@ -125,11 +188,8 @@ L1003
   GOTO 1003
 L1005
 
-( X )
-( search for near failed        )
-  #3000= 101.
+  (# 3000) = 101 ( search for near failed )
 
-( X )
 (     st.alarm[f"search for {di.name} failed"])
 L1004
 
@@ -177,11 +237,8 @@ L1006
   GOTO 1006
 L1008
 
-( X )
-( search for far failed         )
-  #3000= 101.
+  (# 3000) = 101 ( search for far failed )
 
-( X )
 (     st.alarm[f"search for {di.name} failed"])
 L1007
 
@@ -231,11 +288,8 @@ L1009
   GOTO 1009
 L1011
 
-( X )
-( search for right failed       )
-  #3000= 101.
+  (# 3000) = 101 ( search for right failed )
 
-( X )
 (     st.alarm[f"search for {di.name} failed"])
 L1010
 
@@ -281,8 +335,4 @@ L1010
 ( st.goto.machine[z=sch.above.z])
   G01 G90 G53 F65. z-16.
 
-( X )
-(  what changed                 )
-  #3000= 103.
-
-( X )
+  (# 3000) = 101 (  what changed )

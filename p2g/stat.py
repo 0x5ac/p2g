@@ -68,6 +68,8 @@ def compress_and_clean(line: str):
 class StatBase(abc.ABC):
     _comtxt: str
 
+    # empty comment means use src if possible.
+    # <no comment> means no comment
     def __init__(self, comtxt=""):
         self.pos = err.state.last_pos
         self._comtxt = comtxt
@@ -75,18 +77,20 @@ class StatBase(abc.ABC):
     def to_line_lhs(self) -> list[str]:
         raise AssertionError
 
+    @lib.g2l
     def to_full_lines(self, blockstate):
-        breakpoint()
         comtxt = self._comtxt
-        # no comment, make one from source.
-        if comtxt is None:
-            comtxt = err.src_code_from_node_place(self.pos)
-        if comtxt != "":
+
+        if comtxt == "<no comment>":
+            comtxt = ""
+        else:
+            if not comtxt:
+                comtxt = err.src_code_from_node_place(self.pos)
             comtxt = compress_and_clean(comtxt)
             if comtxt == blockstate.prev_comtxt:
                 comtxt = ""
-
-        blockstate.prev_comtxt = comtxt
+            else:
+                blockstate.prev_comtxt = comtxt
 
         for code_txt, com_txt in itertools.zip_longest(
             self.to_line_lhs(),
@@ -146,7 +150,7 @@ class Nest:
     def add_stat(cls, stat):
         Nest.cur.slist.append(stat)
 
-    #    @lib.g2l
+    @lib.g2l
     def to_full_lines(self):
         class BS:
             prev_comtxt = ""
@@ -238,7 +242,7 @@ class Dprint(StatBase):
     txt: str
 
     def __init__(self, txt):
-        super().__init__()
+        super().__init__("<no comment>")
         self.txt = txt
 
     def to_line_lhs(self):
@@ -249,7 +253,7 @@ class Set(StatBase):
     lhs: nd.EBase
     rhs: nd.EBase
 
-    def __init__(self, lhs: nd.EBase, rhs: nd.EBase, comtxt=None):
+    def __init__(self, lhs: nd.EBase, rhs: nd.EBase, comtxt: str = ""):
         super().__init__(comtxt)
         assert isinstance(lhs, nd.EBase)
         self.lhs = lhs
@@ -262,12 +266,12 @@ class Set(StatBase):
         yield f"{NORMAL_PREFIX}{lhs}= {rhs}"
 
 
-def append_set(dst, src, comtxt=None):
+def append_set(dst, src, comtxt=""):
     if not lib.same(dst, src):
         add_stat(Set(dst, src, comtxt))
 
 
-def code(txt, comtxt=None):
+def code(txt, comtxt: str = ""):
     if isinstance(txt, str):
         add_stat(Code(txt, comtxt))
         return

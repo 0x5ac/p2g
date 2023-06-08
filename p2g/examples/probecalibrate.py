@@ -5,6 +5,7 @@ import defs
 
 from p2g import *
 
+
 symbol.Table.print = 1
 
 

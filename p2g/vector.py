@@ -1,5 +1,5 @@
 import typing
-import functools
+
 from p2g import axis
 from p2g import err
 from p2g import nd
@@ -94,9 +94,7 @@ class RValueVec(Vec):
 
     def get_at(self, idx: scalar.Scalar):
         self._read = True
-        i = idx.to_int()
-        assert isinstance(i, int)
-        return self._guts[i]
+        return self._guts[int(idx)]
 
     def nelements(self):
         return len(self._guts)
@@ -169,7 +167,7 @@ class MemVec(Vec):
         return " ".join(res)
 
     def nelements(self):
-        return self._size.to_int()
+        return int(self._size)
 
     def everything(self):
         return (
@@ -180,7 +178,7 @@ class MemVec(Vec):
     def get_at(self, idx: scalar.Scalar):
         if isinstance(idx, scalar.Constant):
             fidx = int(idx)
-            if not 0 <= fidx < self._size.to_int():
+            if not 0 <= fidx < int(self._size):
                 err.compiler(
                     f"Index out of range, index={fidx} size={self._size}",
                 )
@@ -225,7 +223,7 @@ def wrap_optional_maybe_vec(
     if isinstance(thing, tuple):
         return RValueVec(list(thing))
 
-    raise TypeError
+    raise AssertionError
 
 
 def wrap_maybe_vec(thing) -> typing.Union[Vec, scalar.Scalar]:

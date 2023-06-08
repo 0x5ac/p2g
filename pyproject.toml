@@ -86,7 +86,7 @@ exclude= [ "p2g/tests", "p2g/doc" ]
 [tool.mypy]
 ignore_missing_imports = true
 check_untyped_defs = true
-exclude= [ "p2g/tests" , "p2g/doc"]
+exclude= [ "p2g/tests" , "p2g/doc", "p2g/examples"]
 
 [tool.pydocstyle]
 ignore  = "D103,D101,D107,D100,D102,D105, D104"

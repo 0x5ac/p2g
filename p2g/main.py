@@ -1,9 +1,9 @@
 #! /usr/bin/env python
+import datetime
 import pathlib
 import shutil
 import sys
 
-import datetime
 import docopt
 
 from loguru import logger
@@ -67,8 +67,8 @@ Options:
     --loglevel=<loglevel>    Set logger.level [default: ERROR]
     --break                  Breakpoint on error.
 
-    output pattern may include <time> which will create a decrementing 
-    prefix for the output file which makes looking for the .nc in a 
+    output pattern may include <time> which will create a decrementing
+    prefix for the output file which makes looking for the .nc in a
     crowded directory simpler.
 
     eg  --out="~/_nc_/<time>O001-foo.nc" foo.py

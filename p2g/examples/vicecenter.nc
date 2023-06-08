@@ -1,72 +1,34 @@
-( tlc                    :  #100.x  #101.y         )
-( brc                    :  #102.x  #103.y         )
-( cursor                 :  #104.x  #105.y         )
-( its                    :  #106.x                 )
-( its                    :  #106.x                 )
-( its                    :  #106.x                 )
-( its                    :  #106.x                 )
-( error                  :  #106.x  #107.y         )
-( PROBE_R                :  #556.x  #557.y         )
-( MACHINE_POS            : #5021.x #5022.y #5023.z )
-( SKIP_POS               : #5061.x #5062.y #5063.z )
-( WCS                    : #5241.x #5242.y #5243.z )
-( MACHINE_ABS_ABOVE_VICE : -28.,-10.,-16.          )
-( above                  : -28.,-13.,-16.          )
-( backoff                : 0.1,0.1,0.1             )
-( delta                  : 0.,-0.4                 )
-( search_depth           : -0.1                    )
-( amax                   : 14.,8.,3.               )
-( delta                  : 0.75,0.                 )
-( indent                 : 1.4,0.8,0.3             )
-( skim_distance          : 0.3                     )
-( amin                   : 7.,4.,-5.               )
-( delta                  : 0.75,0.4                )
-( delta                  : -0.75,0.                )
-( delta                  : 0.,0.4                  )
-( iota                   : 0.025,0.025,0.025       )
-( start_search           : -3.5,0.                 )
-( start_search           : 0.,-2.                  )
-( start_search           : 0.,2.                   )
-( start_search           : 3.5,0.                  )
-( stop_search            : -7.,0.                  )
-( stop_search            : 0.,-4.                  )
-( stop_search            : 0.,4.                   )
-( stop_search            : 7.,0.                   )
-( xy                     : 7.,4.                   )
-( xy                     : 14.,8.                  )
-( xy                     : #104,#105               )
-( xy                     : #104,#105               )
-( xy                     : #104,#105               )
-( xy                     : 0.1,0.1                 )
-( xy                     : #104,#105               )
-( xy                     : 1.4,0.8                 )
-( xy                     : 7.,4.                   )
-( xy                     : 14.,8.                  )
-( xy                     : #104,#105               )
-( xy                     : #104,#105               )
-( xy                     : #104,#105               )
-( xy                     : 0.1,0.1                 )
-( xy                     : #104,#105               )
-( xy                     : 1.4,0.8                 )
-( xy                     : 7.,4.                   )
-( xy                     : 14.,8.                  )
-( xy                     : #104,#105               )
-( xy                     : #104,#105               )
-( xy                     : #104,#105               )
-( xy                     : 0.1,0.1                 )
-( xy                     : #104,#105               )
-( xy                     : 1.4,0.8                 )
-( xy                     : 7.,4.                   )
-( xy                     : 14.,8.                  )
-( xy                     : #104,#105               )
-( xy                     : #104,#105               )
-( xy                     : #104,#105               )
-( xy                     : 0.1,0.1                 )
-( xy                     : #104,#105               )
-( xy                     : 1.4,0.8                 )
-( xy                     : #5241,#5242             )
-( xy                     : #106,#107               )
-( xyz                    : #5021,#5022,#5023       )
+( brc                    :  #102.x  #103.y          )
+( cursor                 :  #104.x  #105.y          )
+( error                  :  #106.x  #107.y          )
+( G55                    : #5241.x #5242.y #5243.z  )
+( its                    :  #106.x                  )
+( MACHINE_POS            : #5021.x #5022.y #5023.z  )
+( output                 :  #102.x  #103.y          )
+( output                 :  #100.x  #101.y          )
+( PROBE_R                :  #556.x  #557.y          )
+( SKIP_POS               : #5061.x #5062.y #5063.z  )
+( tlc                    :  #100.x  #101.y          )
+( WCS                    : #5241.x #5242.y #5243.z  )
+( amax                   :  14.000,  8.000,  3.000  )
+( amin                   :   7.000,  4.000, -5.000  )
+( backoff                :   0.100,  0.100,  0.100  )
+( delta                  :   0.750,  0.400          )
+( iota                   :   0.025,  0.025,  0.025  )
+( MACHINE_ABS_ABOVE_VICE : -28.000,-10.000,-16.000  )
+( start_search           :   0.000, -2.000          )
+( start_search           :  -3.500,  0.000          )
+( start_search           :   3.500,  0.000          )
+( start_search           :   0.000,  2.000          )
+( stop_search            :   0.000, -4.000          )
+( stop_search            :   7.000,  0.000          )
+( stop_search            :   0.000,  4.000          )
+( stop_search            :  -7.000,  0.000          )
+( fast_probe             : probe M79 work xyz  10.0 )
+( goto                   :   work xyz  65.0         )
+( machine                :   machine xyz  65.0      )
+( relative               :   relative xyz  65.0     )
+( slow_probe             : probe M79 work xyz  10.0 )
   O0001                           ( VICECENTER                    )
 
 ( Find center of plate in vice, )
@@ -84,7 +46,7 @@
 (   0.75, 0.4                   )
   T01 M06                         ( st.setup_probing[]            )
   G65 P9832
-  G103 P1                         ( st.setup_probing[]            )
+  G103 P1
   G04 P1
   G04 P1
   G04 P1
@@ -96,7 +58,7 @@
 ( find top z roughly set [#5241].z. )
   #5241= #5021                    ( st.WCS.xyz = MACHINE_POS.xyz  )
   #5242= #5022
-  #5243= #5023                    ( st.WCS.xyz = MACHINE_POS.xyz  )
+  #5243= #5023
   G01 G90 G31 M79 F10. z-5.       ( st.fast_probe[z=sch.amin.z]   )
   #5243= #5023                    ( st.WCS.z = MACHINE_POS.z      )
 
@@ -113,11 +75,11 @@
 ( quickly move probe to find left edge )
   #106= 5.6667                    (     [abs[stop_search - start_search] / sch.delta][di.cur_axis] + 1,)
   #104= -3.5                      ( cursor[di.cur_axis] = start_search[di.cur_axis])
-L2000
+L2000                             ( while its > 0:                )
   IF [#106 LE 0.] GOTO 2002
   G01 G90 F65. x#104 y#105        (     st.goto[cursor]           )
   G01 G90 G31 M79 F10. z-0.1      (     st.fast_probe[z=sch.search_depth])
-  IF [#5063 LT -0.075] GOTO 2001
+  IF [#5063 LT -0.075] GOTO 2001  (     if SKIP_POS.z < sch.search_depth + sch.iota:)
   #104= #104 - 0.75               (     cursor.xy += delta        )
   #106= #106 - 1.                 (     its -= 1                  )
   GOTO 2000
@@ -125,7 +87,7 @@ L2002
 
   (# 3000) = 101 ( search for left failed )
 
-L2001
+L2001                             (     st.alarm[f"search for {di.name} failed"])
 
 ( back off a bit to the left, then slowly probe  )
 ( rightwards for precise measurement.            )
@@ -145,11 +107,11 @@ L2001
 ( quickly move probe to find near edge )
   #106= 6.                        (     [abs[stop_search - start_search] / sch.delta][di.cur_axis] + 1,)
   #105= -2.                       ( cursor[di.cur_axis] = start_search[di.cur_axis])
-L2003
+L2003                             ( while its > 0:                )
   IF [#106 LE 0.] GOTO 2005
   G01 G90 F65. x#104 y#105        (     st.goto[cursor]           )
   G01 G90 G31 M79 F10. z-0.1      (     st.fast_probe[z=sch.search_depth])
-  IF [#5063 LT -0.075] GOTO 2004
+  IF [#5063 LT -0.075] GOTO 2004  (     if SKIP_POS.z < sch.search_depth + sch.iota:)
   #105= #105 - 0.4                (     cursor.xy += delta        )
   #106= #106 - 1.                 (     its -= 1                  )
   GOTO 2003
@@ -157,7 +119,7 @@ L2005
 
   (# 3000) = 101 ( search for near failed )
 
-L2004
+L2004                             (     st.alarm[f"search for {di.name} failed"])
 
 ( back off a bit to the near, then slowly probe  )
 ( farwards for precise measurement.              )
@@ -177,11 +139,11 @@ L2004
 ( quickly move probe to find far edge )
   #106= 6.                        (     [abs[stop_search - start_search] / sch.delta][di.cur_axis] + 1,)
   #105= 2.                        ( cursor[di.cur_axis] = start_search[di.cur_axis])
-L2006
+L2006                             ( while its > 0:                )
   IF [#106 LE 0.] GOTO 2008
   G01 G90 F65. x#104 y#105        (     st.goto[cursor]           )
   G01 G90 G31 M79 F10. z-0.1      (     st.fast_probe[z=sch.search_depth])
-  IF [#5063 LT -0.075] GOTO 2007
+  IF [#5063 LT -0.075] GOTO 2007  (     if SKIP_POS.z < sch.search_depth + sch.iota:)
   #105= #105 + 0.4                (     cursor.xy += delta        )
   #106= #106 - 1.                 (     its -= 1                  )
   GOTO 2006
@@ -189,7 +151,7 @@ L2008
 
   (# 3000) = 101 ( search for far failed )
 
-L2007
+L2007                             (     st.alarm[f"search for {di.name} failed"])
 
 ( back off a bit to the far, then slowly probe  )
 ( nearwards for precise measurement.            )
@@ -210,11 +172,11 @@ L2007
 ( quickly move probe to find right edge )
   #106= 5.6667                    (     [abs[stop_search - start_search] / sch.delta][di.cur_axis] + 1,)
   #104= 3.5                       ( cursor[di.cur_axis] = start_search[di.cur_axis])
-L2009
+L2009                             ( while its > 0:                )
   IF [#106 LE 0.] GOTO 2011
   G01 G90 F65. x#104 y#105        (     st.goto[cursor]           )
   G01 G90 G31 M79 F10. z-0.1      (     st.fast_probe[z=sch.search_depth])
-  IF [#5063 LT -0.075] GOTO 2010
+  IF [#5063 LT -0.075] GOTO 2010  (     if SKIP_POS.z < sch.search_depth + sch.iota:)
   #104= #104 + 0.75               (     cursor.xy += delta        )
   #106= #106 - 1.                 (     its -= 1                  )
   GOTO 2009
@@ -222,7 +184,7 @@ L2011
 
   (# 3000) = 101 ( search for right failed )
 
-L2010
+L2010                             (     st.alarm[f"search for {di.name} failed"])
 
 ( back off a bit to the right, then slowly probe  )
 ( leftwards for precise measurement.              )

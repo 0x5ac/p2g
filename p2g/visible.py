@@ -1,6 +1,5 @@
 from p2g import err
 from p2g import gbl
-from p2g import scalar
 from p2g import stat
 from p2g import vector
 

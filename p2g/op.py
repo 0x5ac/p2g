@@ -4,7 +4,6 @@ import math
 import typing
 
 from p2g import err
-from p2g import gbl
 from p2g import lib
 from p2g import nd
 from p2g import opinfo
@@ -131,7 +130,6 @@ class Unop(scalar.Scalar):
         res = []
 
         if self.opfo.pyn == "#":
-            inside = self.child
             try:
                 addr = int(self.child)
                 symbol.Table.add_varref(addr, err.state.last_pos)

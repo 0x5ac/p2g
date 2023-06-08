@@ -1,15 +1,7 @@
-from os import sched_get_priority_max
-import p2g
-from p2g import gbl
-from p2g import lib
-from p2g import nd
-from p2g import stat
-from p2g import vector
-from p2g import goto
-import typing
-import dataclasses
 import collections
-import itertools
+import dataclasses
+import typing
+from p2g import lib
 
 
 # symbol tables made by watching every assignment from a vector
@@ -22,12 +14,12 @@ class Table:
 
     # store in this way to keep multiple definitions.
     name_to_thing = collections.defaultdict(set)
-    addrs_used = {}
+    addrs_used = set()
     # Called for every store to a name, so remember when a vector is
     # given an association.
 
     @classmethod
-    def remember_store(cls, ns, key, thing):
+    def remember_store(cls, key, thing):
         cls.remember_load(key, thing)
 
     @classmethod
@@ -39,8 +31,8 @@ class Table:
             pass
 
     @classmethod
-    def add_varref(cls, addr, pos):
-        cls.addrs_used[int(addr)] = pos
+    def add_varref(cls, addr, _pos):
+        cls.addrs_used.add(int(addr))
 
     @classmethod
     def yield_lines(cls):
@@ -79,5 +71,5 @@ class Table:
     @classmethod
     def reset(cls):
         cls.name_to_thing = collections.defaultdict(set)
-        cls.addrs_used = {}
+        cls.addrs_used = set()
         cls.print = False

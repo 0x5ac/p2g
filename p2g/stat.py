@@ -64,6 +64,20 @@ def compress_and_clean(line: str):
     return "( " + guts.ljust(30) + ")"
 
 
+def workout_comtxt(pos, comtxt, blockstate):
+    if comtxt == "<no comment>":
+        return ""
+
+    if not comtxt:
+        comtxt = err.src_code_from_node_place(pos)
+    comtxt = compress_and_clean(comtxt)
+    if comtxt == blockstate.prev_comtxt:
+        comtxt = ""
+    else:
+        blockstate.prev_comtxt = comtxt
+    return comtxt
+
+
 @dataclasses.dataclass
 class StatBase(abc.ABC):
     _comtxt: str
@@ -79,18 +93,7 @@ class StatBase(abc.ABC):
 
     @lib.g2l
     def to_full_lines(self, blockstate):
-        comtxt = self._comtxt
-
-        if comtxt == "<no comment>":
-            comtxt = ""
-        else:
-            if not comtxt:
-                comtxt = err.src_code_from_node_place(self.pos)
-            comtxt = compress_and_clean(comtxt)
-            if comtxt == blockstate.prev_comtxt:
-                comtxt = ""
-            else:
-                blockstate.prev_comtxt = comtxt
+        comtxt = workout_comtxt(self.pos, self._comtxt, blockstate)
 
         for code_txt, com_txt in itertools.zip_longest(
             self.to_line_lhs(),

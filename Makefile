@@ -138,7 +138,7 @@ autoflake:
 	$(V) $(PR) autoflake --ignore-init-module-imports  --remove-all-unused-imports  -i -v $(P2G_SRC)
 
 mypy:
-	$(V) - $(PR) mypy p2g
+	$(V) - $(PR) mypy p2g | cat
 
 flake8:
 	$(V) - $(PR) flake8p p2g | cat

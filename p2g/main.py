@@ -22,6 +22,7 @@ Turns a python program into a gcode program.
 
 Usage:
    p2g [options] gen <srcfile>
+   p2g [options] ngen <srcfile>
    p2g [options] test [<srcfile>]
    p2g [options] examples
    p2g [options] version
@@ -31,6 +32,11 @@ Try:
    p2g gen -o ../nc/O05AC.nc vf3/vicecenter.py
        Read vicecenter.py starting at the last function in file.
        Turn into gcode in ../nc/O05AC.nc
+
+   p2g ngen -o ../nc/O05AC.nc vf3/vicecenter.py
+       Same as the 'gen' command, save the output is formatted
+       to fit in the narrow space in the CNC machine's program
+       display.
 
    p2g gen --func=main vf3/probecheck.py > vf3/probecheck.nc
         Run through probecheck.py(main) and make vf3/probecheck.nc
@@ -159,10 +165,15 @@ def do_gen(opts):
         return 0
     except err.CompilerError as exn:
         exn.report_error(absolute_lines=True)
-        return 1
+
     except FileNotFoundError as exn:
         print(exn, file=sys.stderr)
-        return 1
+
+    # when inside self return with no error
+    # even if there was one, message is in stderr.
+    if opts["--recursive"]:
+        return 0
+    return 1
 
 
 def main(argv=None):
@@ -200,9 +211,10 @@ def main(argv=None):
             opts["--org"],
         )
     elif opts["gen"]:
-        retcode = do_gen(opts)
-        if not opts["--recursive"]:
-            return retcode
+        return do_gen(opts)
+    elif opts["ngen"]:
+        gbl.config.narrow_output = True
+        return do_gen(opts)
 
     elif opts["test"]:  # for debug
         debug.run_test(opts["<srcfile>"])

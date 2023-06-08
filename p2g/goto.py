@@ -67,12 +67,24 @@ def do_goto_worker(self, fter, args, kwargs):
 
 @dataclasses.dataclass(eq=True, frozen=True)
 class GotoWorker:
+    user_defined = True
     want_bp_: bool
     space_: MovementSpace
     feed_: float
     order_: MovementOrder
     probe_: bool
     mcode_: str
+
+    def __eq__(self, x):
+        breakpoint()
+
+    def __lt__(self, x):
+        breakpoint()
+
+    def __hash__(self):
+        v = object.__hash__(self)
+        breakpoint()
+        return v
 
     def to_symtab_entry(self, *_):
         return " ".join(
@@ -88,6 +100,7 @@ class GotoWorker:
 
     def update(self, key, value):
         xxx = {**self.__dict__, key: value}
+        breakpoint()
         return GotoWorker(**xxx)
 
     @property

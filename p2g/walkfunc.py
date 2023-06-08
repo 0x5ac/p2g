@@ -167,7 +167,6 @@ def interpfunc(fun):
 
 @dataclasses.dataclass
 class FuncArgsDescr:
-    defndesc: typing.Any
     args: list[typing.Any]
     kwargs: dict[str, typing.Any]
 

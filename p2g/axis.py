@@ -8,9 +8,9 @@ NAMES = "xyz"
 
 
 class Axes(scalar.Constant):
-
     def __init__(self):
         super().__init__(len(NAMES))
+
     @property
     def _value(self):
         return len(NAMES)

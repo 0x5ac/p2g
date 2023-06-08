@@ -145,7 +145,6 @@ def runit(st, sch):
         f" result in {st.WCS}",
         *sch.comment,
     )
-    st.insert_symbol_table()
 
     st.setup_probing()
 

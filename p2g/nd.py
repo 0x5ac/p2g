@@ -17,6 +17,12 @@ class EBase:
     def to_symtab_entry(self, varrefs):
         return str(self)
 
+    def symbol_name(self, _x):
+        pass
+
+    def symbol_key(self):
+        return ""
+
 
 DECIMALS = 4
 

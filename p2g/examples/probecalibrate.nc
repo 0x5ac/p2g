@@ -1,15 +1,10 @@
 ( MACHINE_ABS_ABOVE_OTS       : -1.16,-7.5,-7.5   )
-( MACHINE_ABS_CLOSE_ABOVE_OTS : -1.16,-7.5,-7.8   )
 ( MACHINE_ABS_ABOVE_RING      : -16.46,-3.5,-22.7 )
-( goto                        :   work xyz  65.0  )
+( MACHINE_ABS_CLOSE_ABOVE_OTS : -1.16,-7.5,-7.8   )
   O0001                           ( PROBECALIBRATE                )
 
 ( Start with fixed height probe,   )
 ( make sure probe stickout <2.25in )
-( MACHINE_ABS_ABOVE_OTS       : -1.16,-7.5,-7.5   )
-( MACHINE_ABS_CLOSE_ABOVE_OTS : -1.16,-7.5,-7.8   )
-( MACHINE_ABS_ABOVE_RING      : -16.46,-3.5,-22.7 )
-( goto                        :   work xyz  65.0  )
   T02 M06                         ( st.load_tool[defs.Tool.KNOWN_LENGTH])
   M59 P2                          ( st.ots_on[]                   )
   G04 P1.0

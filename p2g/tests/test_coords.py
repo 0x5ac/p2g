@@ -95,12 +95,14 @@ def test_comperr_zeros3():
 
 
 @p2g.must_be(
-    "( v = p2Var[x=2, y=3]           )",
-    "  #100= 2.                    ",
+    "( v :  #100.x  #101.y )",
+    "( v = Var[x=2, y=3]             )",
+    "  #100= 2.",
     "  #101= 3.",
     "( [array  100 2] )",
 )
 def test_kwargs():
+    p2g.symbol.Table.print = 1
     v = p2g.Var(x=2, y=3)
     p2g.comment(v)
 
@@ -201,7 +203,6 @@ def test_symtab1():
     p[18] = 123
     st.q.x = 9
     st.q.z = 91
-    st.insert_symbol_table()
 
 
 @p2g.must_be(
@@ -212,11 +213,10 @@ def test_symtab1():
     "( PROBE_R :  #556.x )",
 )
 def test_symtab():
-    st = p2g.Symbols()
+    st = S()
     st.EXTRALONGONEWITHEXTRA = p2g.Fixed[9](addr=100)
     p = p2g.Fixed[9](addr=100)
     st.fish = 3
     p.x = 3
     st.PROBE_R = p2g.Fixed[3](addr=556)
     st.PROBE_R.x = 3
-    st.insert_symbol_table()

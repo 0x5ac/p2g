@@ -5,15 +5,17 @@ import defs
 
 from p2g import *
 
+symbol.Table.print = 1
+
 
 def probecalibrate():
+    symbol.Table.print = 1
     st = defs.JobDefs()
 
     comment(
         "Start with fixed height probe,",
         "make sure probe stickout <2.25in",
     )
-    st.insert_symbol_table()
     st.load_tool(defs.Tool.KNOWN_LENGTH)
     st.ots_on()
     st.goto.machine(z=0)

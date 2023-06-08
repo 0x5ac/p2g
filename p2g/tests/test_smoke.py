@@ -22,7 +22,7 @@ def fn_nest1():
 
 
 def add_some_symbols():
-    st = p2g.Symbols()
+    st = p2g.Table()
     st.txyz = p2g.Var[3]()
     st.txy = p2g.Var[2]()
     st.CURSOR = p2g.Var[2]()

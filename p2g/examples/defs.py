@@ -19,7 +19,7 @@ class Tool(enum.IntEnum):
 
 
 # pylint: disable=too-many-instance-attributes
-class JobDefs(Symbols):
+class JobDefs(Table):
     def __init__(self):
         super().__init__()
         self.MACHINE_ABS_ABOVE_OTS = Const(x=-1.16, y=-7.5, z=-7.5)
@@ -54,8 +54,6 @@ class JobDefs(Symbols):
 
         self.fast_probe = probe.feed(self.FAST_PROBE_FEED)
         self.goto = goto.work.feed(self.FAST_FEED)
-
-        self.init_finished()
 
     def load_tool(self, tool):
         code(f"T{tool:02} M06")

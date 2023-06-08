@@ -407,7 +407,8 @@ def compile2g(func_name_arg, srcfile_name, job_name, in_pytest):
         with stat.Nest(in_pytest) as cursor:
             axis.NAMES = "xyz"
             gbl.iface.reset()
-            symbol.Symbols.reset()
+
+            symbol.Table.reset()
 
             logger.debug(f"Starting {func_name_arg} {cursor.next_label}")
             sourcelines = inf.read()
@@ -426,7 +427,7 @@ def compile2g(func_name_arg, srcfile_name, job_name, in_pytest):
             # mods to varrefs for symbol table
             res = list(cursor.to_full_lines())
 
-            yield from symbol.table()
+            yield from symbol.Table.yield_lines()
             yield from res
 
 

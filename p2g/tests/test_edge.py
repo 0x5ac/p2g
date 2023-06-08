@@ -19,8 +19,7 @@ def test_ok2():
     "  #100= 3.                    ",
 )
 def test_ok():
-    st = p2g.Symbols()
+    st = p2g.Table()
 
     zz = p2g.Var[200]()
     zz[0] = 3
-    st.insert_symbol_table()

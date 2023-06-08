@@ -77,6 +77,7 @@ class WalkBase:
 
     def visit_store(self, node, store_val) -> None:
         self.update_lastplace(node)
+
         method = "_visit_store_" + node.__class__.__name__.lower()
         visitor: typing.Callable[[ast.AST, ast.AST], None] = getattr(
             self, method, self.visit_fail

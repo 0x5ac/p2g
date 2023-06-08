@@ -27,7 +27,7 @@ from .stat import code
 from .stat import com
 from .stat import comment
 from .stat import dprint
-from .symbol import Symbols
+from .symbol import Table
 from .vector import ConstVec
 from .vector import Vec
 

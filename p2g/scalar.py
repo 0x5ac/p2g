@@ -69,6 +69,9 @@ class Constant(ConstantBase):
     def to_int(self) -> int:
         return int(self._value)
 
+    def __int__(self):
+        return int(self._value)
+
     def to_float(self):
         return float(self._value)
 

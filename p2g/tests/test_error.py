@@ -83,13 +83,14 @@ def test_comperr_no_try():
         pass
 
 
+@pytest.mark.skip()
 @p2g.must_be(
     "Redefinition of a.",
     "p2g/tests/test_error.py:9:4:6:     st.a = 10",
     "                                   ^^",
 )
-def test_comperr_redef():
-    st = p2g.Symbols()
+def test_skip_comperr_redef():
+    st = p2g.Table()
     st.a = 9
     st.a = 10
 

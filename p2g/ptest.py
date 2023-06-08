@@ -189,6 +189,8 @@ def check_must_be_worker(fn, gold_data, check_comments=False):
     # if running in pytest then exist out gracefully for them.
     # otherwise, running in debug harness.
     if gbl.config.debug:  # for debug
+        for x in etext:
+            print(x)
         err.compiler(f"ptest error {lib.nljoin(etext)}")
 
     pytest.fail(lib.nljoin(etext))  # for debug
@@ -209,8 +211,10 @@ def check_golden_worker(fn, check_comments):
 
         # if running in pytest then exist out gracefully for them.
         # otherwise, running in debug harness.
-        if gbl.config.debug:
-            err.compiler(f"ptest error {lib.nljoin(etext)}")  # for debug
+        if gbl.config.debug:  # for debug
+            for line in etext:
+                print(line)
+            err.compiler(f"ptest error {lib.nljoin(etext)}")
 
         pytest.fail(lib.nljoin(etext))
 

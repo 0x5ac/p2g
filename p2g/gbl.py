@@ -56,11 +56,5 @@ class PerTranslation:
 
     #        self.next_label = 1000
 
-    def add_varref(self, idx, place):
-        try:
-            self.varrefs[idx.to_int()] = place
-        except NotImplementedError:
-            pass
-
 
 iface = PerTranslation()

@@ -11,7 +11,12 @@ class Vec(nd.EBase):
     is_scalar = False
     is_vec = True
 
+    _assoc_name: str
     _read: bool
+
+    def __init__(self):
+        self._read = False
+        self._assoc_name = ""
 
     def to_scalar(self):
         return self[0]
@@ -69,7 +74,6 @@ class ConstVec(Vec):
     def __init__(self, value):
         super().__init__()
         object.__setattr__(self, "_guts", [])
-        self._read = False
         for el in value:
             self._guts.append(scalar.wrap_scalar(el))
 
@@ -118,6 +122,7 @@ class MemVec(Vec):
     _step: scalar.Scalar
 
     def __init__(self, _addr=0, _size=0, _step=1):
+        super().__init__()
         self._addr = scalar.wrap_scalar(_addr)
         self._size = scalar.wrap_scalar(_size)
         self._step = scalar.wrap_scalar(_step)

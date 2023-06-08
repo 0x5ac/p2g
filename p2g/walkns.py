@@ -5,6 +5,7 @@ import typing
 
 from p2g import err
 from p2g import nd
+from p2g import symbol
 from p2g import vector
 
 
@@ -103,7 +104,7 @@ def lookup_to_ns(res, self, nid):
     return dstns
 
 
-def handle_visit_name_load(self, node):
+def _handle_visit_name_load(self, node):
     res, ns = find_ns(self.ns, node.id)
     if res is GLOBAL:
         res = self.module_ns.get(node.id)
@@ -111,6 +112,7 @@ def handle_visit_name_load(self, node):
         ns = resolve_nonlocal(self, node.id, ns.parent)
         return ns[node.id]
     if res is not UNDEF:
+        symbol.Table.remember_load(node.id, res)
         return res
 
     try:
@@ -141,6 +143,8 @@ def handle_visit_name_store(self, node, store_val):
         return
 
     dstns = lookup_to_ns(res, self, node.id)
+
+    symbol.Table.remember_store(dstns, node.id, store_val)
     dstns[node.id] = store_val
 
 
@@ -148,7 +152,8 @@ def handle_visit_name(self, node):
     match node.ctx:
         case ast.Del():
             handle_visit_name_del(self, node)
-        # for both load and store when augmented
+        # in augmented assign, name arrives as with load ctx, but
+        # must also be stored there, so catch both.
         case _:
-            return handle_visit_name_load(self, node)
+            return _handle_visit_name_load(self, node)
     return None

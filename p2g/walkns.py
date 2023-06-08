@@ -132,7 +132,7 @@ def handle_visit_name_del(self, node):
 
 def handle_visit_name_store(self, node, store_val):
     res = self.ns.get(node.id)
-    if isinstance(res, vector.ConstVec):
+    if isinstance(res, vector.RValueVec):
         err.compiler("Can't set a constant.")
     if isinstance(res, nd.EBase):
         # variable is already in use, instead of

@@ -23,12 +23,12 @@ class Vec(nd.EBase):
 
     def get_axes_vec(self, key):
         if key == "var":
-            return ConstVec(list(scalar.urange(0, self.nelements())))
+            return RValueVec(list(scalar.urange(0, self.nelements())))
 
         indexes = axis.name_to_indexes_list(key)
         if max(indexes) >= self.nelements():
             err.compiler("Reference to too many axes.")
-        return ConstVec(indexes)
+        return RValueVec(indexes)
 
     def forever(self):
         self._read = True
@@ -68,14 +68,22 @@ class Vec(nd.EBase):
         return self
 
 
-class ConstVec(Vec):
+class RValueVec(Vec):
     _guts: list[scalar.Scalar]
+    _from_user: bool
 
-    def __init__(self, value):
+    def __init__(self, value, from_user=False):
         super().__init__()
+
         object.__setattr__(self, "_guts", [])
+
+        object.__setattr__(self, "_from_user", from_user)
         for el in value:
             self._guts.append(scalar.wrap_scalar(el))
+
+    @property
+    def user_defined(self):
+        return self._from_user
 
     def get_address(self):
         return self._guts[0].get_address()
@@ -126,6 +134,10 @@ class MemVec(Vec):
         self._addr = scalar.wrap_scalar(_addr)
         self._size = scalar.wrap_scalar(_size)
         self._step = scalar.wrap_scalar(_step)
+
+    @property
+    def user_defined(self):
+        return True
 
     def get_address(self):
         return self._addr
@@ -200,13 +212,13 @@ def wrap_optional_maybe_vec(
         return res
 
     if isinstance(thing, list):
-        return ConstVec(thing)
-    if isinstance(thing, (ConstVec, MemVec)):
+        return RValueVec(thing)
+    if isinstance(thing, (RValueVec, MemVec)):
         return thing
     if isinstance(thing, (set, dict)):
-        return ConstVec(thing)
+        return RValueVec(thing)
     if isinstance(thing, tuple):
-        return ConstVec(list(thing))
+        return RValueVec(list(thing))
 
     raise TypeError
 
@@ -219,5 +231,5 @@ def wrap_maybe_vec(thing) -> typing.Union[Vec, scalar.Scalar]:
 
 def sorv_from_list(thing: list) -> typing.Union[Vec, scalar.Scalar]:
     if len(thing) != 1:
-        return ConstVec(thing)
+        return RValueVec(thing)
     return thing[0]

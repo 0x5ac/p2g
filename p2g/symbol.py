@@ -32,7 +32,7 @@ class Table:
     def remember_load(cls, key, thing):
         if isinstance(thing, vector.MemVec):
             cls.thing_to_name[thing] = key
-        if isinstance(thing, vector.ConstVec):
+        if isinstance(thing, vector.RValueVec):
             cls.const_to_name[thing] = key
 
     @classmethod
@@ -49,21 +49,6 @@ class Table:
 
         by_addr = sorted(cls.thing_to_name.items(), key=lambda v: v[0].get_address())
         by_const = sorted(cls.const_to_name.items())
-        # #  run through all symbols, see if address used.
-        # for value, key in by_addr:
-        #     try:
-        #         addr = value.get_address()
-
-        #         if addr is None:
-        #             continue
-        #         size = value.nelements()
-
-        #         for i in range(addr.to_int(), addr.to_int() + size):
-        #             if i in cls.addrs_used:
-        #                 used_symbols.add(key)
-        #     except AttributeError:
-        #         # some things in table don't have addresses.
-        #         pass
 
         lcols = []
         rcols = []
@@ -71,8 +56,9 @@ class Table:
         # go through table of all known macro names,
         # find out if used, and print nicely.
         for value, key in itertools.chain(by_addr, by_const):
-            lcols.append(key)
-            rcols.append(value.to_symtab_entry(cls.addrs_used))
+            if value.user_defined:
+                lcols.append(key)
+                rcols.append(value.to_symtab_entry(cls.addrs_used))
 
         lsize = lib.max_str_len(lcols)
         rsize = lib.max_str_len(rcols)

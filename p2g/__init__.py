@@ -28,7 +28,7 @@ from .stat import com
 from .stat import comment
 from .stat import dprint
 from .symbol import Table
-from .vector import ConstVec
+from .vector import RValueVec
 from .vector import Vec
 
 # ruff: noqa: F401

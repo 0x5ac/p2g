@@ -183,7 +183,7 @@ def test_basic_folding1():
     P.var *= V
     P.var += V - U
     Q.xy += [103, 203]
-    Q.xy += p2g.ConstVec([103, 203]) * 7
+    Q.xy += p2g.RValueVec([103, 203]) * 7
 
 
 @p2g.must_be(

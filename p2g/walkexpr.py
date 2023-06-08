@@ -129,7 +129,6 @@ class WalkExpr(walkbase.WalkBase):
 
             case _:
                 res = getattr(obj, node.attr)
-                print(res)
                 symbol.Table.remember_load(node.attr, res)
                 return res
         return None

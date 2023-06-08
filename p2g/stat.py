@@ -242,20 +242,6 @@ class Dprint(StatBase):
         yield "DPRNT[" + self.txt + "]"
 
 
-@dataclasses.dataclass
-class ByLambda(StatBase):
-    def __init__(self, fn):
-        super().__init__()
-        self.fn = fn
-
-    def to_full_lines(self, _):
-        return self.fn()
-
-    @classmethod
-    def emit(cls, fn):
-        add_stat(ByLambda(fn))
-
-
 class Set(StatBase):
     lhs: nd.EBase
     rhs: nd.EBase

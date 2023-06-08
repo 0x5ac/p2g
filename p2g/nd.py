@@ -14,15 +14,6 @@ class EBase:
     def to_gcode(self, _modifier: NodeModifier) -> str:
         return ""  # no cover
 
-    def to_symtab_entry(self, varrefs):
-        return str(self)
-
-    def symbol_name(self, _x):
-        pass
-
-    def symbol_key(self):
-        return ""
-
 
 DECIMALS = 4
 

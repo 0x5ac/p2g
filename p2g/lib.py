@@ -7,9 +7,7 @@ from p2g import gbl
 
 
 def max_str_len(lines):
-    if lines:
-        return max(map(len, lines))
-    return 0
+    return len(max(lines, key=len, default=""))
 
 
 def pad_to_same_width(lines):

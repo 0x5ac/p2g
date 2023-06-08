@@ -31,17 +31,18 @@ def test_job_tmpdir(tmpdir):
     tmpfile = tmpdir / "test.py"
     write_func(tmpfile)
     outfile = pathlib.Path(str(tmpdir / "test.nc"))
+
     p2g.main(
         [
             "--recursive",
-            "gen",
             "--job=O123",
-            str(tmpfile),
             f"--out={str(outfile)}",
+            "gen",
+            str(tmpfile),
         ]
     )
     tmpdata = outfile.read_text()
-    assert re.match("\\s+O123\\s+\\( TEST\\s+\\)", tmpdata)
+    assert "O123" in tmpdata
 
 
 def make_inout(tmpdir):

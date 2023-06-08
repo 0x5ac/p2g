@@ -500,8 +500,6 @@ Goto functions are constructed from parts, eg:
 #+BEGIN_SRC python
   from p2g import *
 
-
-
   def goto1():
       symbol.Table.print = True
       g1 = goto.work.feed (20)

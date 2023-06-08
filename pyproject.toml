@@ -3,7 +3,7 @@
 
 
 name = "p2g"
-version = "0.1.96"
+version = "0.1.97"
 description = "Transpile python into cnc gcode."
 authors = ["sac <sac@0x5ac.com>"]
 readme = "README.rst"

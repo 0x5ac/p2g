@@ -427,11 +427,170 @@ your machine considers to be illegal in a DPRNT string.
     L1002
       M30
 
-9 Notes.
+9 Symbol Tables.
+----------------
+
+Set the global ``p2g.symbol.Table.print`` to get a symbol
+table in the output file.
+
+.. code:: python
+    :name: stest
+
+    import p2g
+
+
+    x1 = -7
+
+
+    MACHINE_ABS_ABOVE_OTS = p2g.Const(x=x1, y=8, z=9)
+    MACHINE_ABS_ABOVE_SEARCH_ROTARY_LHS_5X8 = p2g.Const(100, 101, 102)
+    MACHINE_ABS_ABOVE_VICE = p2g.Const(x=17, y=18, z=19)
+    RAW_ANALOG = p2g.Fixed[10](addr=1080)
+    fish = 10
+    not_used = 12
+
+    def stest():
+        p2g.symbol.Table.print = True    
+        p2g.comment("Only used symbols are in output table.")
+        p2g.Var(MACHINE_ABS_ABOVE_OTS)
+        p2g.Var(MACHINE_ABS_ABOVE_VICE * fish)
+        v1 = p2g.Var()
+        v1 += RAW_ANALOG[7]
+
+::
+
+    ( RAW_ANALOG                              : #1080[10]               )
+    ( v1                                      :  #106.x                 )
+    ( MACHINE_ABS_ABOVE_OTS                   :  -7.000,  8.000,  9.000 )
+    ( MACHINE_ABS_ABOVE_SEARCH_ROTARY_LHS_5X8 : 100.000,101.000,102.000 )
+    ( MACHINE_ABS_ABOVE_VICE                  :  17.000, 18.000, 19.000 )
+      O0001                           ( -                             )
+
+    ( Only used symbols are in output table. )
+      #100= -7.                       ( Var[MACHINE_ABS_ABOVE_OTS]    )
+      #101= 8.
+      #102= 9.
+      #103= 170.                      ( Var[MACHINE_ABS_ABOVE_VICE * fish])
+      #104= 180.
+      #105= 190.
+      #106= #106 + #1087              ( v1 += RAW_ANALOG[7]           )
+      M30
+
+10 Goto.
 --------
+
+Goto functions are constructed from parts, eg:
+
+.. code:: python
+    :name: goto1
+
+    from p2g import *
+
+    def goto1():
+        symbol.Table.print = True
+        g1 = goto.work.feed (20)
+
+        comment ("in work cosys, goto x=1, y=2, z=3 at 20ips")
+        g1 (1,2,3)
+
+        comment ("make a variable, 2,3,4")
+        v1 = Var(x=2,y=3,z=4)        
+
+        absslow = goto.machine.feed(10)
+
+        comment ("In the machine cosys, move to v1.z then v1.xy, slowly")
+
+        absslow.z_then_xy(v1)
+
+        comment ("p1 is whatever absslow was, with feed adjusted to 100.")
+        p1 = absslow.feed(100)
+        p1.xy_then_z(v1)
+
+        comment ("p2 is whatever p1 was, with changed to a probe.")
+        p2 = p1.probe
+        p2.xy_then_z(v1)
+
+        comment ("p3 is whatever p1 was, with a probe and relative,",
+                 "using only the x and y axes")
+        p3 = p1.relative.probe
+        p3.xy_then_z(v1.xy)
+
+        comment ("move a and c axes ")
+        axis.NAMES = 'xyza*c'
+        goto.feed(20) (a=9, c= 90)
+
+::
+
+    ( v1      :  #100.x  #101.y  #102.z )
+    ( absslow : 10 machine xyz          )
+    ( g1      : 20 work xyz             )
+    ( p1      : 100 machine xyz         )
+    ( p2      : 100 machine xyz probe   )
+    ( p3      : 100 relative xyz probe  )
+      O0001                           ( -                             )
+
+    ( in work cosys, goto x=1, y=2, z=3 at 20ips )
+      G01 G90 F20. x1. y2. z3.        ( g1 [1,2,3]                    )
+
+    ( make a variable, 2,3,4 )
+      #100= 2.                        ( v1 = Var[x=2,y=3,z=4]         )
+      #101= 3.
+      #102= 4.
+
+    ( In the machine cosys, move to v1.z then v1.xy, slowly )
+      G01 G90 G53 F10. z#102          ( absslow.z_then_xy[v1]         )
+      G01 G90 G53 F10. x#100 y#101
+
+    ( p1 is whatever absslow was, with feed adjusted to 100. )
+      G01 G90 G53 F100. x#100 y#101   ( p1.xy_then_z[v1]              )
+      G01 G90 G53 F100. z#102
+
+    ( p2 is whatever p1 was, with changed to a probe. )
+    ( p2.xy_then_z[v1]              )
+      G01 G90 G53 G31 F100. x#100 y#101
+      G01 G90 G53 G31 F100. z#102
+
+    ( p3 is whatever p1 was, with a probe and relative, )
+    ( using only the x and y axes                       )
+      G01 G91 G31 F100. x#100 y#101   ( p3.xy_then_z[v1.xy]           )
+
+    ( move a and c axes  )
+      G01 G90 F20. a9. c90.           ( goto.feed[20] [a=9, c= 90]    )
+      M30
+
+11 Notes.
+---------
+
+Nice things:
+
+.. code:: python
+
+
+    from p2g import *
+    from p2g.haas import *
+
+    class X():
+             def __init__(self, a,b):
+                   self.a = a
+                   self.b = b
+             def adjust(self, tof):
+                   self.a += tof.x
+                   self.b += tof.y
+
+    def cool():
+          com ("You can do surprising things.")
+          p = X(12,34)
+
+          p.adjust(TOOL_OFFSET)
+          tmp = Var(p.a, p.b)
+
+12 Notes.
+---------
 
 The entire thing is brittle; I've only used it to make code
 for my own limited purposes. 
+
+Nice things:
 
 .. code:: python
 
@@ -553,7 +712,7 @@ for my own limited purposes.
     L1003
       M30
 
-10 HAAS macro var definitions
+13 HAAS macro var definitions
 -----------------------------
 
 Names predefined in p2g.haas:
@@ -855,7 +1014,7 @@ Names predefined in p2g.haas:
     | ``PROBE_TYPE``                |   ``200`` | ``#52601 … #52800`` |
     +-------------------------------+-----------+---------------------+
 
-11 Why:
+14 Why:
 -------
 
 Waiting for a replacement stylus **and** tool setter to arrive, I

@@ -8,7 +8,6 @@ from p2g import lib
 # constructor to a name and remembering all the address constants
 # used.  walk through all address constants, find the symbols
 # assocaited and mark them as useful.  then print them out.
-@dataclasses.dataclass
 class Table:
     print = False
 
@@ -24,6 +23,8 @@ class Table:
 
     @classmethod
     def remember_load(cls, key, thing):
+        if key in ("machine", "probe", "relative", "work", "goto"):
+            return
         try:
             cls.name_to_thing[key].add(thing)
         except TypeError:

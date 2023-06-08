@@ -53,14 +53,19 @@ def do_goto_worker(self, fter, args, kwargs):
 
     res.append(f"F{nd.to_gcode(self.feed_)}")
 
+    cos = []
     for aname, value in zip(axis.low_names_v(), values):
         if fter and aname not in fter:
             continue
 
         if value.is_none_constant:
             continue
-        res.append(f"{aname}{value.to_gcode(nd.NodeModifier.EMPTY)}")
-    rtxt = " ".join(res)
+        cos.append(f"{aname}{value.to_gcode(nd.NodeModifier.EMPTY)}")
+
+    if not cos:
+        return
+
+    rtxt = " ".join(res + cos)
 
     stat.code(rtxt)
 
@@ -87,14 +92,17 @@ class GotoWorker:
     #     return v
 
     def to_symtab_entry(self, *_):
-        return " ".join(
+        return "".join(
             [
-                "probe" if self.probe_ else "",
-                self.mcode_ if self.mcode_ else "",
-                self.space_.name.lower(),
-                self.order_.name.lower(),
-                "bp" if self.want_bp_ else "",
                 str(self.feed_),
+                " ",
+                self.mcode_ + " " if self.mcode_ else "",
+                self.space_.name.lower(),
+                " ",
+                self.order_.name.lower(),
+                " ",
+                "probe " if self.probe_ else "",
+                "bp" if self.want_bp_ else "",
             ]
         )
 

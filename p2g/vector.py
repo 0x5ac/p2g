@@ -35,9 +35,6 @@ class Vec(nd.EBase):
         while True:
             yield from self.everything()
 
-    def everything(self) -> typing.Iterable[scalar.Scalar]:
-        raise AssertionError
-
     def __getattr__(self, key):
         if key[0] == "_":
             return getattr(self, key)

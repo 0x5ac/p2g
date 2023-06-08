@@ -211,9 +211,10 @@ def main(argv=None):
             opts["--org"],
         )
     elif opts["gen"]:
+        gbl.config.opt_narrow_output = False
         return do_gen(opts)
     elif opts["ngen"]:
-        gbl.config.narrow_output = True
+        gbl.config.opt_narrow_output = True
         return do_gen(opts)
 
     elif opts["test"]:  # for debug

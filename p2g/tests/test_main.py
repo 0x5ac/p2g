@@ -37,7 +37,7 @@ def test_job_tmpdir(tmpdir):
             "--recursive",
             "--job=O123",
             f"--out={str(outfile)}",
-            "gen",
+            "ngen",
             str(tmpfile),
         ]
     )

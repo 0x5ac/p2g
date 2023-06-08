@@ -144,7 +144,7 @@ def handle_visit_name_store(self, node, store_val):
 
     dstns = lookup_to_ns(res, self, node.id)
 
-    symbol.Table.remember_store(dstns, node.id, store_val)
+    symbol.Table.remember_store(node.id, store_val)
     dstns[node.id] = store_val
 
 

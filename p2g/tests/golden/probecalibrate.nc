@@ -1,8 +1,6 @@
 ( MACHINE_ABS_ABOVE_OTS       :  -1.160, -7.500, -7.500 )
 ( MACHINE_ABS_ABOVE_RING      : -16.460, -3.500,-22.700 )
 ( MACHINE_ABS_CLOSE_ABOVE_OTS :  -1.160, -7.500, -7.800 )
-( goto                        :   work xyz  65.0        )
-( machine                     :   machine xyz  65.0     )
 
 ( Start with fixed height probe,   )
 ( make sure probe stickout <2.25in )

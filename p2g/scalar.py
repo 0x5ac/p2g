@@ -35,9 +35,6 @@ class Scalar(nd.EBase):
     def everything(self):
         yield self
 
-    def to_int(self):
-        raise NotImplementedError()
-
     # placeholder to east typechecking,
     # overwitten by op install machines.
     def __add__(self, _other):
@@ -67,10 +64,7 @@ class Constant(ConstantBase):
         return isinstance(other, Constant) and other.value == self._value
 
     def to_int(self) -> int:
-        return int(self._value)
-
-    def __int__(self):
-        return int(self._value)
+        return int(self)
 
     def to_float(self):
         return float(self._value)

@@ -1,1 +1,1 @@
-BAD
+XFAIL

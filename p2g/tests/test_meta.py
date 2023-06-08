@@ -33,7 +33,7 @@ def test_simple_ok():
 
 # gold file is there, but broken.
 
-tmp_path = golden_dir / "meta_simple_xfail1.nc"
+tmp_path = golden_dir / "meta_ismple_xfail1.nc"
 tmp_got_path = golden_dir / "meta_simple_xfail1.got"
 
 

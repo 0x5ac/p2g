@@ -1,3 +1,4 @@
+from os import sched_get_priority_max
 import p2g
 from p2g import gbl
 from p2g import lib
@@ -19,8 +20,8 @@ import itertools
 class Table:
     print = False
 
-    name_to_thing = {}
-
+    # store in this way to keep multiple definitions.
+    name_to_thing = collections.defaultdict(set)
     addrs_used = {}
     # Called for every store to a name, so remember when a vector is
     # given an association.
@@ -31,9 +32,11 @@ class Table:
 
     @classmethod
     def remember_load(cls, key, thing):
-        if hasattr(thing, "to_symtab_entry"):
-            breakpoint()
-            cls.name_to_thing[key] = thing
+        try:
+            cls.name_to_thing[key].add(thing)
+        except TypeError:
+            # some things are unhashable.
+            pass
 
     @classmethod
     def add_varref(cls, addr, pos):
@@ -45,23 +48,28 @@ class Table:
         if not cls.print:
             return
 
-        # sort all used symbols by address.
-
-        by_name = sorted(cls.name_to_thing.items())
-        #        by_const = sorted(cls.const_to_name.items())
-
+        # get object names and sort them.
+        sorted_names = sorted(cls.name_to_thing.keys(), key=str.casefold)
         lcols = []
         rcols = []
         old_rhs = ""
         # go through table of all known macro names,
         # find out if used, and print nicely.
-        for key, value in by_name:
-            if value.user_defined:
-                new_rhs = value.to_symtab_entry(cls.addrs_used)
-                if new_rhs != old_rhs:
-                    lcols.append(key)
-                    rcols.append(new_rhs)
-                    old_rhs = new_rhs
+        for phase in ["#", ",", "xyz"]:
+            for key in sorted_names:
+                new_values = cls.name_to_thing[key]
+                for rhsobj in new_values:
+                    try:
+                        if not rhsobj.user_defined:
+                            continue
+                    except AttributeError:
+                        continue
+                    new_rhs = rhsobj.to_symtab_entry(cls.addrs_used)
+                    if phase in new_rhs:
+                        if new_rhs != old_rhs:
+                            lcols.append(key)
+                            rcols.append(new_rhs)
+                            old_rhs = new_rhs
 
         lsize = lib.max_str_len(lcols)
         rsize = lib.max_str_len(rcols)
@@ -70,8 +78,6 @@ class Table:
 
     @classmethod
     def reset(cls):
-        cls.name_to_vec_store = collections.defaultdict(nd.EBase)
-        cls.thing_to_name = {}
-        cls.const_to_name = {}
+        cls.name_to_thing = collections.defaultdict(set)
         cls.addrs_used = {}
         cls.print = False

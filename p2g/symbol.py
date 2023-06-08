@@ -26,14 +26,19 @@ class Table:
 
     @classmethod
     def remember_store(cls, ns, key, thing):
-        pass
+        cls.remember_load(key, thing)
 
     @classmethod
     def remember_load(cls, key, thing):
-        if isinstance(thing, vector.MemVec):
-            cls.thing_to_name[thing] = key
-        if isinstance(thing, vector.RValueVec):
-            cls.const_to_name[thing] = key
+        try:
+            # symbol could be unhashable,
+            #     still table will be useful.
+            if isinstance(thing, vector.MemVec):
+                cls.thing_to_name[thing] = key
+            if isinstance(thing, vector.RValueVec):
+                cls.const_to_name[thing] = key
+        except TypeError:
+            pass
 
     @classmethod
     def add_varref(cls, addr, pos):
@@ -52,13 +57,16 @@ class Table:
 
         lcols = []
         rcols = []
-
+        old_rhs = ""
         # go through table of all known macro names,
         # find out if used, and print nicely.
         for value, key in itertools.chain(by_addr, by_const):
             if value.user_defined:
-                lcols.append(key)
-                rcols.append(value.to_symtab_entry(cls.addrs_used))
+                new_rhs = value.to_symtab_entry(cls.addrs_used)
+                if new_rhs != old_rhs:
+                    lcols.append(key)
+                    rcols.append(new_rhs)
+                    old_rhs = new_rhs
 
         lsize = lib.max_str_len(lcols)
         rsize = lib.max_str_len(rcols)

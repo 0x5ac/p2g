@@ -1,5 +1,5 @@
 import typing
-
+import functools
 from p2g import axis
 from p2g import err
 from p2g import nd
@@ -72,6 +72,9 @@ class RValueVec(Vec):
     _guts: list[scalar.Scalar]
     _from_user: bool
 
+    # def __eq_(self, a):
+    #     breakpoint()
+
     def __init__(self, value, from_user=False):
         super().__init__()
 
@@ -105,9 +108,9 @@ class RValueVec(Vec):
         res = []
         tlen = 0
         for el in self._guts:
-            nextstr = nd.to_gcode(el)
+            nextstr = nd.to_gcode(el, nd.NodeModifier.F3X3)
             tlen += len(nextstr)
-            if tlen > 20:
+            if tlen > 21:
                 res.append("...")
                 break
             res.append(nextstr)
@@ -128,6 +131,11 @@ class MemVec(Vec):
     _size: scalar.Scalar
     _addr: scalar.Scalar
     _step: scalar.Scalar
+
+    # $    def __eq__(self, x):
+    #        breakpoint()
+    #    def __hash__(self):
+    #        return 1
 
     def __init__(self, _addr=0, _size=0, _step=1):
         super().__init__()

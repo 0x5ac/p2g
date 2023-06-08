@@ -63,7 +63,7 @@ def unpack(args, kwargs) -> vector.RValueVec:
 @dataclasses.dataclass
 class _TypeBuilder:
     btype: str
-    size: int
+    size: typing.Optional[int]
 
     def __init__(self, btype="c", *, size=None):
         self.btype = btype

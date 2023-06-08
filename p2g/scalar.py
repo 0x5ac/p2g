@@ -76,9 +76,7 @@ class Constant(ConstantBase):
         return float(self._value)
 
     def to_gcode(self, modifier=nd.NodeModifier.EMPTY) -> str:
-        if modifier & nd.NodeModifier.ADDRESS:
-            return str(int(self._value))
-        return nd.to_gcode_from_float(self._value)
+        return nd.to_gcode_from_float(self._value, modifier)
 
     def __bool__(self):
         if self._value:

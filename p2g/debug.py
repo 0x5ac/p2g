@@ -70,7 +70,7 @@ def wrap_one_test_(fnname, fndef, args):
 
 def wrap_one_test(fnname, fndef):
     gbl.config.debug = True
-    #    wrap_one_test_(fnname, fndef, [])
+    wrap_one_test_(fnname, fndef, [])
     try:
         wrap_one_test_(fnname, fndef, [])
 
@@ -107,6 +107,7 @@ def run_all_test_(module_name):
 
 def runthem():
     tnames = [
+        "test_tuple",
         "test_example",
         "test_vector",
         "test_for",
@@ -128,7 +129,6 @@ def runthem():
         "test_expr",
         "test_interp",
         "test_str",
-        "test_tuple",
     ]
 
     for name in tnames:

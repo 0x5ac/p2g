@@ -479,7 +479,40 @@ table in the output file.
 10 Goto.
 --------
 
-Goto functions are constructed from parts, eg:
+Goto functions are constructed from parts, and make
+building  blocks when partially applied.
+
+goto [ .  / modifier / ] \*  ``(`` /coordinates/~)~
+
+modifier :
+
+- ``work``
+  Use current work coordinate system. - G90
+
+- ``machine``
+  Use the machine coordinate system - G90 G53
+
+- ``relative``
+  Use relative coordinate system - G91
+
+- ``z_then_xy``
+  move Z axis first.
+
+- ``xy_then_z``
+  move the other axes before the Z.
+
+- ``probe``
+  Emit probe code using G31.
+
+- ``xyz``
+  Move all axes at once.
+
+- ``feed(~/expr/``)~
+  Set feed rate.
+
+- ``mcode(~/string/``)~
+  Apply an mcode.
+
 
 .. code:: python
     :name: goto1
@@ -518,6 +551,10 @@ Goto functions are constructed from parts, eg:
         comment ("move a and c axes ")
         axis.NAMES = 'xyza*c'
         goto.feed(20) (a=9, c= 90)
+
+
+        comment ("probe with a hass MUST_SKIP mcode.")
+        goto.probe.feed(10).mcode("M79")(3,4,5)
 
 ::
 
@@ -561,36 +598,11 @@ Goto functions are constructed from parts, eg:
 11 Notes.
 ---------
 
-Nice things:
-
-.. code:: python
-
-
-    from p2g import *
-    from p2g.haas import *
-
-    class X():
-             def __init__(self, a,b):
-                   self.a = a
-                   self.b = b
-             def adjust(self, tof):
-                   self.a += tof.x
-                   self.b += tof.y
-
-    def cool():
-          com ("You can do surprising things.")
-          p = X(12,34)
-
-          p.adjust(TOOL_OFFSET)
-          tmp = Var(p.a, p.b)
-
-12 Notes.
----------
-
 The entire thing is brittle; I've only used it to make code
 for my own limited purposes. 
 
 Nice things:
+
 
 .. code:: python
 
@@ -712,7 +724,7 @@ Nice things:
     L1003
       M30
 
-13 HAAS macro var definitions
+12 HAAS macro var definitions
 -----------------------------
 
 Names predefined in p2g.haas:
@@ -1014,7 +1026,7 @@ Names predefined in p2g.haas:
     | ``PROBE_TYPE``                |   ``200`` | ``#52601 … #52800`` |
     +-------------------------------+-----------+---------------------+
 
-14 Why:
+13 Why:
 -------
 
 Waiting for a replacement stylus **and** tool setter to arrive, I

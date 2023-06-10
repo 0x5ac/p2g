@@ -1,5 +1,4 @@
 import collections
-import dataclasses
 import typing
 from p2g import lib
 

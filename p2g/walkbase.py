@@ -62,7 +62,7 @@ class WalkBase:
         err.compiler(f"{name} not implemented")
 
     def _visit_return(self, node):
-        if not isinstance(self.ns, walkns.FunctionNS):  # hard to test right
+        if not isinstance(self.ns, walkns.FunctionNS):
             err.compiler("'return' outside function")
         return self.visit(node.value)
 
@@ -77,11 +77,15 @@ class WalkBase:
 
     def visit_store(self, node, store_val) -> None:
         self.update_lastplace(node)
+
         method = "_visit_store_" + node.__class__.__name__.lower()
         visitor: typing.Callable[[ast.AST, ast.AST], None] = getattr(
             self, method, self.visit_fail
         )
         visitor(node, store_val)
+
+    def _visit_expr(self, node):
+        self.visit(node.value)
 
     @contextlib.contextmanager
     def pushpopns(self, ns):
@@ -89,9 +93,6 @@ class WalkBase:
         self.ns = ns
         yield
         self.ns = self.ns.parent
-
-    def _visit_expr(self, node):
-        self.visit(node.value)
 
 
 class WalkNS(WalkBase):

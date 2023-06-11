@@ -40,13 +40,13 @@ class PerTranslation:
     varrefs: typing.Dict
     last_node: typing.Any
 
+    def __init__(self):
+        self.reset()
+
     def next_bss(self, size):
         addr = self.ebss
         self.ebss += size
         return addr
-
-    def __init__(self):
-        self.reset()
 
     def reset(self):
         self.varrefs = {}
@@ -55,12 +55,6 @@ class PerTranslation:
         self.last_node = None
 
     #        self.next_label = 1000
-
-    def add_varref(self, idx):
-        try:
-            self.varrefs[idx.to_int()] = True
-        except NotImplementedError:
-            pass
 
 
 iface = PerTranslation()

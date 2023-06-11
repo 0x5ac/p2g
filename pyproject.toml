@@ -1,6 +1,9 @@
 [tool.poetry]
+
+
+
 name = "p2g"
-version = "0.1.73"
+version = "0.2.2"
 description = "Transpile python into cnc gcode."
 authors = ["sac <sac@0x5ac.com>"]
 readme = "README.rst"
@@ -21,6 +24,7 @@ packages = [
     { include = "p2g", format = "sdist"},
 
 ]
+
 
 [tool.poetry.dependencies]
 
@@ -50,6 +54,7 @@ deptry = "^0.8.0"
 mccabe = "^0.7.0"
 wrapt = "^1.15.0"
 dill = "^0.3.6"
+autoflake = "^2.1.1"
 
 [tool.pyright]
 disable = "N802"
@@ -81,7 +86,7 @@ exclude= [ "p2g/tests", "p2g/doc" ]
 [tool.mypy]
 ignore_missing_imports = true
 check_untyped_defs = true
-exclude= [ "p2g/tests" , "p2g/doc"]
+exclude= [ "p2g/tests" , "p2g/doc", "p2g/examples"]
 
 [tool.pydocstyle]
 ignore  = "D103,D101,D107,D100,D102,D105, D104"
@@ -127,16 +132,15 @@ log_date_format="%H%M"
 addopts="-p no:pylama -p no:pytest_pylama --cov=p2g --cov-append --tb=short -m 'not forcefail'"
 
 [tool.coverage.run]
-# though it looks like python,
-# this code is examined but not actually not run.
-#omit = ["p2g/examples/*", "p2g/tests/*"]
-#include = ["p2g/*.py"]
-omit=["./*.py", "p2g/debug.py", "p2g/builtin.py", "p2g/examples/*.py", "p2g/tests/*.py"]
-[tool.coverage.report]
-#show_missing = true
-#skip_covered = true
-exclude_lines = ["raise AssertionError", "pragma: no cover", "pass","soon", ".*placeholder.*", "for debug", "hard to test right", "no cover; crashes pytest", "no cover"]
 
+#include = ["p2g/*.py"]
+
+
+[tool.coverage.report]
+include = ["p2g/*.py"]
+exclude_lines = ["NotImplemented", "for debug",  "no cover","@(abc\\.)?abstractmethod" ]
+
+omit = ["p2g/tests/*.py","p2g/examples/*.py"]
 
 
 [tool.flake8]

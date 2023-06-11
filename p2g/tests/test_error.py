@@ -18,16 +18,22 @@ def fish():
     PROBE.x = 9
 
 
-@pytest.mark.forcefail
-@p2g.must_be("not the right answer")
+@pytest.mark.xfail
+@p2g.must_be(
+    "( PROBE.x = 9                   )",
+    " error  #5061= 9.",
+    '(  "quote escape" )',
+)
 def test_forcefail():
     PROBE.x = 9
+    p2g.com(' "quote escape"')
 
 
-@pytest.mark.forcefail
+@pytest.mark.xfail
 @p2g.check_golden()
-def test_forcefail1():
+def test_forcefail0():
     PROBE.x = 9
+    p2g.com(' "quote escape"')
 
 
 @p2g.must_be(
@@ -35,7 +41,7 @@ def test_forcefail1():
     "p2g/tests/test_error.py:7:20:21:     f = p2g.address(9)",
     "                                                     ^",
 )
-def test_comperr_addressof0():
+def test_cerror_addressof0():
     f = p2g.address(9)
 
 
@@ -44,7 +50,7 @@ def test_comperr_addressof0():
     "p2g/tests/test_error.py:8:24:25:     f = p2g.address(9 + x)",
     "                                                         ^",
 )
-def test_comperr_addressof1():
+def test_cerror_addressof1():
     x = PROBE
     f = p2g.address(9 + x)
 
@@ -54,7 +60,7 @@ def test_comperr_addressof1():
     "p2g/tests/test_error.py:8:6:7:     a[3][4] = 7",
     "                                     ^",
 )
-def test_comperr_bad_var():
+def test_cerror_bad_var():
     a = []
     a[3][4] = 7
 
@@ -64,7 +70,7 @@ def test_comperr_bad_var():
     "p2g/tests/test_error.py:8:4:5:     a, b = (1,)",
     "                                   ^",
 )
-def test_comperr_test_tupl1():
+def test_cerror_test_tupl1():
     #    with pytest.raises(SyntaxError, match="Not enough .*"):
     a, b = (1,)
 
@@ -74,7 +80,7 @@ def test_comperr_test_tupl1():
     "p2g/tests/test_error.py:7:4:12:     try:",
     "                                    ^^^^^^^^",
 )
-def test_comperr_no_try():
+def test_cerror_no_try():
     try:
         fish()
     except Exception:
@@ -82,22 +88,11 @@ def test_comperr_no_try():
 
 
 @p2g.must_be(
-    "Redefinition of a.",
-    "p2g/tests/test_error.py:9:4:6:     st.a = 10",
-    "                                   ^^",
-)
-def test_comperr_redef():
-    st = p2g.Symbols()
-    st.a = 9
-    st.a = 10
-
-
-@p2g.must_be(
     "Bad axis letter in 'fish'",
     "p2g/tests/test_error.py:8:4:9:     PROBE.fish = 100",
     "                                   ^^^^^",
 )
-def test_comperr_some_errors0():
+def test_cerror_some_errors0():
     #    with pytest.raises(AttributeError):
     PROBE.fish = 100
 
@@ -107,7 +102,7 @@ def test_comperr_some_errors0():
     "p2g/tests/test_error.py:8:7:8:     a, b = (1, 2, 3)",
     "                                      ^",
 )
-def test_comperr_tupl0():
+def test_cerror_tupl0():
     #    with pytest.raises(SyntaxError, match="Too many .*"):
     a, b = (1, 2, 3)
 
@@ -117,7 +112,7 @@ def test_comperr_tupl0():
     "p2g/tests/test_error.py:8:10:19:     tmp = undefined",
     "                                           ^^^^^^^^^",
 )
-def test_comperr_undef0():
+def test_cerror_undef0():
     #    with pytest.raises(SyntaxError, match="undefined.*"):
     tmp = undefined
 
@@ -127,20 +122,20 @@ def test_comperr_undef0():
     "p2g/tests/test_error.py:7:4:12:     try:",
     "                                 ^^^^^^^^",
 )
-def test_comperr_no_try():
+def test_cerror_no_try():
     try:
         fish()
     except Exception:
         pass
 
 
-@p2g.must_be()
 @pytest.mark.xfail()
-def test_xfail_assert0():
+@p2g.must_be("b")
+def test_cerror_assert0():
     assert False
 
 
-@p2g.must_be()
 @pytest.mark.xfail()
-def test_xfail_assert1():
+@p2g.must_be("a")
+def test_cerror_assert1():
     assert False, "message"

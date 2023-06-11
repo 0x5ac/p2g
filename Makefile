@@ -1,4 +1,3 @@
-TITLE=@ echo 
 PR=poetry run
 COVERAGE=$(PR) coverage
 PYTEST=PYTHONPATH=. $(PR) pytest --cov=p2g --cov-append
@@ -6,15 +5,15 @@ GOLDEN=p2g/tests/golden
 OXRST=~/.emacs.d/straight/build/ox-rst/ox-rst.el
 ######################################################################
 
-top: .poetry_and_deps_installed requirements.txt doc examples 
+top: .poetry_and_deps_installed requirements.txt examples  wip
 
 P2G_SRC=$(wildcard p2g/*.py)
 
 ######################################################################
 # Build machinary
-
+.PHONY:
 download_poetry:
-	echo 		 "downloading poetry, ^C to stop"
+	echo "downloading poetry, ^C to stop"
 	sleep 3
 	curl -sSL https://install.python-poetry.org | python3 -
 
@@ -65,17 +64,21 @@ p2g/doc/%.rst: p2g/doc/%.org
 
 ######################################################################
 # release:
+VERSION := $(shell poetry version -s )
+.PHONY: 
+bump: bump-inc | bump-install
 
-bump:
+.PHONY:
+bump-install:
+	echo __version__ = '"v'$(shell poetry version -s)'"'  > p2g/version.py
+	git tag v$$(poetry version -s)
+	git commit -a -m "bumped v$$(poetry version -s)"
+.PHONY:
+bump-inc:
 	poetry version patch
-	$(eval VERSION := $(shell poetry version -s ))
-	echo __version__ = '"'$(VERSION)'"'  > p2g/version.py
-	git tag $$(poetry version -s)
-	git commit -a -m \\"bumped $$(poetry version -s)\\"
-
-build:
-	cp p2g/doc/readme.md README.md
-	cp p2g/doc/readme.md README.md
+	grep "^version" pyproject.toml 
+build: doc
+	cp p2g/doc/readme.rst README.rst
 	poetry build 
 
 bcheck: build
@@ -89,16 +92,12 @@ release:
 
 
 test-standard:
-	$(V)	$(PYTEST) p2g -m 'not forcefail'
+	$(V) echo FAIL  > $(GOLDEN)/test_error_test_forcefail0.nc
+	$(V) echo XFAIL > $(GOLDEN)/test_meta_test_simple_xfail1.nc
+	$(V) $(PYTEST)  
 
-# force some errors, kick the tyres.
-test-fails:
-	$(V) echo FAIL  > $(GOLDEN)/error_xfail_force_fail.nc
-	$(V) echo XFAIL > $(GOLDEN)/meta_simple_xfail1.nc
-	$(TITLE) Test things which should fail
-	$(V) - $(PYTEST) p2g/tests/test_error.py -m forcefail   > /dev/null 2> /dev/null
-	$(V) 
 
+ 
 
 test-cli:
 	$(COVERAGE) run --append -m  p2g --debug test  > /dev/null 2> /dev/null
@@ -108,14 +107,14 @@ coverage-reset:
 	rm -f .coverage
 .PHONY:
 coverage-convert:
-	$(COVERAGE) lcov
+	$(COVERAGE) lcov --include=p2g/*.py 
 .PHONY:
 coverage-report:
-	$(COVERAGE) report
+	$(COVERAGE) report  --include=p2g/*.py 
 
 
-.NOTPARALLEL:
-test: top coverage-reset test-cli test-fails   test-standard coverage-convert
+.PHONY:
+test: |  top  coverage-reset   test-cli test-standard  coverage-convert 
 
 
 
@@ -127,33 +126,25 @@ newtests:
 ######################################################################
 # linty stuff
 isort:
-	$(TITLE) isort
 	$(V)	isort .
 ssort:
-	$(TITLE) ssort
 	$(V)	echo p2g/*.py | xargs $(PR) ssort
 
 autoflake:
-	$(TITLE) Autoflake
 	$(V) $(PR) autoflake --ignore-init-module-imports  --remove-all-unused-imports  -i -v $(P2G_SRC)
 
 mypy:
-	$(TITLE) mypy
-	$(V) - $(PR) mypy p2g
+	$(V) - $(PR) mypy p2g | cat
 
 flake8:
-	$(TITLE) flake8
 	$(V) - $(PR) flake8p p2g | cat
 
 pylint:
-	$(TITLE) pylint
 	$(V) - $(PR) pylint p2g
 
 ruff:
-	$(TITLE) ruff
 	$(V) - NO_COLOR=1 $(PR) ruff check  p2g
 sf:
-	$(TITLE) sf
 	$(V) - python 	/home/sac/w/nih/snakefood/main.py . p2g
 
 
@@ -170,12 +161,19 @@ checkdeps:
 
 
 
-# copy test results to goldens
-gold:
-	find tests -name "*.new"  | sed "s/\([^.]*\).new/mv \1.new \1.nc/g" | bash
-# for the ones which must fail
-	echo fail > p2g/tests/golden/meta_simple_xfail.nc
-	echo fail > p2g/tests/golden/error_force_fail.nc
+
+# Build my wips
+DSTDIR=/home/sac/vf3/_nc_
+SRCDIR=/home/sac/vf3/progs/p2g/p2g/examples
+
+wip:   $(DSTDIR)/.mark-probecalibrate
+
+
+VPATH=$(SRCDIR):$(DSTDIR)
+$(DSTDIR)/.mark-%: %.py
+	poetry run p2g --debug --out="$(DSTDIR)/<time>-$*.nc"  gen $<
+#	touch $@
+
 
 
 

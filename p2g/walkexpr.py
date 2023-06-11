@@ -1,6 +1,7 @@
 import ast
 
 from p2g import op
+from p2g import symbol
 from p2g import walkbase
 from p2g import walkns
 
@@ -127,7 +128,9 @@ class WalkExpr(walkbase.WalkBase):
                 delattr(obj, node.attr)
 
             case _:
-                return getattr(obj, node.attr)
+                res = getattr(obj, node.attr)
+                symbol.Table.remember_load(node.attr, res)
+                return res
         return None
 
     def _visit_store_attribute(self, node, store_val):

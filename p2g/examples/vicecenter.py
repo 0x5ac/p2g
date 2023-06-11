@@ -1,9 +1,7 @@
-#! /usr/bin/env python
-
-import csearch
-import defs
-
 import p2g
+import defs
+import csearch
+
 
 from p2g.haas import *
 
@@ -101,7 +99,7 @@ def find_surface_before(st, sch):
 
     # make work offset z make rough top 0.
     st.WCS.z = MACHINE_POS.z
-    st.message("check g55")
+    st.pause("check g55")
 
     p2g.comment(
         "now work.z should be 0 at surface",
@@ -136,7 +134,7 @@ def find_surface_before(st, sch):
     st.WCS.z = SKIP_POS.z
 
     st.goto.machine(z=sch.above.z)
-    st.alarm(" what changed", 103)
+    st.alarm(" what changed")
 
 
 @p2g.inline
@@ -148,7 +146,6 @@ def runit(st, sch):
         f" result in {st.WCS}",
         *sch.comment,
     )
-    st.insert_symbol_table()
 
     st.setup_probing()
 
@@ -156,6 +153,7 @@ def runit(st, sch):
 
 
 def vicecenter():
+    p2g.symbol.Table.print = True
     st = defs.JobDefs()
 
     sch = csearch.SearchConstraint(

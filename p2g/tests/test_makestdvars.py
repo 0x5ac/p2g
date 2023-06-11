@@ -1,11 +1,15 @@
 import sys
 
+
+sys.path.insert(0, "..")
+sys.path.insert(0, "../..")
+
 import p2g
 
 
 # just code coverage really.
-def test_tmpdir_makestdvars0(tmpdir):
-    srcfile = str(tmpdir / "def.py")
+def test_native_tmpdir_makestdvars0(tmpdir):
+    srcfile = str(tmpdir) + "/def.py"
     with open(srcfile, "w", encoding="utf-8") as of:
         of.writelines([" # MACHINE GEN BELOW", " # MACHINE GEN ABOVE"])
 

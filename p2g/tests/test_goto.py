@@ -6,7 +6,7 @@ import p2g
     "p2g/tests/test_goto.py:7:24:25:     p2g.goto.work(1, 2, 3)",
     "                                                        ^",
 )
-def test_comperr_no_feed():
+def test_cerror_no_feed():
     p2g.goto.work(1, 2, 3)
 
 
@@ -71,3 +71,12 @@ def test_probe0():
 )
 def test_probe1():
     p2g.goto.feed(123).z_then_xy(1, 2, 3)
+
+
+@p2g.must_be(
+    "( goto.r9810.feed[7].z_then_xy[1, 2, 3])",
+    "  G01 G65 R9810 F7. z3.",
+    "  G01 G65 R9810 F7. x1. y2.",
+)
+def test_safemove():
+    p2g.goto.r9810.feed(7).z_then_xy(1, 2, 3)

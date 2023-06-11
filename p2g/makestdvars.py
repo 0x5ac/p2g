@@ -7,6 +7,7 @@ from rich.table import Table
 
 from p2g import lib
 
+
 # three sorts of py outputs, as an arrays,  as attributes to a
 # class, or straight into global names.
 
@@ -24,9 +25,8 @@ def def_prefix(key):
         return f'dst["{key}"]'
     if INTO_ATTR:  # no cover
         return f"dst.{key}"
-    if INTO_GBL:
+    else:
         return f"{key}"
-    raise AssertionError
 
 
 MAKE_PFX = "p2g."

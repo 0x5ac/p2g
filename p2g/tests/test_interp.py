@@ -63,7 +63,7 @@ def test_break():
     "p2g/tests/test_interp.py:7:4:16:     try:",
     "                                     ^^^^^^^^^^^^",
 )
-def test_comperr_tr():
+def test_cerror_tr():
     try:
         V[0] = 1
         raise SyntaxError
@@ -76,7 +76,7 @@ def test_comperr_tr():
     "p2g/tests/test_interp.py:7:4:12:     try:",
     "                                     ^^^^^^^^",
 )
-def test_comperr_try():
+def test_cerror_try():
     try:
         if 1:
             pass
@@ -89,7 +89,7 @@ def test_comperr_try():
     "p2g/tests/test_interp.py:7:4:16:     with foo():",
     "                                     ^^^^^^^^^^^^",
 )
-def test_comperr_with():
+def test_cerror_with():
     with foo():
         V[0] = 1
 
@@ -157,28 +157,6 @@ def test_dict():
 
 
 @p2g.must_be(
-    "Illegal iterator.",
-    "p2g/tests/test_interp.py:7:20:21:     for x in [1, 2, 3]:",
-    "                                                      ^",
-)
-def test_for1():
-    for x in [1, 2, 3]:
-        pass
-
-
-@p2g.must_be(
-    "must be simple name as destination for for",
-    "p2g/tests/test_interp.py:7:25:26:     for V[0] in range(1, 9):",
-    "                                                            ^",
-)
-def test_for():
-    for V[0] in range(1, 9):
-        pass
-    else:
-        V[1] = 10
-
-
-@p2g.must_be(
     "( V[2] = 9                      )",
     "  #202= 9.                    ",
     "( V[3] = 1                      )",
@@ -218,7 +196,7 @@ def test_ifs():
     "p2g/tests/test_interp.py:7:4:34:     from pytest import v2 as dummy",
     "                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
 )
-def test_import_from():
+def test_cerror_import_from():
     from pytest import v2 as dummy
 
     V.xyz = v2
@@ -229,7 +207,7 @@ def test_import_from():
     "p2g/tests/test_interp.py:9:11:16:     V[0] = dummy.v1",
     "                                             ^^^^^",
 )
-def test_import():
+def test_cerror_import():
     import pytest as dummy
 
     V[0] = dummy.v1

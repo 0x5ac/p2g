@@ -4,11 +4,11 @@ import math
 import typing
 
 from p2g import err
-from p2g import gbl
 from p2g import lib
 from p2g import nd
 from p2g import opinfo
 from p2g import scalar
+from p2g import symbol
 from p2g import vector
 
 
@@ -130,7 +130,11 @@ class Unop(scalar.Scalar):
         res = []
 
         if self.opfo.pyn == "#":
-            gbl.iface.add_varref(self.child)
+            try:
+                addr = int(self.child)
+                symbol.Table.add_varref(addr, err.state.last_pos)
+            except TypeError:
+                pass
 
         outer_prec = self.opfo.prec
 

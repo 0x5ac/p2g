@@ -14,7 +14,7 @@ from p2g import walk
 
 # takes fn, works out where it lives, where to find golden output and
 # where to put test output
-# test_foo.py (test_zap) will make a tests/golden/foo_zap.nc file.
+# test_foo.py (test_zap) will make a tests/golden/test_foo_test_zap.nc file.
 
 
 def make_file_path(func, new_suffix) -> pathlib.Path:
@@ -25,7 +25,7 @@ def make_file_path(func, new_suffix) -> pathlib.Path:
 
     # file_part <- function's filename
     file_part = str(pathlib.Path(func.__code__.co_filename).stem)
-    file_part = file_part.replace("test_", "")
+    #    file_part = file_part.replace("test_", "")
 
     # can be in <srcdir>/tests or ../tests depending upon
     # if run installed or not. Look for testdir.
@@ -44,7 +44,8 @@ def make_file_path(func, new_suffix) -> pathlib.Path:
     generated_dir.mkdir(exist_ok=True)
     #  <somewhere>/tests/golden/foo_zap.nc
 
-    new_filename = func.__name__.replace("test", file_part)
+    #    new_filename = func.__name__.replace("test", file_part)
+    new_filename = file_part + "_" + func.__name__
     return (generated_dir / new_filename).with_suffix(new_suffix)
 
 
@@ -117,13 +118,6 @@ def format_differences(marks, golden_data: list[str], callow_data: list[str]):
         )
 
 
-@lib.g2l
-def read_and_trim(path):
-    lines = lib.splitnl(path.read_text())
-    for line in lines:
-        yield line
-
-
 def writelines(path, txt):
     return path.write_text(lib.nljoin(txt))
 
@@ -134,7 +128,6 @@ def writelines(path, txt):
 
 def make_decorated_source_seed(fn, callow_path, callow_data):
     tofix = ["@p2g.must_be("]
-
     for line in callow_data:
         quotechar = '"'
         if quotechar in line:
@@ -164,6 +157,13 @@ def get_all_comp_outputs(fn):
     except err.CompilerError as exn:
         outlines = exn.error_lines(absolute_lines=False, topfn=fn)
     return outlines
+
+
+@lib.g2l
+def read_and_trim(path):
+    lines = lib.splitnl(path.read_text())
+    for line in lines:
+        yield line
 
 
 # when called from test, exceptions are sent to output file
@@ -210,8 +210,10 @@ def check_golden_worker(fn, check_comments):
 
         # if running in pytest then exist out gracefully for them.
         # otherwise, running in debug harness.
-        if gbl.config.debug:
-            err.compiler(f"ptest error {lib.nljoin(etext)}")  # for debug
+        if gbl.config.debug:  # for debug
+            for line in etext:
+                print(line)
+            err.compiler(f"ptest error {lib.nljoin(etext)}")
 
         pytest.fail(lib.nljoin(etext))
 

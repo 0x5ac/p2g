@@ -167,7 +167,6 @@ def interpfunc(fun):
 
 @dataclasses.dataclass
 class FuncArgsDescr:
-    defndesc: typing.Any
     args: list[typing.Any]
     kwargs: dict[str, typing.Any]
 
@@ -200,7 +199,6 @@ class WalkFunc(walkbase.WalkBase):
         #        return desc.callit(*desc.args, **desc.kwargs)
         # f = interpfunc(desc.func)
         # return f
-
         return defn(*desc.args, **desc.kwargs)
 
     def _visit_functiondef(self, node):
@@ -210,7 +208,9 @@ class WalkFunc(walkbase.WalkBase):
         self.ns[node.name] = ifunc
 
 
-def digest_top(walker, func_name, srcpath, job_name):
+def digest_top(walker, func_name, srcpath, job_name, args):
+    if args is None:
+        args = []
     try:
         fncdef = walker.ns[func_name]
         desc = fncdef(Marker())
@@ -221,10 +221,10 @@ def digest_top(walker, func_name, srcpath, job_name):
         stat.add_stat(stat.Code(job_name, srcpath.stem.upper()))
 
     if gbl.config.bp_on_error:  # no cover
-        inline(desc)
+        inline(desc, *args)
     else:
         try:
-            inline(desc)
+            inline(desc, *args)
         except (AttributeError, IndexError) as exn:
             err.compiler(exn)
 

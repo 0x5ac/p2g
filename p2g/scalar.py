@@ -1,3 +1,4 @@
+import abc
 import typing
 
 from p2g import nd
@@ -35,16 +36,18 @@ class Scalar(nd.EBase):
     def everything(self):
         yield self
 
-    def to_int(self):
-        raise NotImplementedError()
-
     # placeholder to east typechecking,
     # overwitten by op install machines.
+    @abc.abstractmethod
     def __add__(self, _other):
         pass
 
+    @abc.abstractmethod
     def __lt__(self, _other):
         pass
+
+    def __int__(self) -> int:
+        raise TypeError
 
 
 class ConstantBase(Scalar):
@@ -55,27 +58,25 @@ class Constant(ConstantBase):
     _value: int | float
     is_numeric_constant = True
 
-    @property
-    def value(self):
-        return self._value
-
     def __init__(self, value: int | float):
         super().__init__(opinfo.const_opinfo)
         self._value = value
+
+    @property
+    def value(self):
+        return self._value
 
     def same(self, other: "Constant"):
         return isinstance(other, Constant) and other.value == self._value
 
     def to_int(self) -> int:
-        return int(self._value)
+        return int(self)
 
     def to_float(self):
         return float(self._value)
 
     def to_gcode(self, modifier=nd.NodeModifier.EMPTY) -> str:
-        if modifier & nd.NodeModifier.ADDRESS:
-            return str(int(self._value))
-        return nd.to_gcode_from_float(self._value)
+        return nd.to_gcode_from_float(self._value, modifier)
 
     def __bool__(self):
         if self._value:

@@ -15,6 +15,7 @@ from p2g import lib
 from p2g import op
 from p2g import scalar
 from p2g import stat
+from p2g import symbol
 from p2g import vector
 from p2g import walkbase
 from p2g import walkexpr
@@ -146,7 +147,6 @@ class ItrSlice:
 
     def __init__(self, itr, interp, target):
         self.interp = interp
-        #        breakpoint()
         self.target = target
 
         # with a slice, always need a pointer to
@@ -172,7 +172,6 @@ class ItrSlice:
         return self.pastptr
 
     def load_target(self):
-        #        breakpoint()
         handle_assign(self.interp, self.target, op.hashop(scalar.wrap_scalar(self.ptr)))
 
     #        stat.add_stat(stat.Set(self.interp.visit(self.var), op.hashop(self.ptr)))
@@ -382,20 +381,25 @@ def compile_all(node, srcfile_name):
     return walker
 
 
+def find_defined_funcs(sourcelines):
+    for line in sourcelines.split("\n"):
+        # find last line with def in it, that's the function we need
+        mares = re.match("def (.*?)\\(", line)
+        if mares:
+            yield mares.group(1)
+
+
 def find_main_func_name(sourcelines, func_name_arg):
     if func_name_arg != "<last function in file>":
         return func_name_arg
-    function_to_call = ""
-    for line in sourcelines.split("\n"):
-        # find last line with def in it, that's the function we need
-        mares = re.match("(.*)def (.*?)\\(", line)
-        if mares:
-            function_to_call = mares.group(2)
+    function_to_call = "no function in file"
+    for fname in find_defined_funcs(sourcelines):
+        function_to_call = fname
     return function_to_call
 
 
 @lib.g2l
-def compile2g(func_name_arg, srcfile_name, job_name, in_pytest):
+def compile2g(func_name_arg, srcfile_name, job_name, in_pytest, args=None):
     gbl.config.in_pytest = in_pytest
 
     srcpath = pathlib.Path(srcfile_name)
@@ -403,15 +407,16 @@ def compile2g(func_name_arg, srcfile_name, job_name, in_pytest):
     with lib.openr(srcpath) as inf:
         sys.path.insert(0, str(srcpath.parent))
 
-        with stat.Nest() as cursor:
+        with stat.Nest(in_pytest) as cursor:
             axis.NAMES = "xyz"
-
             gbl.iface.reset()
-            logger.debug(f"Starting {func_name_arg}")
+
+            symbol.Table.reset()
+
+            logger.debug(f"Starting {func_name_arg} {cursor.next_label}")
             sourcelines = inf.read()
             node = ast.parse(sourcelines)
             # load everything
-
             walker = compile_all(node, srcfile_name)
             if node.body:
                 walkfunc.digest_top(
@@ -419,9 +424,14 @@ def compile2g(func_name_arg, srcfile_name, job_name, in_pytest):
                     find_main_func_name(sourcelines, func_name_arg),
                     srcpath,
                     job_name,
+                    args,
                 )
-            res = cursor.to_full_lines()
-            return res
+            # can't use generator 'cause need
+            # mods to varrefs for symbol table
+            res = list(cursor.to_full_lines())
+
+            yield from symbol.Table.yield_lines()
+            yield from res
 
 
 class WantInline:

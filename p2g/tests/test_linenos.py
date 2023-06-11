@@ -8,7 +8,7 @@ import p2g
     "p2g/tests/test_linenos.py:10:19:20:     j = p2g.Var[2](1)",
     "                                                       ^",
 )
-def test_no0():
+def test_cerror_no0():
     # abs 6 rel 2
     #   7       3
     #   8       4
@@ -20,6 +20,6 @@ def test_no0():
     "p2g/tests/test_linenos.py:8:19:20:     j = p2g.Var[2](1)",
     "                                                      ^",
 )
-def test_no1():
+def test_cerror_no1():
     # 14
     j = p2g.Var[2](1)

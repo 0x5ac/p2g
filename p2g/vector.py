@@ -1,3 +1,4 @@
+import abc
 import typing
 
 from p2g import axis
@@ -11,27 +12,29 @@ class Vec(nd.EBase):
     is_scalar = False
     is_vec = True
 
+    _assoc_name: str
     _read: bool
+
+    def __init__(self):
+        self._read = False
+        self._assoc_name = ""
 
     def to_scalar(self):
         return self[0]
 
     def get_axes_vec(self, key):
         if key == "var":
-            return ConstVec(list(scalar.urange(0, self.nelements())))
+            return RValueVec(list(scalar.urange(0, self.nelements())))
 
         indexes = axis.name_to_indexes_list(key)
         if max(indexes) >= self.nelements():
             err.compiler("Reference to too many axes.")
-        return ConstVec(indexes)
+        return RValueVec(indexes)
 
     def forever(self):
         self._read = True
         while True:
             yield from self.everything()
-
-    def everything(self) -> typing.Iterable[scalar.Scalar]:
-        raise AssertionError
 
     def __getattr__(self, key):
         if key[0] == "_":
@@ -56,22 +59,34 @@ class Vec(nd.EBase):
             return self.get_slice(scalar_index)
         return self.get_at(scalar.wrap_scalar(scalar_index))
 
+    @abc.abstractmethod
     def __add__(self, _other) -> "Vec":  # placeholder, filled in from op.reg
         return self
 
+    @abc.abstractmethod
     def __mul__(self, _other) -> "Vec":  # placeholder, filled in from op.reg
         return self
 
 
-class ConstVec(Vec):
+class RValueVec(Vec):
     _guts: list[scalar.Scalar]
+    _from_user: bool
 
-    def __init__(self, value):
+    # def __eq_(self, a):
+    #     breakpoint()
+
+    def __init__(self, value, from_user=False):
         super().__init__()
+
         object.__setattr__(self, "_guts", [])
-        self._read = False
+
+        object.__setattr__(self, "_from_user", from_user)
         for el in value:
             self._guts.append(scalar.wrap_scalar(el))
+
+    @property
+    def user_defined(self):
+        return self._from_user
 
     def get_address(self):
         return self._guts[0].get_address()
@@ -82,20 +97,18 @@ class ConstVec(Vec):
 
     def get_at(self, idx: scalar.Scalar):
         self._read = True
-        i = idx.to_int()
-        assert isinstance(i, int)
-        return self._guts[i]
+        return self._guts[int(idx)]
 
     def nelements(self):
         return len(self._guts)
 
-    def to_symtab_entry(self, _):
+    def to_symtab_entry(self, _) -> str:
         res = []
         tlen = 0
         for el in self._guts:
-            nextstr = nd.to_gcode(el)
+            nextstr = nd.to_gcode(el, nd.NodeModifier.F3X3)
             tlen += len(nextstr)
-            if tlen > 20:
+            if tlen > 21:
                 res.append("...")
                 break
             res.append(nextstr)
@@ -117,15 +130,25 @@ class MemVec(Vec):
     _addr: scalar.Scalar
     _step: scalar.Scalar
 
+    # $    def __eq__(self, x):
+    #        breakpoint()
+    #    def __hash__(self):
+    #        return 1
+
     def __init__(self, _addr=0, _size=0, _step=1):
+        super().__init__()
         self._addr = scalar.wrap_scalar(_addr)
         self._size = scalar.wrap_scalar(_size)
         self._step = scalar.wrap_scalar(_step)
 
+    @property
+    def user_defined(self):
+        return True
+
     def get_address(self):
         return self._addr
 
-    def to_symtab_entry(self, varrefs):
+    def to_symtab_entry(self, varrefs) -> str:
         fwidth = 7
         hit_indexes = {}
 
@@ -147,7 +170,7 @@ class MemVec(Vec):
         return " ".join(res)
 
     def nelements(self):
-        return self._size.to_int()
+        return int(self._size)
 
     def everything(self):
         return (
@@ -158,7 +181,7 @@ class MemVec(Vec):
     def get_at(self, idx: scalar.Scalar):
         if isinstance(idx, scalar.Constant):
             fidx = int(idx)
-            if not 0 <= fidx < self._size.to_int():
+            if not 0 <= fidx < int(self._size):
                 err.compiler(
                     f"Index out of range, index={fidx} size={self._size}",
                 )
@@ -195,15 +218,15 @@ def wrap_optional_maybe_vec(
         return res
 
     if isinstance(thing, list):
-        return ConstVec(thing)
-    if isinstance(thing, (ConstVec, MemVec)):
+        return RValueVec(thing)
+    if isinstance(thing, (RValueVec, MemVec)):
         return thing
     if isinstance(thing, (set, dict)):
-        return ConstVec(thing)
+        return RValueVec(thing)
     if isinstance(thing, tuple):
-        return ConstVec(list(thing))
+        return RValueVec(list(thing))
 
-    raise TypeError
+    raise NotImplementedError
 
 
 def wrap_maybe_vec(thing) -> typing.Union[Vec, scalar.Scalar]:
@@ -214,5 +237,5 @@ def wrap_maybe_vec(thing) -> typing.Union[Vec, scalar.Scalar]:
 
 def sorv_from_list(thing: list) -> typing.Union[Vec, scalar.Scalar]:
     if len(thing) != 1:
-        return ConstVec(thing)
+        return RValueVec(thing)
     return thing[0]

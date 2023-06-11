@@ -1,20 +1,25 @@
 from p2g import *
 from p2g.haas import *
 
+
 X = Fixed[3](addr=203)
 
 
 @must_be_cc(
+    "",
     "( ha )",
+    "",
+    '( h"a" )',
     "( X.y = 2 * -1                  )",
     "  #204= -2.",
 )
 def test_0():
     comment("ha")
+    comment('h"a"')
     X.y = 2 * -1
 
 
-@must_be_cc("( ho )")
+@must_be_cc("", "( ho )")
 def test_del0():
     comment("ho")
     aa = {1: 2, 3: 4}

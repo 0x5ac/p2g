@@ -8,6 +8,9 @@ NAMES = "xyz"
 
 
 class Axes(scalar.Constant):
+    def __init__(self):
+        super().__init__(len(NAMES))
+
     @property
     def _value(self):
         return len(NAMES)
@@ -15,9 +18,6 @@ class Axes(scalar.Constant):
     @_value.setter
     def _value(self, inset):
         pass
-
-    def __init__(self):
-        super().__init__(len(NAMES))
 
 
 def low_names_v():

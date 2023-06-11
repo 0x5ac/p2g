@@ -18,6 +18,7 @@ class MovementSpace(enum.IntEnum):
     WORK = enum.auto()
     MACHINE = enum.auto()
     RELATIVE = enum.auto()
+    R9810 = enum.auto()
 
 
 class MovementOrder(enum.IntEnum):
@@ -42,6 +43,8 @@ def do_goto_worker(self, fter, args, kwargs):
             res.append("G91")
         case MovementSpace.WORK:
             res.append("G90")
+        case MovementSpace.R9810:
+            res.append("G65 R9810")
 
     if self.probe_:
         res.append("G31")
@@ -53,20 +56,26 @@ def do_goto_worker(self, fter, args, kwargs):
 
     res.append(f"F{nd.to_gcode(self.feed_)}")
 
+    cos = []
     for aname, value in zip(axis.low_names_v(), values):
         if fter and aname not in fter:
             continue
 
         if value.is_none_constant:
             continue
-        res.append(f"{aname}{value.to_gcode(nd.NodeModifier.EMPTY)}")
-    rtxt = " ".join(res)
+        cos.append(f"{aname}{value.to_gcode(nd.NodeModifier.EMPTY)}")
+
+    if not cos:
+        return
+
+    rtxt = " ".join(res + cos)
 
     stat.code(rtxt)
 
 
 @dataclasses.dataclass(eq=True, frozen=True)
 class GotoWorker:
+    user_defined = True
     want_bp_: bool
     space_: MovementSpace
     feed_: float
@@ -74,15 +83,29 @@ class GotoWorker:
     probe_: bool
     mcode_: str
 
-    def to_symtab_entry(self, *_):
-        return " ".join(
+    # def __eq__(self, x):
+    #     breakpoint()
+
+    # def __lt__(self, x):
+    #     breakpoint()
+
+    # def __hash__(self):
+    #     v = object.__hash__(self)
+    #     breakpoint()
+    #     return v
+
+    def to_symtab_entry(self, *_) -> str:
+        return "".join(
             [
-                "probe" if self.probe_ else "",
-                self.mcode_ if self.mcode_ else "",
-                self.space_.name.lower(),
-                self.order_.name.lower(),
-                "bp" if self.want_bp_ else "",
                 str(self.feed_),
+                " ",
+                self.mcode_ + " " if self.mcode_ else "",
+                self.space_.name.lower(),
+                " ",
+                self.order_.name.lower(),
+                " ",
+                "probe " if self.probe_ else "",
+                "bp" if self.want_bp_ else "",
             ]
         )
 
@@ -93,6 +116,10 @@ class GotoWorker:
     @property
     def work(self):
         return self.update("space_", MovementSpace.WORK)
+
+    @property
+    def r9810(self):
+        return self.update("space_", MovementSpace.R9810)
 
     @property
     def machine(self):
@@ -136,6 +163,7 @@ class GotoWorker:
                 do_goto_worker(self, "z", args, kwargs)
 
 
+nd.HasToSymTab.register(GotoWorker)
 goto = GotoWorker(
     want_bp_=False,
     space_=MovementSpace.WORK,

@@ -55,7 +55,7 @@ def clean_comment_chars(txt: str):
 
 def compress_and_clean(line: str):
     guts = clean_comment_chars(line)
-    for too_talky in ["p2g.", "goto", "var."]:
+    for too_talky in ["p2g.", "var."]:
         guts = guts.replace(too_talky, "")
 
     if guts.startswith("    "):
@@ -64,27 +64,37 @@ def compress_and_clean(line: str):
     return "( " + guts.ljust(30) + ")"
 
 
+def workout_comtxt(pos, comtxt, blockstate):
+    if comtxt == "<no comment>":
+        return ""
+
+    if not comtxt:
+        comtxt = err.src_code_from_node_place(pos)
+    comtxt = compress_and_clean(comtxt)
+    if comtxt == blockstate.prev_comtxt:
+        comtxt = ""
+    else:
+        blockstate.prev_comtxt = comtxt
+    return comtxt
+
+
 @dataclasses.dataclass
 class StatBase(abc.ABC):
     _comtxt: str
 
+    # empty comment means use src if possible.
+    # <no comment> means no comment
     def __init__(self, comtxt=""):
         self.pos = err.state.last_pos
         self._comtxt = comtxt
 
-    def to_line_lhs(self) -> list[str]:
-        raise AssertionError
+    # @abc.abstractmethod
+    # def to_line_lhs(self) -> list[str]:
+    #     return []
 
     @lib.g2l
     def to_full_lines(self, blockstate):
-        comtxt = self._comtxt
-        if not comtxt:
-            comtxt = err.src_code_from_node_place(self.pos)
-        comtxt = compress_and_clean(comtxt)
-        if comtxt == blockstate.prev_comtxt:
-            comtxt = ""
-        else:
-            blockstate.prev_comtxt = comtxt
+        comtxt = workout_comtxt(self.pos, self._comtxt, blockstate)
 
         for code_txt, com_txt in itertools.zip_longest(
             self.to_line_lhs(),
@@ -120,17 +130,17 @@ class StatBase(abc.ABC):
 class Nest:
     first_label: int
     next_label: int
-    axis_names: str
+
     prev: "Nest"
     slist: list[StatBase]
     cur: "Nest" = typing.cast("Nest", None)
 
-    def __init__(self):
+    def __init__(self, in_pytest=False):
         self.prev = Nest.cur
-        if Nest.cur:
+        if not in_pytest and Nest.cur:
             self.first_label = self.prev.first_label + 1000
         else:
-            self.first_label = 0
+            self.first_label = 1000
         Nest.cur = self
         self.next_label = self.first_label
         self.slist = []
@@ -170,8 +180,10 @@ class CommentLines(StatBase):
         lines = lib.pad_to_same_width(lines)
 
         for line in lines:
-            if line:
+            if line.strip():
                 yield "( " + clean_comment_chars(line) + " )"
+            else:
+                yield ""
 
 
 def add_stat(stat):
@@ -180,11 +192,12 @@ def add_stat(stat):
 
 
 def comment(*lines):
+    add_stat(CommentLines(" "))
     add_stat(CommentLines(lines))
 
 
 def com(*lines):
-    comment(*lines)
+    add_stat(CommentLines(lines))
 
 
 @dataclasses.dataclass
@@ -233,25 +246,11 @@ class Dprint(StatBase):
     txt: str
 
     def __init__(self, txt):
-        super().__init__()
+        super().__init__("<no comment>")
         self.txt = txt
 
     def to_line_lhs(self):
         yield "DPRNT[" + self.txt + "]"
-
-
-@dataclasses.dataclass
-class ByLambda(StatBase):
-    def __init__(self, fn):
-        super().__init__()
-        self.fn = fn
-
-    def to_full_lines(self, _):
-        return self.fn()
-
-    @classmethod
-    def emit(cls, fn):
-        add_stat(ByLambda(fn))
 
 
 class Set(StatBase):

@@ -38,7 +38,7 @@ def withv1(x, *, p, q):
     "p2g/tests/test_func.py:7:16:17:     with0(1, 2, 3)",
     "                                                ^",
 )
-def test_bad_args0():
+def test_cerror_bad_args0():
     with0(1, 2, 3)
 
 
@@ -47,7 +47,7 @@ def test_bad_args0():
     "p2g/tests/test_func.py:7:4:9:     with1()",
     "                                  ^^^^^",
 )
-def test_bad_args1():
+def test_cerror_bad_args1():
     with1()
 
 
@@ -56,7 +56,7 @@ def test_bad_args1():
     "p2g/tests/test_func.py:7:13:14:     with1(1, 2)",
     "                                             ^",
 )
-def test_bad_args2():
+def test_cerror_bad_args2():
     with1(1, 2)
 
 
@@ -65,7 +65,7 @@ def test_bad_args2():
     "p2g/tests/test_func.py:7:22:23:     with0(1, 2, 3, 2, 1)",
     "                                                      ^",
 )
-def test_bad_argsk0():
+def test_cerror_bad_argsk0():
     with0(1, 2, 3, 2, 1)
 
 
@@ -74,12 +74,12 @@ def test_bad_argsk0():
     "p2g/tests/test_func.py:7:23:24:     withv2(1, 2, 3, 2, 1)",
     "                                                       ^",
 )
-def test_bad_argsk1():
+def test_cerror_bad_argsk1():
     withv2(1, 2, 3, 2, 1)
 
 
 @p2g.must_be()
-def test_bad_argsk2():
+def test_cerror_bad_argsk2():
     withv3(1, 2, 3, 2, 1)
 
 
@@ -88,7 +88,7 @@ def test_bad_argsk2():
     "p2g/tests/test_func.py:7:4:6:     t0(foo=100, bar=7)",
     "                                  ^^",
 )
-def test_kwonly0():
+def test_cerror_kwonly0():
     t0(foo=100, bar=7)
     t0(foo=100)
 
@@ -98,7 +98,7 @@ def test_kwonly0():
     "p2g/tests/test_func.py:7:16:17:     withv2(1, q=7)",
     "                                                ^",
 )
-def test_more_args0():
+def test_cerror_more_args0():
     withv2(1, q=7)
 
 
@@ -107,7 +107,7 @@ def test_more_args0():
     "p2g/tests/test_func.py:7:18:19:     withv2(1, zap=7)",
     "                                                  ^",
 )
-def test_more_args1():
+def test_cerror_more_args1():
     withv2(1, zap=7)
 
 
@@ -116,7 +116,7 @@ def test_more_args1():
     "p2g/tests/test_func.py:7:17:18:     withv2(1, za=3)",
     "                                                 ^",
 )
-def test_more_args2():
+def test_cerror_more_args2():
     withv2(1, za=3)
 
 
@@ -125,7 +125,7 @@ def test_more_args2():
     "p2g/tests/test_func.py:7:15:16:     withv2(za9=3)",
     "                                               ^",
 )
-def test_more_args3():
+def test_cerror_more_args3():
     withv2(za9=3)
 
 
@@ -134,7 +134,7 @@ def test_more_args3():
     "p2g/tests/test_func.py:8:4:8:     ins1(T)",
     "                                  ^^^^",
 )
-def test_nesting_functions1():
+def test_cerror_nesting_functions1():
     T = p2g.Var()
     ins1(T)
 
@@ -144,7 +144,7 @@ def test_nesting_functions1():
     "p2g/tests/test_func.py:8:4:11:     inside2(T[0], T[1])",
     "                                   ^^^^^^^",
 )
-def test_nesting_functions2():
+def test_cerror_nesting_functions2():
     T = p2g.Var[2]()
     inside2(T[0], T[1])
 
@@ -154,7 +154,7 @@ def test_nesting_functions2():
     "p2g/tests/test_func.py:9:4:11:     inside3(T[0], T[1], V)",
     "                                   ^^^^^^^",
 )
-def test_nesting_functions3():
+def test_cerror_nesting_functions3():
     T = p2g.Var[2]()
     V = p2g.Const(1, 2, 3)
     inside3(T[0], T[1], V)
@@ -165,7 +165,7 @@ def test_nesting_functions3():
     "p2g/tests/test_func.py:7:4:6:     t1(0, 1)",
     "                                  ^^",
 )
-def test_varargs0():
+def test_cerror_varargs0():
     t1(0, 1)
 
 
@@ -174,7 +174,7 @@ def test_varargs0():
     "p2g/tests/test_func.py:7:4:6:     t1(zap=123, dog=999)",
     "                                  ^^",
 )
-def test_varargs1():
+def test_cerror_varargs1():
     t1(zap=123, dog=999)
 
 
@@ -183,7 +183,7 @@ def test_varargs1():
     "p2g/tests/test_func.py:7:4:6:     t1(zap=123)",
     "                                  ^^",
 )
-def test_varargs2():
+def test_cerror_varargs2():
     t1(zap=123)
 
 
@@ -211,13 +211,12 @@ def callunp1(fish=3):
     "p2g/tests/test_func.py:8:15:16:     callunp1(**x)",
     "                                               ^",
 )
-def test_unpack1():
+def test_cerror_unpack1():
     x = {"zap": 98}
     callunp1(**x)
 
 
 @p2g.must_be(
-    '( dprint[f"this is {x:5.2f}"]   )',
     "DPRNT[this*is*19.00]",
 )
 def test_dprint2():
@@ -228,7 +227,6 @@ def test_dprint2():
 @p2g.must_be(
     "( xc = Var[12]                  )",
     "  #100= 12.",
-    '( dprint[f"this is {xc:5.2f}"]  )',
     "DPRNT[this*is*[#100][52]]",
 )
 def test_dprint3():
@@ -239,7 +237,6 @@ def test_dprint3():
 @p2g.must_be(
     "( xc = Var[12]                  )",
     "  #100= 12.",
-    '( dprint[f"this is {xc:5.2f}"]  )',
     "DPRNT[this*is*[#100+#100][52]]",
 )
 def test_dprint4():

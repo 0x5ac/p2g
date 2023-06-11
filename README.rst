@@ -19,7 +19,48 @@ compilation can be used in the source, classes, dicts, and so on.
 It comes with a set of macro variable definitions for a Haas mill with
 NCD.  And a few example settings for my own VF-3SSYT.
 
-2 A taste.
+2 Install:
+----------
+
+::
+
+    $ pip install p2g
+
+for big show:
+
+::
+
+    $ p2g examples
+
+something smaller:
+
+::
+
+    $ cat > tst.py <<EOF
+    import p2g
+    def t():
+      x = p2g.Var(9)
+      for y in range(10):
+        x += y
+    EOF
+    $ p2g gen tst.py
+
+yields 
+
+::
+
+      O0001                           ( TST                           )
+      #100= 9.                        (   x = Var[9]                  )
+      #102= 0.                        (   for y in range[10]:         )
+    L2000
+      IF [#102 GE 10.] GOTO 2002
+      #100= #100 + #102               ( x += y                        )
+      #102= #102 + 1.
+      GOTO 2000
+    L2002
+      M30
+
+3 A taste.
 ----------
 
 .. code:: python
@@ -90,7 +131,7 @@ NCD.  And a few example settings for my own VF-3SSYT.
     L1001                             (     message[ALARM.var, f"too far {sch.name}.", code=101])
       M30
 
-3 Coordinates
+4 Coordinates
 -------------
 
 Describe position, with axis by location, in sequence or by name.
@@ -149,7 +190,7 @@ Describe position, with axis by location, in sequence or by name.
       #105= 30.                       ( p4.c = asin [0.5]             )
       M30
 
-4 Variables
+5 Variables
 -----------
 
 - Give names to macro variables at a known address:
@@ -210,7 +251,7 @@ Example:
       #102= #102 + 333.
       M30
 
-5 Expressions
+6 Expressions
 -------------
 
 Python expressions turn into G-Code as you may expect, save that
@@ -281,7 +322,7 @@ folding is done in degrees.
       #105= [#113 + #114 + 3.] / COS[#115]
       M30
 
-6 Axes
+7 Axes
 ------
 
 Any number of axes are supported, default just being xy and z.
@@ -348,7 +389,7 @@ coordinates to turn up in work offset registers.
     #102= #5243 * 34.
     M30
 
-7 Printing
+8 Printing
 ----------
 
 Turns Python f string prints into G-code DPRNT.  Make sure
@@ -386,11 +427,197 @@ your machine considers to be illegal in a DPRNT string.
     L1002
       M30
 
-8 Notes.
+9 Symbol Tables.
+----------------
+
+Set the global ``p2g.symbol.Table.print`` to get a symbol
+table in the output file.
+
+.. code:: python
+    :name: stest
+
+    import p2g
+
+
+    x1 = -7
+
+
+    MACHINE_ABS_ABOVE_OTS = p2g.Const(x=x1, y=8, z=9)
+    MACHINE_ABS_ABOVE_SEARCH_ROTARY_LHS_5X8 = p2g.Const(100, 101, 102)
+    MACHINE_ABS_ABOVE_VICE = p2g.Const(x=17, y=18, z=19)
+    RAW_ANALOG = p2g.Fixed[10](addr=1080)
+    fish = 10
+    not_used = 12
+
+    def stest():
+        p2g.symbol.Table.print = True    
+        p2g.comment("Only used symbols are in output table.")
+        p2g.Var(MACHINE_ABS_ABOVE_OTS)
+        p2g.Var(MACHINE_ABS_ABOVE_VICE * fish)
+        v1 = p2g.Var()
+        v1 += RAW_ANALOG[7]
+
+::
+
+    ( RAW_ANALOG                              : #1080[10]               )
+    ( v1                                      :  #106.x                 )
+    ( MACHINE_ABS_ABOVE_OTS                   :  -7.000,  8.000,  9.000 )
+    ( MACHINE_ABS_ABOVE_SEARCH_ROTARY_LHS_5X8 : 100.000,101.000,102.000 )
+    ( MACHINE_ABS_ABOVE_VICE                  :  17.000, 18.000, 19.000 )
+      O0001                           ( -                             )
+
+    ( Only used symbols are in output table. )
+      #100= -7.                       ( Var[MACHINE_ABS_ABOVE_OTS]    )
+      #101= 8.
+      #102= 9.
+      #103= 170.                      ( Var[MACHINE_ABS_ABOVE_VICE * fish])
+      #104= 180.
+      #105= 190.
+      #106= #106 + #1087              ( v1 += RAW_ANALOG[7]           )
+      M30
+
+10 Goto.
 --------
+
+Goto functions are constructed from parts, and make
+building  blocks when partially applied.
+
+goto [ .  / modifier / ] \*  ``(`` /coordinates/~)~
+
+modifier :
+
+- ``r9810``
+  Use Renishaw macro 9810 to do a protected positioning cycle.
+
+- ``work``
+  Use current work coordinate system. - G90
+
+- ``machine``
+  Use the machine coordinate system - G90 G53
+
+- ``relative``
+  Use relative coordinate system - G91
+
+- ``z_then_xy``
+  move Z axis first.
+
+- ``xy_then_z``
+  move the other axes before the Z.
+
+- ``probe``
+  Emit probe code using G31.
+
+- ``xyz``
+  Move all axes at once.
+
+- ``feed(~/expr/``)~
+  Set feed rate.
+
+- ``mcode(~/string/``)~
+  Apply an mcode.
+
+
+.. code:: python
+    :name: goto1
+
+    from p2g import *
+
+    def goto1():
+        symbol.Table.print = True
+        g1 = goto.work.feed (20)
+
+        comment ("in work cosys, goto x=1, y=2, z=3 at 20ips")
+        g1 (1,2,3)
+
+        comment ("make a variable, 2,3,4")
+        v1 = Var(x=2,y=3,z=4)        
+
+        absslow = goto.machine.feed(10)
+
+        comment ("In the machine cosys, move to v1.z then v1.xy, slowly")
+
+        absslow.z_then_xy(v1)
+
+        comment ("p1 is whatever absslow was, with feed adjusted to 100.")
+        p1 = absslow.feed(100)
+        p1.xy_then_z(v1)
+
+        comment ("p2 is whatever p1 was, with changed to a probe.")
+        p2 = p1.probe
+        p2.xy_then_z(v1)
+
+        comment ("p3 is whatever p1 was, with a probe and relative,",
+                 "using only the x and y axes")
+        p3 = p1.relative.probe
+        p3.xy_then_z(v1.xy)
+
+        comment ("move a and c axes ")
+        axis.NAMES = 'xyza*c'
+        goto.feed(20) (a=9, c= 90)
+
+
+        comment ("probe with a hass MUST_SKIP mcode.")
+        goto.probe.feed(10).mcode("M79")(3,4,5)
+
+
+        comment ("Define shortcut for safe_goto and use.")
+        safe_goto = goto.feed(20).r9810
+
+        safe_goto.z_then_xy(1,2,3)
+
+::
+
+    ( v1      :  #100.x  #101.y  #102.z )
+    ( absslow : 10 machine xyz          )
+    ( g1      : 20 work xyz             )
+    ( p1      : 100 machine xyz         )
+    ( p2      : 100 machine xyz probe   )
+    ( p3      : 100 relative xyz probe  )
+    ( r9810   : 20 r9810 xyz            )
+      O0001                           ( -                             )
+
+    ( in work cosys, goto x=1, y=2, z=3 at 20ips )
+      G01 G90 F20. x1. y2. z3.        ( g1 [1,2,3]                    )
+
+    ( make a variable, 2,3,4 )
+      #100= 2.                        ( v1 = Var[x=2,y=3,z=4]         )
+      #101= 3.
+      #102= 4.
+
+    ( In the machine cosys, move to v1.z then v1.xy, slowly )
+      G01 G90 G53 F10. z#102          ( absslow.z_then_xy[v1]         )
+      G01 G90 G53 F10. x#100 y#101
+
+    ( p1 is whatever absslow was, with feed adjusted to 100. )
+      G01 G90 G53 F100. x#100 y#101   ( p1.xy_then_z[v1]              )
+      G01 G90 G53 F100. z#102
+
+    ( p2 is whatever p1 was, with changed to a probe. )
+    ( p2.xy_then_z[v1]              )
+      G01 G90 G53 G31 F100. x#100 y#101
+      G01 G90 G53 G31 F100. z#102
+
+    ( p3 is whatever p1 was, with a probe and relative, )
+    ( using only the x and y axes                       )
+      G01 G91 G31 F100. x#100 y#101   ( p3.xy_then_z[v1.xy]           )
+
+    ( move a and c axes  )
+      G01 G90 F20. a9. c90.           ( goto.feed[20] [a=9, c= 90]    )
+
+    ( probe with a hass MUST_SKIP mcode. )
+      G01 G90 G31 M79 F10. x3. y4. z5.( goto.probe.feed[10].mcode["M79"][3,4,5])
+      G01 G65 R9810 F20. z3.          ( safe_goto.z_then_xy[1,2,3]    )
+      G01 G65 R9810 F20. x1. y2.
+      M30
+
+11 Notes.
+---------
 
 The entire thing is brittle; I've only used it to make code
 for my own limited purposes. 
+
+Nice things:
+
 
 .. code:: python
 
@@ -512,8 +739,8 @@ for my own limited purposes.
     L1003
       M30
 
-9 HAAS macro var definitions
-----------------------------
+12 HAAS macro var definitions
+-----------------------------
 
 Names predefined in p2g.haas:
 
@@ -814,11 +1041,14 @@ Names predefined in p2g.haas:
     | ``PROBE_TYPE``                |   ``200`` | ``#52601 … #52800`` |
     +-------------------------------+-----------+---------------------+
 
-10 Why:
+13 Why:
 -------
 
 Waiting for a replacement stylus **and** tool setter to arrive, I
 wondered if were possible to replace the hundreds of inscrutible lines
 of Hass WIPS Renishaw G-code with just a few lines of Python?
 
-Probably.
+Maybe.
+
+
+>>

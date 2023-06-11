@@ -1,6 +1,5 @@
 from p2g import err
 from p2g import gbl
-from p2g import scalar
 from p2g import stat
 from p2g import vector
 
@@ -17,8 +16,8 @@ def base_addr(new_base=None):
     return gbl.iface.ebss
 
 
-def message(var, txt: str, *, code: int):
-    stat.append_set(var, scalar.wrap_scalar(code), txt)
+def message(dst, txt: str):
+    stat.code(f"{dst[0]} = 101 ( {txt} )", "<no comment>")
 
 
 def as_address(src):

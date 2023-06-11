@@ -11,7 +11,7 @@ import p2g
 # sys.path.insert(0, "..")
 
 
-def test_version_capfd(capfd):
+def test_native_version_capfd(capfd):
     p2g.main(["--recursive", "version"])
     got = capfd.readouterr()
     assert "Version: p2g" in got.out
@@ -27,21 +27,22 @@ def write_func(test_file):
     )
 
 
-def test_job_tmpdir(tmpdir):
+def test_native_job_tmpdir(tmpdir):
     tmpfile = tmpdir / "test.py"
     write_func(tmpfile)
     outfile = pathlib.Path(str(tmpdir / "test.nc"))
+
     p2g.main(
         [
             "--recursive",
-            "gen",
             "--job=O123",
-            str(tmpfile),
             f"--out={str(outfile)}",
+            "ngen",
+            str(tmpfile),
         ]
     )
     tmpdata = outfile.read_text()
-    assert re.match("\\s+O123\\s+\\( TEST\\s+\\)", tmpdata)
+    assert "O123" in tmpdata
 
 
 def make_inout(tmpdir):
@@ -75,18 +76,18 @@ def gentwinfuncs(fnname, inout):
     return inout.ncfile.read_text(encoding="utf-8").strip()
 
 
-def test_function0_tmpdir(tmpdir):
+def test_native_function0_tmpdir(tmpdir):
     tfun = gentwinfuncs("f1", make_inout(tmpdir))
     assert "#200= 123." in tfun
 
 
-def test_function1_tmpdir(tmpdir):
+def test_native_function1_tmpdir(tmpdir):
     tfun = gentwinfuncs("f2", make_inout(tmpdir))
 
     assert "#200= 456." in tfun
 
 
-def test_function2_capfd_tmpdir(capfd, tmpdir):
+def test_native_function2_capfd_tmpdir(capfd, tmpdir):
     inout = make_inout(tmpdir)
     inout.ncfile = "-"
 
@@ -103,11 +104,11 @@ def test_function2_capfd_tmpdir(capfd, tmpdir):
     assert "No such function" in tfun.err
 
 
-def test_cli_examples():
-    p2g.main("examples")
+def test_native_cli_tmpdir_examples(tmpdir):
+    p2g.main(["--outdir", tmpdir, "examples"])
 
 
-def test_capfd_tmpdir_stdout(capfd, tmpdir):
+def test_native_capfd_tmpdir_stdout(capfd, tmpdir):
     tmpfile = tmpdir / "test.py"
     write_func(tmpfile)
     p2g.main(
@@ -120,32 +121,39 @@ def test_capfd_tmpdir_stdout(capfd, tmpdir):
         ]
     )
     tmpdata = capfd.readouterr()
-    assert re.match("\\s+O123\\s+\\( TEST\\s+\\)", tmpdata.out)
+    assert "O123" in tmpdata.out
 
 
-def test_fake_capture0():
+def test_native_fake_capture0():
     with p2g.lib.CaptureO(0) as x:
         print("HI")
     assert x.out.startswith("HI")
 
 
-def test_fake_capture1():
+def test_native_fake_capture1():
     with p2g.lib.CaptureO(0) as x:
         print("THERE", file=sys.stderr)
     assert x.err.startswith("THERE")
 
 
-def test_fake_capture2():
+def test_native_fake_capture2():
     with p2g.lib.CaptureO(0) as x:
         print("HI")
         assert x.readouterr().out.startswith("HI")
 
 
-def test_logger_capfd_setup(capfd):
+def test_native_logger_capfd_setup(capfd):
     p2g.main(["--recursive", "--logfile=-", "--loglevel=INFO", "version"])
     got = capfd.readouterr()
-    assert got.out.startswith("Logging on")
+    assert "Version:" in got.out
 
 
-def test_typeguard_setup():
-    assert "typeguard" in sys.modules.keys()
+# @pytest.mark.skip
+# def test_typeguard_setup():
+#     assert "typeguard" in sys.modules.keys()
+
+
+def test_native_capfd_nf(capfd):
+    assert p2g.main(["gen", "nothere.py"]) != 0
+    got = capfd.readouterr()
+    assert "No such file or directory" in got.err

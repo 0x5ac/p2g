@@ -1,62 +1,83 @@
-from p2g import err
-from p2g import gbl
+import collections
+import typing
 from p2g import lib
-from p2g import stat
-from p2g import vector
+from p2g import nd
 
 
-class Symbols:
-    def __init__(self):
-        object.__setattr__(self, "guts", {})
-        object.__setattr__(self, "revguts", {})
-        object.__setattr__(self, "read", set())
+# symbol tables made by watching every assignment from a vector
+# constructor to a name and remembering all the address constants
+# used.  walk through all address constants, find the symbols
+# assocaited and mark them as useful.  then print them out.
+class Table:
+    print = False
+    print_all = False
 
-    # after init run, clear out all use counts to
-    # reset incorrect uswage info made by aliasing refs.
+    # store in this way to keep multiple definitions.
+    name_to_thing: typing.Dict[str, typing.Set[nd.HasToSymTab]] = collections.defaultdict(
+        set
+    )
+    addrs_used: typing.Set[int] = set()
+    # Called for every store to a name, so remember when a vector is
+    # given an association.
 
-    def init_finished(self):
-        object.__setattr__(self, "read", set())
+    @classmethod
+    def remember_store(cls, key, thing):
+        cls.remember_load(key, thing)
 
-    def table_of_macro_vars(self, varrefs, show_all_names):
-        lcols = []
-        rcols = []
+    @classmethod
+    def remember_load(cls, key, thing):
+        if key in ("machine", "probe", "relative", "work", "goto", "r9810"):
+            return
+        try:
+            cls.name_to_thing[key].add(thing)
+        except TypeError:
+            # some things are unhashable.
+            pass
+
+    @classmethod
+    def add_varref(cls, addr, _pos):
+        cls.addrs_used.add(int(addr))
+
+    @classmethod
+    def yield_lines(cls):
+        #        breakpoint()
+        if not cls.print and not cls.print_all:
+            return
+
+        # get object names and sort them.
+        sorted_names = sorted(cls.name_to_thing.keys(), key=str.casefold)
 
         # go through table of all known macro names,
         # find out if used, and print nicely.
+        def yield_table_part(phase):
+            old_rhs = ""
+            for key in sorted_names:
+                new_values = cls.name_to_thing[key]
+                for rhsobj in new_values:
+                    try:
+                        if not cls.print_all and not rhsobj.user_defined:
+                            continue
+                        new_rhs = rhsobj.to_symtab_entry(cls.addrs_used)
+                        if phase in new_rhs:
+                            if new_rhs != old_rhs:
+                                yield (key, new_rhs)
+                                old_rhs = new_rhs
+                    except AttributeError:
+                        continue
 
-        for key, value in self.guts.items():
-            if not show_all_names and key not in self.read:
-                continue
+        @lib.g2l
+        def yield_all_parts():
+            for phase in ["#", ",", "xyz"]:
+                yield from yield_table_part(phase)
 
-            lcols.append(key)
-            rcols.append(value.to_symtab_entry(varrefs))
-
+        lcols, rcols = zip(*yield_all_parts())
         lsize = lib.max_str_len(lcols)
         rsize = lib.max_str_len(rcols)
         for key, value in zip(lcols, rcols):
             yield "( " + key.ljust(lsize) + " : " + value.ljust(rsize) + " )"
 
-    def insert_symbol_table(self, show_all_names=False):
-        stat.ByLambda.emit(
-            lambda: self.table_of_macro_vars(
-                gbl.iface.varrefs,
-                show_all_names,
-            )
-        )
-
-    def __getattr__(self, key):
-        self.read.add(key)
-        return self.guts[key]
-
-    def __setattr__(self, key, value):
-        if key in self.guts:
-            err.compiler(f"Redefinition of {key}.")
-        try:
-            newv = vector.wrap_maybe_vec(value)
-        except TypeError:
-            newv = value
-
-        self.guts[key] = newv
-        # keep the most original version of an alias.
-        if newv not in self.revguts:
-            self.revguts[newv] = key
+    @classmethod
+    def reset(cls):
+        cls.name_to_thing = collections.defaultdict(set)
+        cls.addrs_used = set()
+        cls.print = False

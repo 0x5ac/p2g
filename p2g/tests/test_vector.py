@@ -13,7 +13,7 @@ def test_nested1c():
 
 
 def add_some_symbols():
-    st = p2g.Symbols()
+    st = p2g.Table()
     st.txyz = p2g.Var[3]()
     st.txy = p2g.Var[2]()
     st.CURSOR = p2g.Var[2]()
@@ -63,7 +63,7 @@ def test_const_deref_addresses():
     "p2g/tests/test_vector.py:9:4:6:     st.txyz.pop",
     "                                    ^^",
 )
-def test_comperr_bad_attribute():
+def test_cerror_bad_attribute():
     #    with pytest.raises(AttributeError):
     st = add_some_symbols()
     st.txyz.pop
@@ -74,7 +74,7 @@ def test_comperr_bad_attribute():
     "p2g/tests/test_vector.py:10:4:6:     st.txy.xyz = 0x99",
     "                                     ^^",
 )
-def test_comperr_bad_bounds0():
+def test_cerror_bad_bounds0():
     st = add_some_symbols()
 
     #    with pytest.raises(AttributeError):
@@ -86,7 +86,7 @@ def test_comperr_bad_bounds0():
     "p2g/tests/test_vector.py:9:17:19:     st.txyz.xy = st.txy.z",
     "                                                   ^^",
 )
-def test_comperr_bad_bounds1():
+def test_cerror_bad_bounds1():
     st = add_some_symbols()
 
     st.txyz.xy = st.txy.z
@@ -117,7 +117,7 @@ def test_nested3():
     "p2g/tests/test_vector.py:9:6:8:     x[20] = 9",
     "                                      ^^",
 )
-def test_comperr_oob():
+def test_cerror_oob():
     x = p2g.Fixed[10]()
     # with pytest.raises(IndexError):
     x[20] = 9

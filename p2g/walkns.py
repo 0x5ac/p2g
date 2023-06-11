@@ -5,7 +5,7 @@ import typing
 
 from p2g import err
 from p2g import nd
-from p2g import vector
+from p2g import symbol
 
 
 @dataclasses.dataclass
@@ -56,20 +56,6 @@ class ClassNS(ANamespace):
     pass
 
 
-def resolve_nonlocal(self, name, ns):
-    while ns:
-        res = ns.get(name)
-        if res is GLOBAL:
-            return self.module_ns
-        if res is not UNDEF and res is not NONLOCAL:
-            if isinstance(ns, ModuleNS):
-                break
-            return ns
-        ns = ns.parent
-    err.compiler(f"no binding for nonlocal '{name}'")  # hard to test right
-    return None
-
-
 # return namespace and all the parents, filterint out
 # parents which are classes.
 
@@ -93,24 +79,37 @@ def find_ns(first_ns, nid):
     return UNDEF, None
 
 
+def resolve_nonlocal(name, ns):
+    while ns:
+        res = ns.get(name)
+        if res is not UNDEF and res is not NONLOCAL:
+            if isinstance(ns, ModuleNS):
+                break
+            return ns
+        ns = ns.parent
+
+    err.compiler(f"no binding for nonlocal '{name}'")
+
+
 def lookup_to_ns(res, self, nid):
     if res is GLOBAL:
         dstns = self.module_ns
     elif res is NONLOCAL:
-        dstns = resolve_nonlocal(self, nid, self.ns.parent)
+        dstns = resolve_nonlocal(nid, self.ns.parent)
     else:
         dstns = self.ns
     return dstns
 
 
-def handle_visit_name_load(self, node):
+def _handle_visit_name_load(self, node):
     res, ns = find_ns(self.ns, node.id)
     if res is GLOBAL:
         res = self.module_ns.get(node.id)
     elif res is NONLOCAL:
-        ns = resolve_nonlocal(self, node.id, ns.parent)
-        return ns[node.id]
+        ns = resolve_nonlocal(node.id, ns.parent)
+        res = ns[node.id]
     if res is not UNDEF:
+        symbol.Table.remember_load(node.id, res)
         return res
 
     try:
@@ -130,8 +129,7 @@ def handle_visit_name_del(self, node):
 
 def handle_visit_name_store(self, node, store_val):
     res = self.ns.get(node.id)
-    if isinstance(res, vector.ConstVec):
-        err.compiler("Can't set a constant.")
+
     if isinstance(res, nd.EBase):
         # variable is already in use, instead of
         # overwriting it,  treat as if writing to
@@ -141,6 +139,8 @@ def handle_visit_name_store(self, node, store_val):
         return
 
     dstns = lookup_to_ns(res, self, node.id)
+
+    symbol.Table.remember_store(node.id, store_val)
     dstns[node.id] = store_val
 
 
@@ -148,7 +148,8 @@ def handle_visit_name(self, node):
     match node.ctx:
         case ast.Del():
             handle_visit_name_del(self, node)
-        # for both load and store when augmented
+        # in augmented assign, name arrives as with load ctx, but
+        # must also be stored there, so catch both.
         case _:
-            return handle_visit_name_load(self, node)
+            return _handle_visit_name_load(self, node)
     return None

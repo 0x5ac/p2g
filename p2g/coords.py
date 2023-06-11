@@ -23,7 +23,7 @@ def flatten(args):
     return res
 
 
-def unpack(args, kwargs) -> vector.ConstVec:
+def unpack(args, kwargs) -> vector.RValueVec:
     resmap: typing.Dict[int, scalar.Scalar] = {}
     if args:
         args = map(vector.wrap_maybe_vec, args)
@@ -54,14 +54,16 @@ def unpack(args, kwargs) -> vector.ConstVec:
     # turned into that.
 
     min_size = 0
-    return vector.ConstVec([resmap.get(x) for x in range(max(min_size, coord_size))])
+    return vector.RValueVec(
+        [resmap.get(x) for x in range(max(min_size, coord_size))], from_user=True
+    )
 
 
 # build things like AABuilder(1,2,3, _addr=123) and AABuilder[8](_addr=123)
 @dataclasses.dataclass
 class _TypeBuilder:
     btype: str
-    size: int
+    size: typing.Optional[int]
 
     def __init__(self, btype="c", *, size=None):
         self.btype = btype

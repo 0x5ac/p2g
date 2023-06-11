@@ -22,7 +22,7 @@ def fn_nest1():
 
 
 def add_some_symbols():
-    st = p2g.Symbols()
+    st = p2g.Table()
     st.txyz = p2g.Var[3]()
     st.txy = p2g.Var[2]()
     st.CURSOR = p2g.Var[2]()
@@ -35,7 +35,7 @@ def add_some_symbols():
     "p2g/tests/test_smoke.py:8:4:6:     st.txyz.pop",
     "                                   ^^",
 )
-def test_comperr_bad_attribute():
+def test_cerror_bad_attribute():
     st = add_some_symbols()
     st.txyz.pop
 
@@ -45,7 +45,7 @@ def test_comperr_bad_attribute():
     "p2g/tests/test_smoke.py:8:20:23:     T.var = T.var / 0.0",
     "                                                     ^^^",
 )
-def test_comperr_div_err():
+def test_cerror_div_err():
     T = p2g.Var()
     T.var = T.var / 0.0
 

@@ -174,7 +174,6 @@ def do_gen():
     return 1
 
 
-@contextlib.contextmanager
 def main(options=None):
     gbl.opts = docopt.docopt(DOC, options)
 

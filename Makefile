@@ -5,9 +5,9 @@ GOLDEN=p2g/tests/golden
 OXRST=~/.emacs.d/straight/build/ox-rst/ox-rst.el
 ######################################################################
 
-top: .poetry_and_deps_installed requirements.txt examples  wip
+top: .poetry_and_deps_installed requirements.txt examples  
 
-P2G_SRC=$(wildcard p2g/*.py)
+
 
 ######################################################################
 # Build machinary
@@ -92,8 +92,8 @@ release:
 
 
 test-standard:
-	$(V) echo FAIL  > $(GOLDEN)/test_error_test_forcefail0.nc
-	$(V) echo XFAIL > $(GOLDEN)/test_meta_test_simple_xfail1.nc
+#	$(V) echo FAIL  > $(GOLDEN)/test_error_test_forcefail0.nc
+#	$(V) echo XFAIL > $(GOLDEN)/test_meta_test_simple_xfail1.nc
 	$(V) $(PYTEST)  
 
 
@@ -131,7 +131,7 @@ ssort:
 	$(V)	echo p2g/*.py | xargs $(PR) ssort
 
 autoflake:
-	$(V) $(PR) autoflake --ignore-init-module-imports  --remove-all-unused-imports  -i -v $(P2G_SRC)
+	$(V) $(PR) autoflake --ignore-init-module-imports  --remove-all-unused-imports  -i -v p2g/*.py
 
 mypy:
 	$(V) - $(PR) mypy p2g | cat
@@ -172,7 +172,7 @@ wip:   $(DSTDIR)/.mark-probecalibrate
 VPATH=$(SRCDIR):$(DSTDIR)
 $(DSTDIR)/.mark-%: %.py
 	poetry run p2g  --out="$(DSTDIR)/<time>-$*.nc"  gen $<
-#	touch $@
+	touch $@
 
 
 

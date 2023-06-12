@@ -115,10 +115,6 @@ def run_all_test_(module_name):
                 breakpoint()
 
 
-def test_null():
-    main.main(None)
-
-
 def runthem():
     tnames = [
         "not_pytest_nonlocal0",
@@ -150,9 +146,6 @@ def runthem():
 
     for name in tnames:
         run_all_test_(name)
-
-
-#    test_null()
 
 
 def local_tests():

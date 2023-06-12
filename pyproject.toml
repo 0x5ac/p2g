@@ -140,7 +140,7 @@ addopts="-p no:pylama -p no:pytest_pylama --cov=p2g --cov-append --tb=short -m '
 include = ["p2g/*.py"]
 exclude_lines = ["NotImplemented", "for debug",  "no cover","@(abc\\.)?abstractmethod" ]
 
-omit = ["p2g/tests/*.py","p2g/examples/*.py"]
+omit = ["p2g/tests/*.py","p2g/examples/*.py","p2g/__main__.py"]
 
 
 [tool.flake8]

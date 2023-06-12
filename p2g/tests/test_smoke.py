@@ -9,12 +9,10 @@ PROBE = p2g.Fixed[3](addr=5061)
 # pylint: disable=attribute-defined-outside-init,unneeded-not
 
 
-@p2g.inline
 def fn_nest2():
     PROBE.x = 111
 
 
-@p2g.inline
 def fn_nest1():
     PROBE.y = 2
     fn_nest2()

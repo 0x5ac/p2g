@@ -1,4 +1,3 @@
-import abc
 import typing
 
 from p2g import axis
@@ -59,13 +58,14 @@ class Vec(nd.EBase):
             return self.get_slice(scalar_index)
         return self.get_at(scalar.wrap_scalar(scalar_index))
 
-    @abc.abstractmethod
-    def __add__(self, _other) -> "Vec":  # placeholder, filled in from op.reg
-        return self
+    def __add__(self, _other) -> "Vec":
+        return self  # no cover, filled in from op.reg
 
-    @abc.abstractmethod
-    def __mul__(self, _other) -> "Vec":  # placeholder, filled in from op.reg
-        return self
+    def __mul__(self, _other) -> "Vec":
+        return self  # no cover, filled in from op.reg
+
+    def __lt__(self, _other) -> "Vec":
+        return self  # no cover, filled in from op.reg
 
 
 class RValueVec(Vec):

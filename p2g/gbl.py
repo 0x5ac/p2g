@@ -8,7 +8,7 @@ class Config:
     opt_narrow_output: bool
     in_pytest: bool
     bp_on_error: bool
-    recursive: bool
+    opts: dict
 
     def __init__(self):
         self.bp_on_error = False
@@ -17,7 +17,6 @@ class Config:
         self.opt_narrow_output = False
         self.debug = False
         self.in_pytest = True
-        self.recursive = False
 
     @property
     def relative_lines(self):
@@ -33,6 +32,7 @@ class Config:
 
 
 config = Config()
+opts = {}
 
 
 class PerTranslation:

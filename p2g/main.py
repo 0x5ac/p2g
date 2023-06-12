@@ -1,4 +1,5 @@
 #! /usr/bin/env python
+import contextlib
 import datetime
 import pathlib
 import shutil
@@ -23,7 +24,7 @@ Turns a python program into a gcode program.
 Usage:
    p2g [options] gen <srcfile>
    p2g [options] ngen <srcfile>
-   p2g [options] test [<srcfile>]
+   p2g [options] test 
    p2g [options] examples
    p2g [options] version
    p2g [options] stdvars [--txt=<txtfile>] [--dev=<devfile>] [--py=<pyfile>] [--org=<orgfile>]
@@ -56,7 +57,7 @@ Options:
     -o <file> --out=<file>   Output file, [default: <stdout>]
     --outdir <dir>           Output directory, [default: .]
     -h --help                This.
-    -v --verbose             Make verbose
+    -q --quiet               Make less noise.
     --relative-paths         Errors contain paths relative to current directory.
     --relative-lines         Errors contain linenumbers relative to start of function.
     --job=<pattern>             Job name, [default: O0001]
@@ -79,18 +80,19 @@ Options:
 """
 
 
-def do_examples(opts):
+def do_examples():
     here_dir = pathlib.Path(__file__).parent
+
     example_dir = here_dir / "examples"
     examples = example_dir.glob("[a-z]*.py")
 
-    outdir = opts["--outdir"]
+    outdir = gbl.opts["--outdir"]
     outdir.mkdir(exist_ok=True, parents=True)
 
     srcnames = []
     for src in examples:
         dst_name = outdir / src.parts[-1]
-        print(f"Copying {src} {dst_name}")
+        lib.qprint(f"Copying {src} {dst_name}")
         shutil.copy(src, dst_name)
         srcnames.append(dst_name)
     for job in ["vicecenter", "probecalibrate"]:
@@ -103,17 +105,14 @@ def do_examples(opts):
             str(top_name),
         ]
 
-        print(f"Running {' '.join(sysargs)}")
+        lib.qprint(f"Running {' '.join(sysargs)}")
         main(sysargs)
 
 
-def setup_logger(opt):
-    loglevel = opt["--loglevel"]
+def setup_logger():
+    loglevel = gbl.opts["--loglevel"]
 
-    if gbl.config.debug:
-        loglevel = "DEBUG"
-
-    logfile = opt["--logfile"]
+    logfile = gbl.opts["--logfile"]
     if logfile == "<stdout>":
         logfile = sys.stdout
 
@@ -123,10 +122,10 @@ def setup_logger(opt):
         level=loglevel,
         format="{message}",
     )
-    logger.info(f"Logging on {opt['--loglevel']} {logfile}")
+    logger.info(f"Logging on {gbl.opts['--loglevel']} {logfile}")
 
 
-def output_file_name(opts):
+def output_file_name():
     now = datetime.datetime.now()
     prev_midnight = now.replace(hour=0, minute=0, second=0, microsecond=0)
     next_midnight = 24 * 60
@@ -134,26 +133,26 @@ def output_file_name(opts):
 
     out_name = "-"
 
-    if opts["--out"] != "<stdout>":
-        out_name = opts["--outdir"] / pathlib.Path(opts["--out"])
+    if gbl.opts["--out"] != "<stdout>":
+        out_name = gbl.opts["--outdir"] / pathlib.Path(gbl.opts["--out"])
 
     out_name = str(out_name).replace("<time>", f"{mins_togo:05d}")
     return out_name
 
 
-def do_gen(opts):
+def do_gen():
     gbl.config.in_pytest = False
 
-    src_name = opts["<srcfile>"]
+    src_name = gbl.opts["<srcfile>"]
     src_path = pathlib.Path(src_name)
     job_name = src_path.stem
 
-    if opts["--job"] != "<srcfilename>":
-        job_name = opts["--job"]
+    if gbl.opts["--job"] != "<srcfilename>":
+        job_name = gbl.opts["--job"]
 
-    func_name = opts["--function"]
+    func_name = gbl.opts["--function"]
 
-    output_name = opts["--out"]
+    output_name = gbl.opts["--out"]
 
     logger.info(f"src: {src_path}")
     logger.info(f"fnc: {func_name}")
@@ -165,58 +164,50 @@ def do_gen(opts):
         return 0
     except err.CompilerError as exn:
         exn.report_error(absolute_lines=True)
-
     except FileNotFoundError as exn:
         print(exn, file=sys.stderr)
 
     # when inside self return with no error
     # even if there was one, message is in stderr.
-    if opts["--recursive"]:
+    if gbl.opts["--recursive"]:
         return 0
     return 1
 
 
-def main(argv=None):
-    opts = docopt.docopt(DOC, argv)
+@contextlib.contextmanager
+def main(options=None):
+    gbl.opts = docopt.docopt(DOC, options)
 
-    gbl.config.debug = opts["--debug"]
-    opts["--outdir"] = pathlib.Path(opts["--outdir"])
-    setup_logger(opts)
-    logger.info(argv)
+    gbl.config.debug = gbl.opts["--debug"]
+    gbl.config.opt_relative_paths = gbl.opts["--relative-paths"]
+    gbl.config.opt_relative_lines = gbl.opts["--relative-lines"]
+    gbl.config.bp_on_error = gbl.opts["--break"]
 
-    opts["--out"] = output_file_name(opts)
-    if opts["--break"]:  # no cover
-        gbl.config.bp_on_error = True
+    gbl.opts["--outdir"] = pathlib.Path(gbl.opts["--outdir"])
 
-    gbl.config.opt_relative_paths = opts["--relative-paths"]
-    gbl.config.opt_relative_lines = opts["--relative-lines"]
+    setup_logger()
+    logger.info(options)
+    gbl.opts["--out"] = output_file_name()
 
-    if opts["version"]:
-        with lib.openw(opts["--out"]) as out:
+    if gbl.opts["version"]:
+        with lib.openw(gbl.opts["--out"]) as out:
             print(f"Version: p2g {version.__version__}", file=out)
 
-    if opts["--recursive"]:
-        if isinstance(argv, list):
-            argv.insert(0, "p2g")
-            sys.argv = argv
-        gbl.config.recursive = True
-
-    if opts["examples"]:
-        do_examples(opts)
-    elif opts["stdvars"]:
+    if gbl.opts["examples"]:
+        do_examples()
+    elif gbl.opts["stdvars"]:
         makestdvars.makestdvars(
-            opts["--txt"],
-            opts["--dev"],
-            opts["--py"],
-            opts["--org"],
+            gbl.opts["--txt"],
+            gbl.opts["--dev"],
+            gbl.opts["--py"],
+            gbl.opts["--org"],
         )
-    elif opts["gen"]:
+    elif gbl.opts["gen"]:
         gbl.config.opt_narrow_output = False
-        return do_gen(opts)
-    elif opts["ngen"]:
+        return do_gen()
+    elif gbl.opts["ngen"]:
         gbl.config.opt_narrow_output = True
-        return do_gen(opts)
-
-    elif opts["test"]:  # for debug
-        debug.run_test(opts["<srcfile>"])
+        return do_gen()
+    elif gbl.opts["test"]:
+        debug.run_test(gbl.opts["<srcfile>"])
     return 0

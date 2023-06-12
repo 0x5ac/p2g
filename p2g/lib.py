@@ -71,7 +71,7 @@ class SimpleOBuf:
 
     def __init__(self, tee=False):
         self.buf = []
-        self.tee = tee
+        self.tee = tee or 1
 
     def write(self, txt):
         if self.tee:  # no cover
@@ -80,25 +80,21 @@ class SimpleOBuf:
 
         self.buf.append(txt)
 
-    # def lines(self):
-    #     return self.text().split("\n")
-
     def text(self):
         return "".join(self.buf)
 
 
-@dataclasses.dataclass
 class CaptureO:
     prevout: typing.Any
     preverr: typing.Any
     stdout: SimpleOBuf
     stderr: SimpleOBuf
 
-    def __init__(self, tee=False):
+    def __init__(self, tee):
         self.prevout = sys.stdout
         self.preverr = sys.stderr
-        self.stdout = SimpleOBuf(tee)
-        self.stderr = SimpleOBuf(tee)
+        self.stdout = SimpleOBuf(tee or gbl.config.debug)
+        self.stderr = SimpleOBuf(tee or gbl.config.debug)
 
     def readouterr(self):
         return self
@@ -111,18 +107,12 @@ class CaptureO:
     def err(self):
         return self.stderr.text()
 
-    #    @property
-    #    @g2l
-    # def all_lines(self):
-    #     yield from self.stdout.lines()
-    #     yield from self.stderr.lines()
-
     def __enter__(self):
         sys.stdout = typing.cast(typing.TextIO, self.stdout)
         sys.stderr = typing.cast(typing.TextIO, self.stderr)
         return self
 
-    def __exit__(self, *_):
+    def __exit__(self, _exc, _value, _tb):
         sys.stdout = self.prevout
         sys.stderr = self.preverr
 
@@ -139,15 +129,8 @@ def openw(name):
 class SimpleIBuf:
     fromstdin: str = ""
 
-    # def __new__(cls):
-    #     breakpoint()
-    #     if not hasattr(cls, "fromstdin"):
-    #         cls.fromstdin = sys.stdin.read()
-    #     return cls
-
-    def __init__(self):
-        if not SimpleIBuf.fromstdin:
-            SimpleIBuf.fromstdin = "" if gbl.config.recursive else sys.stdin.read()
+    def __init__(self, istr=""):
+        SimpleIBuf.fromstdin = istr
 
     def read(self):
         return SimpleIBuf.fromstdin
@@ -155,8 +138,15 @@ class SimpleIBuf:
 
 @contextlib.contextmanager
 def openr(name):
-    if str(name) == "-" or not str(name):
-        yield SimpleIBuf()
+    if str(name) == "<null>":
+        yield SimpleIBuf("")
     else:
         with open(name, "r", encoding="utf-8") as rfile:
             yield rfile
+
+
+# a print which could be quieted.
+def qprint(*args):
+    if gbl.opts["--quiet"]:
+        return
+    print(*args)

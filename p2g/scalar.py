@@ -1,4 +1,3 @@
-import abc
 import typing
 
 from p2g import nd
@@ -38,12 +37,11 @@ class Scalar(nd.EBase):
 
     # placeholder to east typechecking,
     # overwitten by op install machines.
-    @abc.abstractmethod
-    def __add__(self, _other):
+
+    def __add__(self, _other):  # no cover
         pass
 
-    @abc.abstractmethod
-    def __lt__(self, _other):
+    def __lt__(self, _other):  # no cover
         pass
 
     def __int__(self) -> int:

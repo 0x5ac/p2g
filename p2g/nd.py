@@ -23,9 +23,19 @@ class HasToSymTab(abc.ABC):
 
 
 # common base class for scalar and vector.
-class EBase:
+class EBase(abc.ABC):
     def to_gcode(self, _modifier: NodeModifier) -> str:
         return ""  # no cover
+
+    # placeholder to east typechecking,
+    # overwitten by op install machines.
+    @abc.abstractmethod
+    def __add__(self, _other):
+        pass
+
+    @abc.abstractmethod
+    def __lt__(self, _other):
+        pass
 
 
 DECIMALS = 4

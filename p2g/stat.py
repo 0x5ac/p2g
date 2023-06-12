@@ -88,9 +88,8 @@ class StatBase(abc.ABC):
         self.pos = err.state.last_pos
         self._comtxt = comtxt
 
-    # @abc.abstractmethod
-    # def to_line_lhs(self) -> list[str]:
-    #     return []
+    def to_line_lhs(self) -> list[str]:
+        return []  # no cover
 
     @lib.g2l
     def to_full_lines(self, blockstate):

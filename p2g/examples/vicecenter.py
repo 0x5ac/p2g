@@ -31,7 +31,6 @@ dinfo = {
 }
 
 
-@p2g.inline
 def prod_surface(st, sch, di, output):
     p2g.comment(
         "",
@@ -83,7 +82,6 @@ def prod_surface(st, sch, di, output):
     p2g.base_addr(addr)
 
 
-@p2g.inline
 def find_surface_before(st, sch):
     p2g.set_wcs(st.WCS)
 
@@ -137,7 +135,6 @@ def find_surface_before(st, sch):
     st.alarm(" what changed")
 
 
-@p2g.inline
 def runit(st, sch):
     st.WCS = G55
 

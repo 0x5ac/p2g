@@ -30,6 +30,7 @@ from .stat import dprint
 from .symbol import Table
 from .vector import RValueVec
 from .vector import Vec
+
 # ruff: noqa: F401
 # noqa: F401
 from .version import __version__
@@ -39,5 +40,3 @@ from .visible import as_address
 from .visible import base_addr
 from .visible import message
 from .visible import set_wcs
-from .walk import compile2g
-from .walk import inline

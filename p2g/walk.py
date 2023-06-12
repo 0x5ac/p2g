@@ -434,12 +434,12 @@ def compile2g(func_name_arg, srcfile_name, job_name, in_pytest, args=None):
             yield from res
 
 
-class WantInline:
-    def __init__(self, fn):
-        self.fn = fn
+# class WantInline:
+#     def __init__(self, fn):
+#         self.fn = fn
 
 
-# at definition of an inline function,
-# just remember the tree.
-def inline(fn):
-    return WantInline(fn)
+# # at definition of an inline function,
+# # just remember the tree name.
+# def inline(fn):
+#     return WantInline(fn)

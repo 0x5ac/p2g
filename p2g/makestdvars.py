@@ -25,8 +25,8 @@ def def_prefix(key):
         return f'dst["{key}"]'
     if INTO_ATTR:  # no cover
         return f"dst.{key}"
-    else:
-        return f"{key}"
+
+    return f"{key}"
 
 
 MAKE_PFX = "p2g."

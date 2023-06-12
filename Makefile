@@ -84,7 +84,7 @@ build: doc
 bcheck: build
 	pip install --force dist/*gz
 	type p2g
-	$(PR)	p2g test	
+	$(PR)	p2g -q test	
 
 
 release:
@@ -100,7 +100,7 @@ test-standard:
  
 
 test-cli:
-	$(COVERAGE) run --append -m  p2g --debug test  > /dev/null 2> /dev/null
+	$(COVERAGE) run --append -m  p2g  -q test
 
 .PHONY:
 coverage-reset:
@@ -114,7 +114,7 @@ coverage-report:
 
 
 .PHONY:
-test: |  top  coverage-reset   test-cli test-standard  coverage-convert 
+test: |  top  coverage-reset    test-standard  coverage-convert 
 
 
 
@@ -171,7 +171,7 @@ wip:   $(DSTDIR)/.mark-probecalibrate
 
 VPATH=$(SRCDIR):$(DSTDIR)
 $(DSTDIR)/.mark-%: %.py
-	poetry run p2g --debug --out="$(DSTDIR)/<time>-$*.nc"  gen $<
+	poetry run p2g  --out="$(DSTDIR)/<time>-$*.nc"  gen $<
 #	touch $@
 
 

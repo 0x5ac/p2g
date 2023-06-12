@@ -20,7 +20,7 @@ def tolist_worker():
 
 # two phases 'cause fixtures don't work on interp functions.
 def test_native_tolist():
-    got = p2g.compile2g("tolist_worker", __file__, job_name=None, in_pytest=True)
+    got = p2g.walk.compile2g("tolist_worker", __file__, job_name=None, in_pytest=True)
 
     r = "#100" in got[1]
     assert r

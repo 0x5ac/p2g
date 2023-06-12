@@ -105,7 +105,7 @@ def test_native_function2_capfd_tmpdir(capfd, tmpdir):
 
 
 def test_native_cli_tmpdir_examples(tmpdir):
-    p2g.main(["--outdir", tmpdir, "examples"])
+    p2g.main(["--outdir", tmpdir, "-q", "examples"])
 
 
 def test_native_capfd_tmpdir_stdout(capfd, tmpdir):

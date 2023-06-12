@@ -2,6 +2,7 @@
 import contextlib
 import pathlib
 import sys
+import typing
 import tempfile
 
 from loguru import logger
@@ -12,6 +13,7 @@ from p2g import lib
 from p2g import stat
 
 from p2g import walk
+from p2g import main
 
 
 sys.path.insert(0, "p2g/examples")
@@ -27,7 +29,6 @@ def run_one_test(module_name, fname, args):
     prev_argv = sys.argv
     sys.argv = []
     logger.info(f"starting test {fname}")
-
     if "native" in fname:
         inside = __import__(f"p2g.tests.{module_name}")
         fndef = getattr(getattr(inside.tests, module_name), fname)
@@ -47,28 +48,40 @@ def run_one_test(module_name, fname, args):
 
 # wrap tests with glue equivalent to pytest's fixtures.
 
+# capwrap and tmpwrap return real context managers if
+# the function name says the function needs it, and
+# update the args to the callee test function.
 
-def wrap_one_test_(module_name, fname):
-    td = tempfile.TemporaryDirectory() if "tmpdir" in fname else contextlib.nullcontext()
-    cm = lib.CaptureO(gbl.config.debug) if "capfd" in fname else contextlib.nullcontext()
-    args = []
-    with cm as streams:
-        if streams is not None:
-            args.append(streams)
 
-        with td as tdir:
-            if tdir is not None:
-                args.append(pathlib.Path(tdir))
-            run_one_test(module_name, fname, args)
+@contextlib.contextmanager
+def capwrap(fname, test_callee_arg):
+    if "capfd" not in fname:
+        yield
+        return
+    with lib.CaptureO(gbl.config.debug) as out:
+        test_callee_arg.append(out)
+        yield
+
+
+@contextlib.contextmanager
+def tmpwrap(fname, test_callee_arg):
+    if "tmpdir" not in fname:
+        yield
+        return
+    with tempfile.TemporaryDirectory() as tdir:
+        dirpath = pathlib.Path(tdir)
+        test_callee_arg.append(dirpath)
+        yield
 
 
 def wrap_one_test(module_name, fname):
-    gbl.config.debug = True
-
     try:
-        wrap_one_test_(module_name, fname)
+        args: list[typing.Any] = []
+        with capwrap(fname, args):
+            with tmpwrap(fname, args):
+                run_one_test(module_name, fname, args)
 
-    except (AssertionError, TypeError) as ass:
+    except (AssertionError, TypeError):
         return "cerror" in fname
 
     except err.CompilerError as ass:  # no cover
@@ -96,11 +109,14 @@ def find_all_tests(module_name):
 def run_all_test_(module_name):
     with stat.Nest():
         funcs = find_all_tests(module_name)
-
         for key in funcs:
-            print("run", module_name, key)
+            lib.qprint("run", module_name, key)
             if not wrap_one_test(module_name, key):  # for debug
                 breakpoint()
+
+
+def test_null():
+    main.main(None)
 
 
 def runthem():
@@ -136,20 +152,18 @@ def runthem():
         run_all_test_(name)
 
 
+#    test_null()
+
+
 def local_tests():
-    gbl.config.recursive = True
     res = walk.compile2g(
-        func_name_arg="", srcfile_name="-", job_name="abc", in_pytest=False
+        func_name_arg="", srcfile_name="<null>", job_name="abc", in_pytest=False
     )
     lib.write_nl_lines(res, "-")
-    gbl.config.recursive = False
 
 
 def run_test(maybe_module):
-    prev = sys.argv
-
     def mtests():
-        sys.argv = prev
         if maybe_module:  # for debug
             run_all_test_(maybe_module)
             return
@@ -157,5 +171,3 @@ def run_test(maybe_module):
 
     local_tests()
     mtests()
-
-    sys.argv = prev

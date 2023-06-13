@@ -224,7 +224,7 @@ def check_golden_worker(fn, check_comments):
 
     else:
         # no source gold, make it.
-        writelines(fn, ".gold", callow, "no source gold, create")
+        writelines(fn, ".nc", callow, "no source gold, create")
 
 
 # decorator for tests, turns the node into ast and calls
@@ -255,6 +255,7 @@ def must_be(*text):
     def must_be_(fn):
         @functools.wraps(fn)
         def must_be__():
+            breakpoint()
             check_must_be_worker(fn, text)
 
         return must_be__

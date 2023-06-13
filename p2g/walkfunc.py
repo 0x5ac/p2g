@@ -115,6 +115,7 @@ def inline(func_def, *args, **kwargs):
     dyna_scope = walker.ns
     walker.ns = func_def.lexical_scope
     res = None
+
     with walker.pushpopns(walkns.FunctionNS()):
         formals_dict = gather_func_formals(func_def, *args, **kwargs)
 
@@ -143,11 +144,15 @@ class FuncDefWrap:
     def __init__(self, walker, node):
         self.call = False
         self.gen = []
-        for decorator in node.decorator_list:
-            walker.visit(decorator)
+        self.func_name = node.name
+        for decorator in reversed(node.decorator_list):
+            breakpoint()
+
+            dec_function = walker.visit(decorator)
+            node = dec_function(node)
 
         self.file_name = walker.module_ns["__file__"]
-        self.func_name = node.name
+
         self.node = node
         self.walker = walker
         self.lexical_scope = walker.ns
@@ -189,6 +194,15 @@ class FuncArgsDescr:
         self.kwargs = kwargs
 
 
+def funcall(target, *args, **kwargs):
+    breakpoint()
+    if isinstance(target, typing.Callable):
+        return target(*args, **kwargs)
+
+    else:
+        return target(*args, **kwargs)
+
+
 class WalkFunc(walkbase.WalkBase):
     def _visit_call(self, node):
         defn = self.visit(node.func)
@@ -199,8 +213,7 @@ class WalkFunc(walkbase.WalkBase):
         #        return desc.callit(*desc.args, **desc.kwargs)
         # f = interpfunc(desc.func)
         # return f
-        breakpoint()
-        return defn(*desc.args, **desc.kwargs)
+        return funcall(defn, *desc.args, **desc.kwargs)
 
     def _visit_functiondef(self, node):
         desc = FuncDefWrap(self, node)

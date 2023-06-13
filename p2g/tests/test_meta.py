@@ -9,6 +9,12 @@ import pytest
 import p2g
 
 
+@p2g.must_be()
+def test_simple_ok():
+    print("WORKING")
+    a = 3
+
+
 this_path = pathlib.Path(__file__)
 golden_dir = this_path.parent / "golden"
 
@@ -26,37 +32,36 @@ def test_native_tolist():
     assert r
 
 
-@p2g.must_be()
-def test_simple_ok():
-    a = 3
-
-
 # gold file is there, but broken.
 
-tmp_path = golden_dir / "test_meta_test_simple_xfail1.nc"
-tmp_got_path = golden_dir / "test_meta_test_simple_xfail1.got"
+
+meta_make_bad_gold_path = golden_dir / "test_meta_test_simple_xfail1.nc"
+
+
+def make_bad_gold():
+    meta_make_bad_gold_path.write_text("fail")
 
 
 @p2g.check_golden()
 @pytest.mark.xfail()
 def test_simple_xfail1():
+    breakpoint()
     p2g.com("A comment")
-    tmp_path.write_text("BAD", encoding="utf-8")
     CURSOR = p2g.Fixed(addr=100)
     CURSOR.x = 9
 
 
-def test_cerror_xfail_created():
-    assert tmp_got_path.exists()
+def test_check_and_remove_golden():
+    assert meta_make_bad_gold_path.read_text() == (
+        "( A comment )\n"
+        "( CURSOR.x = 9                  )\n"
+        "  #100= 9.                             \n"
+    )
+    meta_make_bad_gold_path.unlink()
 
 
 # test what happens when file is no there.
-make_golden_path = golden_dir / "test_meta_test_native_transitory_golden.gold"
-
-
-def test_native_remove_golden():
-    make_golden_path.unlink(missing_ok=True)
-    assert not make_golden_path.exists()
+make_golden_path = golden_dir / "test_meta_test_native_transitory_golden.nc"
 
 
 # output file not there, so test fails,
@@ -83,6 +88,10 @@ def test_native_remove_seed():
 # the force inserts an error  in the output
 # so the test fails, but generates them
 # error output.
+
+meta_decorator_path = golden_dir / "test_meta_test_native_decorate_seed.decorator"
+
+
 @p2g.must_be("FORCE")
 def test_native_decorate_seed():
     CURSOR = p2g.Fixed(17, addr=100)
@@ -90,8 +99,8 @@ def test_native_decorate_seed():
 
 def test_native_seed_exists():
     print("GOT ", meta_decorate_seed)
-    assert meta_decorate_seed.exists()
-    meta_decorate_seed.unlink()
+    assert meta_decorator_path.exists()
+    meta_decorator_path.unlink()
 
 
 @pytest.mark.xfail

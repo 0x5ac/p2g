@@ -51,7 +51,7 @@ def test_cerror_xfail_created():
 
 
 # test what happens when file is no there.
-make_golden_path = golden_dir / "test_meta_test_native_transitory_golden.nc"
+make_golden_path = golden_dir / "test_meta_test_native_transitory_golden.gold"
 
 
 def test_native_remove_golden():
@@ -72,7 +72,7 @@ def test_native_golden_exists():
     assert make_golden_path.exists()
 
 
-meta_decorate_seed = golden_dir / "transitory.decorator"
+meta_decorate_seed = golden_dir / "test_meta_test_decorate_seed.decorator"
 
 
 def test_native_remove_seed():
@@ -80,15 +80,18 @@ def test_native_remove_seed():
     assert not meta_decorate_seed.exists()
 
 
-# must create new seed, but since it says
-# force, there's no error.
+# the force inserts an error  in the output
+# so the test fails, but generates them
+# error output.
 @p2g.must_be("FORCE")
-def test_decorate_seed():
+def test_native_decorate_seed():
     CURSOR = p2g.Fixed(17, addr=100)
 
 
 def test_native_seed_exists():
-    assert not meta_decorate_seed.exists()
+    print("GOT ", meta_decorate_seed)
+    assert meta_decorate_seed.exists()
+    meta_decorate_seed.unlink()
 
 
 @pytest.mark.xfail

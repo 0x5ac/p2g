@@ -199,6 +199,7 @@ class WalkFunc(walkbase.WalkBase):
         #        return desc.callit(*desc.args, **desc.kwargs)
         # f = interpfunc(desc.func)
         # return f
+        breakpoint()
         return defn(*desc.args, **desc.kwargs)
 
     def _visit_functiondef(self, node):

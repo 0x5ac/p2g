@@ -1,5 +1,6 @@
 import functools
 import inspect
+from loguru import logger
 import itertools
 import pathlib
 import typing
@@ -118,7 +119,10 @@ def format_differences(marks, golden_data: list[str], callow_data: list[str]):
         )
 
 
-def writelines(path, txt):
+def writelines(fn, suffix, txt, comment):
+    path = make_file_path(fn, suffix)
+    print(f"WRRTIGIN {comment} to ", path)
+    logger.error(f"Ptest error, writing to {comment}")
     return path.write_text(lib.nljoin(txt))
 
 
@@ -126,7 +130,7 @@ def writelines(path, txt):
 # have passed.
 
 
-def make_decorated_source_seed(fn, callow_path, callow_data):
+def make_decorated_source_seed(fn, callow_data):
     tofix = ["@p2g.must_be("]
     for line in callow_data:
         quotechar = '"'
@@ -141,7 +145,7 @@ def make_decorated_source_seed(fn, callow_path, callow_data):
     while lines and not lines[0].startswith("def"):
         lines = lines[1:]
 
-    writelines(callow_path, tofix + lines)
+    writelines(fn, ".decorator", tofix + lines, "creating decorator")
 
 
 # compile fn, return generated errors or text.
@@ -174,15 +178,15 @@ def read_and_trim(path):
 
 
 def check_must_be_worker(fn, gold_data, check_comments=False):
-    callow = get_all_comp_outputs(fn)
+    callow_data = get_all_comp_outputs(fn)
 
-    markers = find_differences(gold_data, callow, check_comments)
+    markers = find_differences(gold_data, callow_data, check_comments)
 
     if not markers:
         return
-    etext = format_differences(markers, gold_data, callow)
+    etext = format_differences(markers, gold_data, callow_data)
 
-    make_decorated_source_seed(fn, make_file_path(fn, ".decorator"), callow)
+    make_decorated_source_seed(fn, callow_data)
 
     if "FORCE" in gold_data[0]:
         return
@@ -206,7 +210,8 @@ def check_golden_worker(fn, check_comments):
         if not markers:
             return
         etext = format_differences(markers, gold_data, callow)
-        writelines(make_file_path(fn, ".got"), callow)
+
+        writelines(fn, ".got", callow)
 
         # if running in pytest then exist out gracefully for them.
         # otherwise, running in debug harness.
@@ -219,7 +224,7 @@ def check_golden_worker(fn, check_comments):
 
     else:
         # no source gold, make it.
-        writelines(gold_path, callow)
+        writelines(fn, ".gold", callow, "no source gold, create")
 
 
 # decorator for tests, turns the node into ast and calls

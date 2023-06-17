@@ -97,6 +97,7 @@ class CompilerError(Exception):
 def compiler(message, exc=None, err_pos=None) -> typing.NoReturn:
     if gbl.config.bp_on_error:  # for debug
         breakpoint()
+        breakpoint()
 
     if not err_pos:
         err_pos = state.last_pos

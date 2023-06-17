@@ -111,14 +111,15 @@ def run_all_test_(module_name):
         funcs = find_all_tests(module_name)
         for key in funcs:
             lib.qprint("run", module_name, key)
-            breakpoint()
+
             if not wrap_one_test(module_name, key):  # for debug
+                breakpoint()
                 breakpoint()
 
 
 def runthem():
     tnames = [
-        "test_meta",
+        #        "test_meta",
         "not_pytest_nonlocal0",
         "not_pytest_nonlocal1",
         "not_pytest_nonlocal2",

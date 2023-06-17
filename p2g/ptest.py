@@ -211,7 +211,7 @@ def check_golden_worker(fn, check_comments):
             return
         etext = format_differences(markers, gold_data, callow)
 
-        writelines(fn, ".got", callow)
+        writelines(fn, ".got", callow, "compare fail so")
 
         # if running in pytest then exist out gracefully for them.
         # otherwise, running in debug harness.
@@ -255,7 +255,6 @@ def must_be(*text):
     def must_be_(fn):
         @functools.wraps(fn)
         def must_be__():
-            breakpoint()
             check_must_be_worker(fn, text)
 
         return must_be__

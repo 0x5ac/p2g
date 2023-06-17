@@ -32,32 +32,25 @@ def test_native_tolist():
     assert r
 
 
-# gold file is there, but broken.
+# # gold file is there, but broken.
+# meta_make_bad_gold_path = golden_dir / "test_meta_test_native_simple_xfail1.nc"
 
 
-meta_make_bad_gold_path = golden_dir / "test_meta_test_simple_xfail1.nc"
+# def make_bad_gold():
+#     meta_make_bad_gold_path.write_text("fail")
 
 
-def make_bad_gold():
-    meta_make_bad_gold_path.write_text("fail")
+# @p2g.check_golden()
+# @pytest.mark.xfail()
+# def test_native_simple_xfail1():
+#     p2g.com("A comment")
+#     CURSOR = p2g.Fixed(addr=100)
+#     CURSOR.x = 9
 
 
-@p2g.check_golden()
-@pytest.mark.xfail()
-def test_simple_xfail1():
-    breakpoint()
-    p2g.com("A comment")
-    CURSOR = p2g.Fixed(addr=100)
-    CURSOR.x = 9
-
-
-def test_check_and_remove_golden():
-    assert meta_make_bad_gold_path.read_text() == (
-        "( A comment )\n"
-        "( CURSOR.x = 9                  )\n"
-        "  #100= 9.                             \n"
-    )
-    meta_make_bad_gold_path.unlink()
+# def test_native_check_and_remove_golden():
+#     assert "A comment" in meta_make_bad_gold_path.read_text()
+#     meta_make_bad_gold_path.unlink()
 
 
 # test what happens when file is no there.
@@ -75,6 +68,23 @@ def test_native_transitory_golden():
 # # so can be tested here.
 def test_native_golden_exists():
     assert make_golden_path.exists()
+    make_golden_path.unlink()
+
+
+gold_compare_fail = golden_dir / "test_meta_test_native_gold_compare_fail.nc"
+# test when there is a file but its wrong.
+
+
+@p2g.check_golden()
+@pytest.mark.xfail
+def test_native_gold_compare_fail():
+    # not going to match.
+    gold_compare_fail.write_text("BAD")
+
+
+@p2g.must_be()
+def test_cleanup():
+    gold_compare_fail.unlink()
 
 
 meta_decorate_seed = golden_dir / "test_meta_test_decorate_seed.decorator"

@@ -145,11 +145,10 @@ class FuncDefWrap:
         self.call = False
         self.gen = []
         self.func_name = node.name
-        for decorator in reversed(node.decorator_list):
-            breakpoint()
-
-            dec_function = walker.visit(decorator)
-            node = dec_function(node)
+        if 0:
+            for decorator in reversed(node.decorator_list):
+                dec_function = walker.visit(decorator)
+                node = dec_function(node)
 
         self.file_name = walker.module_ns["__file__"]
 
@@ -195,12 +194,7 @@ class FuncArgsDescr:
 
 
 def funcall(target, *args, **kwargs):
-    breakpoint()
-    if isinstance(target, typing.Callable):
-        return target(*args, **kwargs)
-
-    else:
-        return target(*args, **kwargs)
+    return target(*args, **kwargs)
 
 
 class WalkFunc(walkbase.WalkBase):

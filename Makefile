@@ -109,7 +109,7 @@ ELCOMMON=  --directory $(OX_GFM_DIR)					\
            --eval "(setq default-directory \"$(realpath $(@D))\")"
 %.md: %.org
 	emacs  $<  $(ELCOMMON) --eval   "(org-gfm-export-to-markdown)"
-	rm -f $*.tmp
+	rm -f $*.md.tmp
 
 %.txt: %.org
 	emacs  $< $(ELCOMMON) --eval       "(org-ascii-export-to-ascii)"

@@ -4,7 +4,7 @@ DOC_DIR=./doc
 EXAMPLE_DIR=./examples
 TESTS_DIR=./tests
 EMACS?=emacs
-POETRY=python -m poetry 
+POETRY=poetry 
 PR=$(POETRY) run
 COVERAGE=$(PR) coverage
 
@@ -131,8 +131,12 @@ endif
 ######################################################################
 # release:
 VERSION=$(shell cat pyproject.toml | grep "^version =" | sed 's:version = "\(.*\)":\1:g')
+
+.PHONY:
+bump-tag:
+	git tag $(shell $(POETRY) version -s)
 .PHONY: 
-bump: bump-inc | bump-install
+bump: bump-inc | bump-install | bump-tag
 
 .PHONY:
 
@@ -142,7 +146,7 @@ bump-install:
 .PHONY:
 bump-inc:
 	$(POETRY) version patch
-	grep "^version" pyproject.toml
+
 
 .PHONY:
 build: clean compiled-doc lint

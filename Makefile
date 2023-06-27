@@ -136,7 +136,7 @@ VERSION=$(shell cat pyproject.toml | grep "^version =" | sed 's:version = "\(.*\
 bump-tag:
 	git tag $(shell $(POETRY) version -s)
 .PHONY: 
-bump: bump-inc | bump-install | bump-tag
+bump: | bump-inc  bump-install  bump-tag
 
 .PHONY:
 

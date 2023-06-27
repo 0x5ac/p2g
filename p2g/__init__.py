@@ -81,4 +81,4 @@ fish__all__ = [
 ]
 
 
-VERSION = "0.2.14"
+VERSION = "0.2.16"

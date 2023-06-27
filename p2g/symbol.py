@@ -1,7 +1,5 @@
 import collections
 import typing
-from p2g import lib
-from p2g import nd
 
 
 # symbol tables made by watching every assignment from a vector
@@ -13,9 +11,7 @@ class Table:
     print_all = False
 
     # store in this way to keep multiple definitions.
-    name_to_thing: typing.Dict[str, typing.Set[nd.HasToSymTab]] = collections.defaultdict(
-        set
-    )
+    name_to_thing: typing.Dict[str, typing.Set] = collections.defaultdict(set)
     addrs_used: typing.Set[int] = set()
     # Called for every store to a name, so remember when a vector is
     # given an association.
@@ -65,14 +61,17 @@ class Table:
                     except AttributeError:
                         continue
 
-        @lib.g2l
         def yield_all_parts():
             for phase in ["#", ",", "xyz"]:
                 yield from yield_table_part(phase)
 
         lcols, rcols = zip(*yield_all_parts())
-        lsize = lib.max_str_len(lcols)
-        rsize = lib.max_str_len(rcols)
+
+        def max_str_len(lines):
+            return len(max(lines, key=len, default=""))
+
+        lsize = max_str_len(lcols)
+        rsize = max_str_len(rcols)
         for key, value in zip(lcols, rcols):
             yield "( " + key.ljust(lsize) + " : " + value.ljust(rsize) + " )"
 

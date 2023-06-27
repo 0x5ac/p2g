@@ -1,180 +1,259 @@
-PR=poetry run
+CWD=$(shell  pwd)
+SRC_DIR=./p2g
+DOC_DIR=./doc
+EXAMPLE_DIR=./examples
+TESTS_DIR=./tests
+EMACS?=emacs
+POETRY=python -m poetry 
+PR=$(POETRY) run
 COVERAGE=$(PR) coverage
-PYTEST=PYTHONPATH=. $(PR) pytest --cov=p2g --cov-append
-GOLDEN=p2g/tests/golden
-OXRST=~/.emacs.d/straight/build/ox-rst/ox-rst.el
+
+PYTEST=$(PR) pytest --cov=$(SRC_DIR) --cov-append
+OX_GFM_DIR=~/.emacs.d/straight/build/ox-gfm
+
+
+ECHO=@ echo
 ######################################################################
 
-top: .poetry_and_deps_installed requirements.txt examples  
+GENERATED_SRC=$(SRC_DIR)/haas.py
+
+SRC=$(SRC_DIR)/axis.py				\
+    $(GENERATED_SRC)				\
+    $(SRC_DIR)/builtin.py			\
+    $(SRC_DIR)/coords.py			\
+    $(SRC_DIR)/err.py				\
+    $(SRC_DIR)/gbl.py				\
+    $(SRC_DIR)/goto.py				\
+    $(SRC_DIR)/__init__.py			\
+    $(SRC_DIR)/lib.py				\
+    $(SRC_DIR)/__main__.py			\
+    $(SRC_DIR)/main.py				\
+    $(SRC_DIR)/makestdvars.py			\
+    $(SRC_DIR)/nd.py				\
+    $(SRC_DIR)/op.py				\
+    $(SRC_DIR)/ptest.py				\
+    $(SRC_DIR)/scalar.py				\
+    $(SRC_DIR)/stat.py				\
+    $(SRC_DIR)/symbol.py				\
+    $(SRC_DIR)/vector.py				\
+    $(SRC_DIR)/visible.py			\
+    $(SRC_DIR)/walkbase.py			\
+    $(SRC_DIR)/walkexpr.py			\
+    $(SRC_DIR)/walkfunc.py			\
+    $(SRC_DIR)/walk.py
 
 
+TESTS=$(TESTS_DIR)/*.py
 
+COMPILED_EXAMPLES=$(EXAMPLE_DIR)/vicecenter.nc \
+                  $(EXAMPLE_DIR)/probecalibrate.nc
+
+COMPILED_DOC=\
+	$(DOC_DIR)/haas.org				\
+	$(DOC_DIR)/haas.txt				\
+	$(DOC_DIR)/readme.txt				\
+	readme.md \
+	license.md					\
+	authors.md
+
+ALL_FOR_DIST= $(COMPILED_EXAMPLES)  $(COMPILED_DOC) $(GENERATED_SRC) $(SRC)
+
+top: poetry-install $(ALL_FOR_DIST)
+	$(ECHO) Ready for build dist.
 ######################################################################
-# Build machinary
+# Init environment
+
+
 .PHONY:
-download_poetry:
-	echo "downloading poetry, ^C to stop"
-	sleep 3
-	curl -sSL https://install.python-poetry.org | python3 -
+poetry-install: .poetry_and_deps_installed
+	$(ECHO) Poetry installed.
 
-requirements.txt: pyproject.toml
-	poetry export -f requirements.txt --output requirements.txt
-
-.poetry_and_deps_installed:
-	if [ ! $$(which poetry) ] ; then make download_poetry; fi
-	poetry env use 3.11
-	poetry install
+.poetry_and_deps_installed: readme.md
+	python -m poetry install
 	touch $@
+
+
 
 ######################################################################
 # Examples.
+.PHONY:
+compiled-examples: 
+	$(ECHO) Examples ready.
 
-examples: p2g/examples/vicecenter.nc p2g/examples/probecalibrate.nc
-
-%.nc:%.py
-	$(PR) p2g gen $< -o $@
+%.nc:%.py 
+	$(PR) p2g gen $<  $@
 
 ######################################################################
 # Doc and machine generated headers.
 
-doc: p2g/doc/readme.rst p2g/doc/haas.org p2g/doc/haas.txt p2g/haas.py README.rst   AUTHORS.rst
+$(SRC_DIR)/haas.py: $(SRC_DIR)/makestdvars.py 
+	$(PR) p2g stdvars --py=$@ 
 
-p2g/doc/readme.rst: p2g/doc/readme.org p2g/doc/haas.org
+$(DOC_DIR)/haas.txt: p2g/makestdvars.py
+	$(PR) p2g stdvars --txt=$@ 
 
-p2g/haas.py: p2g/makestdvars.py 
-	poetry run p2g stdvars --py=$@ 
+$(DOC_DIR)/haas.org: $(SRC_DIR)/makestdvars.py
+	$(PR) p2g stdvars --org=$@ 
 
-p2g/doc/haas.txt: p2g/makestdvars.py
-	poetry run p2g stdvars --txt=$@ 
+HAVE_EMACS=$(and  $(shell which $(EMACS)),$(wildcard $(OX_GFM_DIR)/*),1)
 
-p2g/doc/haas.org: p2g/makestdvars.py
-	poetry run p2g stdvars --org=$@ 
+VPATH=$(DOC_DIR)
 
-AUTHORS.rst: p2g/doc/authors.rst
-	cp  $< $@
+ifeq ($(HAVE_EMACS),1)
+ELCOMMON=  --directory $(OX_GFM_DIR)					\
+           -q 								\
+           --batch 							\
+           --eval  "(require 'ox-ascii)"				\
+           --eval "(require 'ox-gfm)"					\
+           --eval "(setq org-confirm-babel-evaluate nil)"		\
+           --eval "(setq default-directory \"$(realpath $(@D))\")"
+%.md: %.org
+	emacs  $<  $(ELCOMMON) --eval   "(org-gfm-export-to-markdown)"
+	rm -f $*.tmp
 
-README.rst: p2g/doc/readme.rst
-	cp  $< $@
+%.txt: %.org
+	emacs  $< $(ELCOMMON) --eval       "(org-ascii-export-to-ascii)"
 
-LICENSE.rst: p2g/doc/license.rst
-	cp  $< $@
+else
 
-p2g/doc/%.rst: p2g/doc/%.org
-	emacs $< --batch -l $(OXRST) -f org-rst-export-to-rst --kill
+%.md: %.org
+	@ echo
+	@ echo "edit makefile - emacs not setup"
+	@ echo
+	touch $@
+%.txt: %.org
+	@ echo
+	@ echo "edit makefile - emacs not setup"
+	@ echo
+	touch $@
+endif
 
 ######################################################################
 # release:
-VERSION := $(shell poetry version -s )
+VERSION=$(shell cat pyproject.toml | grep "^version =" | sed 's:version = "\(.*\)":\1:g')
 .PHONY: 
 bump: bump-inc | bump-install
 
 .PHONY:
+
 bump-install:
-	echo __version__ = '"v'$(shell poetry version -s)'"'  > p2g/version.py
-	git tag v$$(poetry version -s)
-	git commit -a -m "bumped v$$(poetry version -s)"
+	sed -i $(SRC_DIR)/__init__.py -e 'sX^VERSION.*XVERSION = "$(shell $(POETRY) version -s)"Xg' 
+
 .PHONY:
 bump-inc:
-	poetry version patch
-	grep "^version" pyproject.toml 
-build: doc
-	cp p2g/doc/readme.rst README.rst
-	poetry build 
+	$(POETRY) version patch
+	grep "^version" pyproject.toml
 
+.PHONY:
+build: clean compiled-doc lint
+	$(POETRY) build 
+
+.PHONY:
 bcheck: build
 	pip install --force dist/*gz
 	type p2g
-	$(PR)	p2g -q test	
+	$(PR)	p2g test	> test.output 2>&1
+	diff -u test.output.prev test.output
+	cp test.output test.output.prev
 
 
-release:
-	 poetry publish --build -r testpypi 
+.PHONY:
+publish:dist/p2g-$(VERSION).tar.gz
+	$(POETRY) publish 
+
+.PHONY:
+dist: dist/p2g-$(VERSION).tar.gz
+	$(ECHO) Dist made.
 
 
+dist/p2g-$(VERSION).tar.gz: pyproject.toml   $(ALL_FOR_DIST)
+	@ # want to distribute examples  and docs, so copy
+	@ # somewhere safe.
+	@ rm -rf  $(SRC_DIR)/doc $(SRC_DIR)/examples
+	@ cp -a $(DOC_DIR) $(EXAMPLE_DIR) $(SRC_DIR)
+	$(POETRY) build
+	@ rm -rf  $(SRC_DIR)/doc $(SRC_DIR)/examples
+
+.PHONY:
 test-standard:
-#	$(V) echo FAIL  > $(GOLDEN)/test_error_test_forcefail0.nc
-#	$(V) echo XFAIL > $(GOLDEN)/test_meta_test_simple_xfail1.nc
-	$(V) $(PYTEST)  
-
-
- 
-
-test-cli:
-	$(COVERAGE) run --append -m  p2g  -q test
+	$(PYTEST) 
 
 .PHONY:
 coverage-reset:
 	rm -f .coverage
 .PHONY:
 coverage-convert:
-	$(COVERAGE) lcov --include=p2g/*.py 
+	$(COVERAGE) lcov -q
 .PHONY:
 coverage-report:
-	$(COVERAGE) report  --include=p2g/*.py 
-
+	$(COVERAGE) report
 
 .PHONY:
-test: |  top  coverage-reset    test-standard  coverage-convert 
+test: | top coverage-reset     test-standard coverage-convert
 
-
-
-
-newtests:
-	git add p2g/tests/golden/*.nc
-	git add p2g/tests/*.py
 
 ######################################################################
 # linty stuff
+.PHONY:
 isort:
-	$(V)	isort .
+	$(PR) isort $(SRC) $(TESTS)
+.PHONY:
 ssort:
-	$(V)	echo p2g/*.py | xargs $(PR) ssort
-
+	 $(PR) ssort $(SRC) $(PRECIOUS_SRC)  $(TESTS)
+.PHONY:
 autoflake:
-	$(V) $(PR) autoflake --ignore-init-module-imports  --remove-all-unused-imports  -i -v p2g/*.py
-
+	 $(PR) autoflake --ignore-init-module-imports  --remove-all-unused-imports  -i -v $(SRC)   $(TESTS)
+.PHONY:
+pyright:
+	 $(PR)  pyright p2g 
+.PHONY:
 mypy:
-	$(V) - $(PR) mypy p2g | cat
-
+	 $(PR) mypy p2g 
+.PHONY:
 flake8:
-	$(V) - $(PR) flake8p p2g | cat
-
+	 $(PR) flake8p p2g  |cat
+.PHONY:
 pylint:
-	$(V) - $(PR) pylint p2g
-
+	 $(PR) pylint p2g 
+.PHONY:
 ruff:
-	$(V) - NO_COLOR=1 $(PR) ruff check  p2g
-sf:
-	$(V) - python 	/home/sac/w/nih/snakefood/main.py . p2g
-
-
+	 $(PR) ruff check  p2g | cat
+.PHONY:
 clean:
 	git clean -fdx
+	rm -f $(COMPILED_EXAMPLES)
+ifeq ($(HAVE_EMACS),1)
+	rm -f $(COMPILED_DOC) 
+endif
 
+.PHONY:
 cleanup: isort ssort autoflake
 
-lint: mypy  flake8 pylint  ruff
-
+.PHONY:
 checkdeps:
 	$(PR) deptry .
+
+
+.PHONY:
+lint: pyright mypy  flake8 pylint  ruff  checkdeps
 
 
 
 
 
 # Build my wips
+mall:
+	 sed 'sXfrom.*import \(.*\)X"\1\",Xg' p2g/__init__.py
+verbose:
+	poetry run pytest tests/test_vars.py  -vvvv --capture=tee-sys
+.PHONY:
+sf:
+	 python 	/home/sac/w/nih/snakefood/main.py . p2g
+
 DSTDIR=/home/sac/vf3/_nc_
-SRCDIR=/home/sac/vf3/progs/p2g/p2g/examples
+NSRC_DIR=/home/sac/vf3/progs/p2g/examples
 
-wip:   $(DSTDIR)/.mark-probecalibrate
+wip:  wip-probe
 
-
-VPATH=$(SRCDIR):$(DSTDIR)
-$(DSTDIR)/.mark-%: %.py
-	poetry run p2g  --out="$(DSTDIR)/<time>-$*.nc"  gen $<
-	touch $@
-
-
-
-
+wip-probe: $(DSTDIR)/.mark-probecalibrate
 

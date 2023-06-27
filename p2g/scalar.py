@@ -1,14 +1,13 @@
 import typing
 
 from p2g import nd
-from p2g import opinfo
 
 
 Ctype = typing.Union[float, int, str]
 
 
 class Scalar(nd.EBase):
-    opfo: opinfo.Opinfo
+    opfo: nd.Opinfo
     is_none_constant = False
     is_constant = False
     is_string_constant = False
@@ -57,7 +56,7 @@ class Constant(ConstantBase):
     is_numeric_constant = True
 
     def __init__(self, value: int | float):
-        super().__init__(opinfo.const_opinfo)
+        super().__init__(nd.const_nd)
         self._value = value
 
     @property
@@ -96,7 +95,7 @@ class ConstantNone(ConstantBase):
     is_none_constant = True
 
     def __init__(self):
-        super().__init__(opinfo.const_opinfo)
+        super().__init__(nd.const_nd)
 
 
 class ConstantStr(ConstantBase):
@@ -104,7 +103,7 @@ class ConstantStr(ConstantBase):
     is_string_constant = True
 
     def __init__(self, value: str):
-        super().__init__(opinfo.const_opinfo)
+        super().__init__(nd.const_nd)
         self.value = value
 
     def to_gcode(self, modifier=nd.NodeModifier.EMPTY) -> str:

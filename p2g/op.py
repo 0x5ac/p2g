@@ -6,16 +6,16 @@ import typing
 from p2g import err
 from p2g import lib
 from p2g import nd
-from p2g import opinfo
 from p2g import scalar
 from p2g import symbol
 from p2g import vector
 
 
 OptRes = typing.Optional[scalar.Scalar]
+ScalarScalar = typing.Union[scalar.Scalar, int, float, bool]
 
-op_byclass: typing.Dict[typing.Any, opinfo.Opinfo] = {}
-allops: typing.Dict[str, opinfo.Opinfo] = {}
+op_byclass: typing.Dict[typing.Any, nd.Opinfo] = {}
+allops: typing.Dict[str, nd.Opinfo] = {}
 
 
 def parensif(cond, thing):
@@ -158,7 +158,7 @@ class Unop(scalar.Scalar):
         return f"({self.opfo.pyn} {self.child})"
 
 
-def make_scalar_unop(opfo, child: scalar.Scalar):
+def make_scalar_unop(opfo, child: ScalarScalar):
     child = scalar.wrap_scalar(child)
     if opfo.opt1 and (res := opfo.opt1(opfo, child)) is not None:
         return res
@@ -196,7 +196,7 @@ def make_scalar_func(fname, *args):
 
 
 class MAST(abc.ABC):
-    opfo: opinfo.Opinfo
+    opfo: nd.Opinfo
 
 
 MAST.register(ast.AST)
@@ -286,7 +286,7 @@ not_compop = {
 }
 
 
-def opt1_not(_opinfo, arg) -> OptRes:
+def opt1_not(_nd, arg) -> OptRes:
     if arg.is_constant:
         return scalar.Constant(not arg.value)
 
@@ -408,7 +408,7 @@ def make_hashop(lhs, rhs):
 vector.MemVec.make_hashop = make_hashop
 
 
-def opinfo_install(opfo: opinfo.Opinfo):
+def nd_install(opfo: nd.Opinfo):
     def make_multi_binop_tramp(lhs, rhs):
         return make_vec_binop(opfo, lhs, rhs)
 
@@ -434,10 +434,10 @@ def opinfo_install(opfo: opinfo.Opinfo):
 
 
 def reg(**kwargs):
-    opi = opinfo.Opinfo(**kwargs)
+    opi = nd.Opinfo(**kwargs)
     allops[opi.pyn] = opi
     op_byclass[opi.astc] = opi
-    opinfo_install(opi)
+    nd_install(opi)
 
 
 def regfunc(name, lam):

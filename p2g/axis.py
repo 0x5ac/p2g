@@ -36,4 +36,4 @@ def name_to_indexes_list(name: str) -> list[int]:
     try:
         return [axis_name_to_index(ch) for ch in name]
     except ValueError:
-        return err.compiler(f"Bad axis letter in '{name}'")
+        return err.compiler(f"Bad axis letter in '{name}'.")

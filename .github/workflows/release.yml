@@ -1,0 +1,28 @@
+name: Upload Python Package
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  deploy:
+    name: on ubuntu
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+    - name: Install dependencies
+      run: |
+        make
+    - name: Test
+      run: |
+        make test
+    - name: Make dist
+      run: |
+        make dist
+    - name: Send to pypi
+      run: |
+        make publish
+        
+

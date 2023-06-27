@@ -1,38 +1,32 @@
+import abc
+import contextlib
+import functools
+import sys
 import typing
 
 
-class Config:
-    opt_relative_lines: bool
-    opt_relative_paths: bool
-    debug: bool
-    opt_narrow_output: bool
-    in_pytest: bool
-    bp_on_error: bool
-    opts: dict
-
-    def __init__(self):
-        self.bp_on_error = False
-        self.opt_relative_lines = False
-        self.opt_relative_paths = False
-        self.opt_narrow_output = False
-        self.debug = False
-        self.in_pytest = True
-
-    @property
-    def relative_lines(self):
-        return self.opt_relative_lines or self.in_pytest
-
-    @property
-    def relative_paths(self):
-        return self.opt_relative_paths or self.in_pytest
-
-    @property
-    def narrow_output(self):
-        return self.opt_narrow_output or self.in_pytest
+class Config(typing.NamedTuple):
+    debug: bool = False
+    narrow_output: bool = False
+    bp_on_error: bool = False
+    boiler_plate: bool = True
+    verbose: bool = False
+    logio: bool = False
+    # overwrittern if we get in via main
+    tin_test: bool = True
 
 
 config = Config()
-opts = {}
+
+
+@contextlib.contextmanager
+def save_config(**kwargs):
+    global config  # pylint: disable=global-statement
+    old = config
+    config = config._replace(**kwargs)
+    yield
+
+    config = old
 
 
 class PerTranslation:
@@ -54,7 +48,62 @@ class PerTranslation:
 
         self.last_node = None
 
-    #        self.next_label = 1000
-
 
 iface = PerTranslation()
+
+
+def log(*args):
+    if config.verbose:
+        print(*args)
+
+
+def sprint(*args):
+    print(*args)
+
+
+# print to redirected stderr
+def eprint(*args):
+    print(*args, file=sys.stderr)
+
+
+@functools.cache
+def logread(handle):
+    res = handle.read()
+    if config.logio:
+        print(res)  # no cover
+    return res
+
+
+def splitnl(line):
+    return line.split("\n")
+
+
+######################################################################
+# i/o redirection
+
+
+@contextlib.contextmanager
+def openr(name):
+    if str(name) == "-":
+        yield sys.stdin, None
+    else:
+        try:
+            with open(name, "r", encoding="utf-8") as rfile:
+                yield rfile, None
+        except FileNotFoundError as err:
+            yield None, err
+
+
+def g2l(generator):
+    def g2l_(*args, **kwargs):
+        return list(generator(*args, **kwargs))
+
+    return g2l_
+
+
+class HasToSymTab(abc.ABC):
+    user_defined = False
+
+    @abc.abstractmethod
+    def to_symtab_entry(self, _addrs_used) -> str:
+        return ""

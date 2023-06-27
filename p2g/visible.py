@@ -17,7 +17,7 @@ def base_addr(new_base=None):
 
 
 def message(dst, txt: str):
-    stat.code(f"{dst[0]} = 101 ( {txt} )", "<no comment>")
+    stat.code(f"{dst[0]} = 101 ({txt})", comment_txt="<none>")
 
 
 def as_address(src):

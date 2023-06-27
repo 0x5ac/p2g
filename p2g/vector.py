@@ -175,7 +175,7 @@ class MemVec(Vec):
     def everything(self):
         return (
             self.get_at(scalar.wrap_scalar(idx))
-            for idx in scalar.urange(0, self._size, self._step)
+            for idx in scalar.urange(0, self._size, int(self._step))
         )
 
     def get_at(self, idx: scalar.Scalar):
@@ -183,7 +183,7 @@ class MemVec(Vec):
             fidx = int(idx)
             if not 0 <= fidx < int(self._size):
                 err.compiler(
-                    f"Index out of range, index={fidx} size={self._size}",
+                    f"Index out of range, index={fidx} size={self._size}.",
                 )
 
         return MemVec.make_hashop(idx, self._addr)
@@ -197,7 +197,10 @@ class MemVec(Vec):
         if len(tmp) > 1:
             step = tmp[1] - tmp[0]
 
-        return MemVec(self._addr + tmp[0], tmp[-1] - tmp[0] + 1, step)
+        addr = self._addr + tmp[0]
+        size = tmp[-1] - tmp[0] + 1
+        assert addr is not None
+        return MemVec(addr, size, step)
 
     def __setitem__(self, indexes, src):
         if isinstance(indexes, slice):

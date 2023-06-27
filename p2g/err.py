@@ -1,10 +1,8 @@
 import dataclasses
 import pathlib
-import sys
 import typing
 
 from p2g import gbl
-from p2g import lib
 
 
 @dataclasses.dataclass
@@ -32,9 +30,11 @@ def mark_pos(last_pos):
 
 
 def src_code_from_line_near(pos, lineno):
-    with lib.openr(pos.filename) as inf:
-        src = inf.read()
-        lines = lib.splitnl(src)
+    with gbl.openr(pos.filename) as (inf, etrace):
+        if etrace:
+            return ""
+        src = gbl.logread(inf)
+        lines = gbl.splitnl(src)
         return lines[lineno - 1]
 
 
@@ -44,11 +44,11 @@ def src_code_from_node_place(pos):
 
 def note_from_node_place(pos, absolute_lines, topfn=None):
     relfixer = 1
-    if (gbl.config.relative_lines or (not absolute_lines)) and topfn is not None:
+    if (gbl.config.tin_test or (not absolute_lines)) and topfn is not None:
         relfixer = topfn.__code__.co_firstlineno
 
     filename = pos.filename
-    if gbl.config.relative_paths:
+    if gbl.config.tin_test:
         orig = pathlib.Path(filename)
         filename = "/".join(orig.parts[-3:])
 
@@ -86,12 +86,9 @@ class CompilerError(Exception):
 
         return [self.message, pfx + sourceline, carat]
 
-    def report_error(self, outf=None, absolute_lines=True, topfn=None):
-        if outf is None:
-            outf = sys.stderr
-
+    def report_error(self, absolute_lines=True, topfn=None):
         for line in self.error_lines(absolute_lines, topfn):
-            print(line, file=outf)
+            gbl.eprint(line)
 
 
 def compiler(message, exc=None, err_pos=None) -> typing.NoReturn:

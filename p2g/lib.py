@@ -1,47 +1,25 @@
 import contextlib
-import dataclasses
+import pathlib
 import sys
-import typing
-
-from p2g import gbl
 
 
-def max_str_len(lines):
-    return len(max(lines, key=len, default=""))
+# open accouting for '-' files.
+# sourcing empty file when in test.
 
 
-def pad_to_same_width(lines):
-    wid = max_str_len(lines)
-    res = []
-    for line in lines:
-        res.append(line.ljust(wid))
-    return res
-
-
-def g2l(generator):
-    #    @functools.wraps(generator)
-    def g2l_(*args, **kwargs):
-        return list(generator(*args, **kwargs))
-
-    return g2l_
-
-
-class Sentinel:
-    def __init__(self, name):
-        self.name = name
-
-
-NOPE = Sentinel("NOPE")
+@contextlib.contextmanager
+def openw(name):
+    if str(name) == "-":
+        yield sys.stdout
+    else:
+        with open(name, "w", encoding="utf-8") as wfile:
+            yield wfile
 
 
 def write_nl_lines(thing, outfile_path):
-    if outfile_path == "-":
+    with openw(outfile_path) as outf:
         for line in thing:
-            print(line)
-    else:
-        with open(outfile_path, "w", encoding="utf-8") as outf:
-            for line in thing:
-                print(line, file=outf)
+            print(line, file=outf)
 
 
 def same(lhs, rhs):
@@ -55,98 +33,29 @@ def nljoin(line_list):
     return "\n".join(line_list)
 
 
-def splitnl(line):
-    return line.split("\n")
+# unwind a list of lists etc can turn generators of lists of strings
+# into space joined string.
 
 
-######################################################################
-# i/o redirection
-
-
-# somewhere to put stdout or stderr during debug tests.
-@dataclasses.dataclass
-class SimpleOBuf:
-    buf: list[str]
-    tee: bool
-
-    def __init__(self, tee=False):
-        self.buf = []
-        self.tee = tee or 1
-
-    def write(self, txt):
-        if self.tee:  # no cover
-            sys.__stderr__.write(txt)
-            sys.__stderr__.flush()
-
-        self.buf.append(txt)
-
-    def text(self):
-        return "".join(self.buf)
-
-
-class CaptureO:
-    prevout: typing.Any
-    preverr: typing.Any
-    stdout: SimpleOBuf
-    stderr: SimpleOBuf
-
-    def __init__(self, tee):
-        self.prevout = sys.stdout
-        self.preverr = sys.stderr
-        self.stdout = SimpleOBuf(tee or gbl.config.debug)
-        self.stderr = SimpleOBuf(tee or gbl.config.debug)
-
-    def readouterr(self):
-        return self
-
-    @property
-    def out(self):
-        return self.stdout.text()
-
-    @property
-    def err(self):
-        return self.stderr.text()
-
-    def __enter__(self):
-        sys.stdout = typing.cast(typing.TextIO, self.stdout)
-        sys.stderr = typing.cast(typing.TextIO, self.stderr)
-        return self
-
-    def __exit__(self, _exc, _value, _tb):
-        sys.stdout = self.prevout
-        sys.stderr = self.preverr
-
-
-@contextlib.contextmanager
-def openw(name):
-    if str(name) == "-":
-        yield sys.stdout
+def unwind1(args):
+    if isinstance(args, str):
+        yield args
     else:
-        with open(name, "w", encoding="utf-8") as wfile:
-            yield wfile
+        for el in args:
+            yield from unwind1(el)
 
 
-class SimpleIBuf:
-    fromstdin: str = ""
-
-    def __init__(self, istr=""):
-        SimpleIBuf.fromstdin = istr
-
-    def read(self):
-        return SimpleIBuf.fromstdin
+def unwind(args):
+    return " ".join(unwind1(args))
 
 
-@contextlib.contextmanager
-def openr(name):
-    if str(name) == "<null>":
-        yield SimpleIBuf("")
-    else:
-        with open(name, "r", encoding="utf-8") as rfile:
-            yield rfile
+# find the file if in dist or just checkout out.
+def find_ours(filename):
+    for dir in [".", ".."]:
+        for subdir in ["tests", "doc", "examples"]:
+            look_here = pathlib.Path(__file__).parent / dir / subdir / filename
 
+            if look_here.exists():
+                return look_here.resolve()
 
-# a print which could be quieted.
-def qprint(*args):
-    if gbl.opts["--quiet"]:
-        return
-    print(*args)
+    raise FileNotFoundError  # no cover

@@ -1,5 +1,34 @@
 import abc
+import ast
+
+# just information about operators.
+# pylint: disable=too-many-instance-attributes
+import dataclasses
 import enum
+import typing
+
+
+def opt_null(*_):
+    return None
+
+
+@dataclasses.dataclass(kw_only=True)
+class Opinfo:
+    astc: typing.Optional[typing.Type] = None
+    pyn: str = ""
+    mth: str = ""
+    lam: typing.Callable = opt_null
+    gname: str = ""
+    prec: int = 20
+    comm: bool = False
+    nargs: int = 2
+    g_func: bool = False
+
+    opt1: typing.Callable = opt_null
+    opt2: typing.Callable = opt_null
+
+
+const_nd = Opinfo(astc=ast.Constant, pyn="konstant", gname="", prec=20)
 
 
 class NodeModifier(enum.IntFlag):
@@ -14,16 +43,28 @@ class NodeModifier(enum.IntFlag):
     F3X3 = enum.auto()
 
 
-class HasToSymTab(abc.ABC):
-    user_defined = False
-
-    @abc.abstractmethod
-    def to_symtab_entry(self, _addrs_used) -> str:
-        return ""
-
-
 # common base class for scalar and vector.
 class EBase(abc.ABC):
+    @abc.abstractmethod
+    def everything(self) -> typing.Generator[typing.Any, None, None]:
+        ...
+
+    def get_at(self, _idx) -> typing.Any:
+        return None  # no cover
+
+    def set_at(self, _idx, _src):
+        pass  # no cover
+
+    def nelements(self):
+        return 1  # no cover
+
+    def get_slice(self, _slice) -> typing.Any:
+        return None  # no cover
+
+    @abc.abstractmethod
+    def get_address(self) -> int:
+        ...
+
     def to_gcode(self, _modifier: NodeModifier) -> str:
         return ""  # no cover
 

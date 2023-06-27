@@ -38,7 +38,7 @@ def unpack(args, kwargs) -> vector.RValueVec:
         axis_indexes = axis.name_to_indexes_list(axis_string)
         for axis_idx, value in zip(axis_indexes, values.forever()):
             if axis_idx in resmap:
-                err.compiler(f"Overlapping axes {args} {kwargs}")
+                err.compiler(f"Overlapping axes {args} {kwargs}.")
             resmap[axis_idx] = value
 
     # fill any holes.
@@ -79,7 +79,7 @@ class _TypeBuilder:
 
     def check_size_sanity(self, size, initialized_size):
         if initialized_size > 0 and initialized_size != size:
-            err.compiler(f"Conflicting sizes {self.size} and {initialized_size}")
+            err.compiler(f"Conflicting sizes {self.size} and {initialized_size}.")
         if size == 0 and initialized_size == 0:
             err.compiler("Zero sized vector.")
 

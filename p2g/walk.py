@@ -5,13 +5,11 @@ import pathlib
 import re
 import sys
 
-from loguru import logger
-
 from p2g import axis
 from p2g import coords
 from p2g import err
 from p2g import gbl
-from p2g import lib
+from p2g import nd
 from p2g import op
 from p2g import scalar
 from p2g import stat
@@ -20,7 +18,6 @@ from p2g import vector
 from p2g import walkbase
 from p2g import walkexpr
 from p2g import walkfunc
-from p2g import walkns
 
 
 # wrap enough state that we can call an
@@ -93,7 +90,7 @@ class ItrRange:
         self.var = coords.Var()
 
         if not isinstance(target, ast.Name):
-            err.compiler("must be simple name as destination for for")
+            err.compiler("Must be simple name as destination for 'for'.")
         self.var = coords.Var()
         interp.ns[target.id] = self.var
 
@@ -140,7 +137,7 @@ class ItrRange:
 
 @dataclasses.dataclass
 class ItrSlice:
-    ptr: scalar.Scalar
+    ptr: nd.EBase
     pastptr: scalar.Scalar
     step: scalar.Scalar
     var: ast.AST
@@ -154,7 +151,7 @@ class ItrSlice:
         self.ptr = coords.Var(itr._addr)  # scalar.wrap_scalar(coords.Var(itr._addr))
 
         if not isinstance(target, ast.Name):
-            err.compiler("must be simple name as destination for for")
+            err.compiler("Must be simple name as destination for 'for'.")
 
         self.pastptr = itr._addr + itr._size
         self.step = itr._step
@@ -255,7 +252,7 @@ class WalkStatement(walkbase.WalkBase):
         return obj
 
     def _visit_module(self, node, file_name):
-        self.ns = self.module_ns = walkns.ModuleNS()
+        self.ns = self.module_ns = walkbase.ModuleNS()
         self.ns["__file__"] = file_name
         self.file_name = file_name
         self.ns["__name__"] = "__main__"
@@ -266,7 +263,7 @@ class WalkStatement(walkbase.WalkBase):
         self._visit_module(node, file_name)
 
     def _visit_classdef(self, node):
-        clsns = walkns.ClassNS()
+        clsns = walkbase.ClassNS()
         with self.pushpopns(clsns):
             self.visit_slist(node.body)
 
@@ -296,6 +293,7 @@ class WalkStatement(walkbase.WalkBase):
 
     def _visit_if(self, node):
         #   for nicer looking code
+        # for a conditional break.
         if isinstance(node.body[0], ast.Break):
             exp = op.make_scalar_unop(op.a2opfo(ast.UAdd), self.visit(node.test))
             self.loop.lbreak.used = True
@@ -304,13 +302,23 @@ class WalkStatement(walkbase.WalkBase):
 
         elsepart = stat.next_label()
         donepart = stat.next_label()
-        exp1 = op.make_scalar_unop(op.a2opfo(ast.Not), self.visit(node.test))
-        stat.add_stat(stat.If(exp1, on_t=elsepart))
-        self.visit_slist(node.body)
-        stat.add_stat(stat.Goto(donepart))
-        stat.add_stat(stat.LabelDef(elsepart))
-        self.visit_slist(node.orelse)
-        stat.add_stat(stat.LabelDef(donepart))
+
+        cond = op.make_scalar_unop(op.a2opfo(ast.UAdd), self.visit(node.test))
+
+        # nice code for if with constant.
+        if cond.is_constant:
+            if cond:
+                self.visit_slist(node.body)
+            else:
+                self.visit_slist(node.orelse)
+        else:
+            exp1 = op.make_scalar_unop(op.a2opfo(ast.Not), cond)
+            stat.add_stat(stat.If(exp1, on_t=elsepart))
+            self.visit_slist(node.body)
+            stat.add_stat(stat.Goto(donepart))
+            stat.add_stat(stat.LabelDef(elsepart))
+            self.visit_slist(node.orelse)
+            stat.add_stat(stat.LabelDef(donepart))
 
     def _visit_import(self, node):
         for n in node.names:
@@ -390,7 +398,7 @@ def find_defined_funcs(sourcelines):
 
 
 def find_main_func_name(sourcelines, func_name_arg):
-    if func_name_arg != "<last function in file>":
+    if func_name_arg != "<last>":
         return func_name_arg
     function_to_call = "no function in file"
     for fname in find_defined_funcs(sourcelines):
@@ -398,26 +406,27 @@ def find_main_func_name(sourcelines, func_name_arg):
     return function_to_call
 
 
-@lib.g2l
-def compile2g(func_name_arg, srcfile_name, job_name, in_pytest, args=None):
-    gbl.config.in_pytest = in_pytest
-
+@gbl.g2l
+def compile2g(func_name_arg, srcfile_name, job_name, args=None):
     srcpath = pathlib.Path(srcfile_name)
 
-    with lib.openr(srcpath) as inf:
+    with gbl.openr(srcpath) as (inf, etrace):
+        if etrace:
+            err.compiler(f"File '{srcpath}' not found.")
         sys.path.insert(0, str(srcpath.parent))
 
-        with stat.Nest(in_pytest) as cursor:
+        with stat.Nest() as cursor:
             axis.NAMES = "xyz"
             gbl.iface.reset()
 
             symbol.Table.reset()
 
-            logger.debug(f"Starting {func_name_arg} {cursor.next_label}")
-            sourcelines = inf.read()
+            gbl.log(f"Starting {func_name_arg} {cursor.next_label}")
+            sourcelines = gbl.logread(inf)
             node = ast.parse(sourcelines)
             # load everything
             walker = compile_all(node, srcfile_name)
+
             if node.body:
                 walkfunc.digest_top(
                     walker,
@@ -432,14 +441,3 @@ def compile2g(func_name_arg, srcfile_name, job_name, in_pytest, args=None):
 
             yield from symbol.Table.yield_lines()
             yield from res
-
-
-# class WantInline:
-#     def __init__(self, fn):
-#         self.fn = fn
-
-
-# # at definition of an inline function,
-# # just remember the tree name.
-# def inline(fn):
-#     return WantInline(fn)

@@ -3,7 +3,6 @@ import ast
 from p2g import op
 from p2g import symbol
 from p2g import walkbase
-from p2g import walkns
 
 
 def enumerate_comps(self, iters):
@@ -25,15 +24,15 @@ def enumerate_comps(self, iters):
 
 class WalkExpr(walkbase.WalkBase):
     def _visit_listcomp(self, node):
-        with self.pushpopns(walkns.FunctionNS()):
+        with self.pushpopns(walkbase.FunctionNS()):
             return [self.visit(node.elt) for _ in enumerate_comps(self, node.generators)]
 
     def _visit_setcomp(self, node):
-        with self.pushpopns(walkns.FunctionNS()):
+        with self.pushpopns(walkbase.FunctionNS()):
             return {self.visit(node.elt) for _ in enumerate_comps(self, node.generators)}
 
     def _visit_dictcomp(self, node):
-        with self.pushpopns(walkns.FunctionNS()):
+        with self.pushpopns(walkbase.FunctionNS()):
             return {
                 self.visit(node.key): self.visit(node.value)
                 for _ in enumerate_comps(self, node.generators)
@@ -137,10 +136,10 @@ class WalkExpr(walkbase.WalkBase):
         setattr(self.visit(node.value), node.attr, store_val)
 
     def _visit_name(self, node):
-        return walkns.handle_visit_name(self, node)
+        return walkbase.handle_visit_name(self, node)
 
     def _visit_store_name(self, node, store_val):
-        return walkns.handle_visit_name_store(self, node, store_val)
+        return walkbase.handle_visit_name_store(self, node, store_val)
 
     def _visit_dict(self, node):
         return {self.visit(p[0]): self.visit(p[1]) for p in zip(node.keys, node.values)}

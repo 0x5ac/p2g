@@ -3,8 +3,6 @@ import dataclasses
 import itertools
 import typing
 
-from loguru import logger
-
 from p2g import err
 from p2g import gbl
 from p2g import lib
@@ -31,7 +29,7 @@ class Label:
         return f"{self.idx}"
 
     def as_gcode_definition(self):
-        return f"L{self.idx}"
+        return f"N{self.idx}"
 
 
 # auto comment is a comment which comes from
@@ -64,36 +62,33 @@ def compress_and_clean(line: str):
     return "( " + guts.ljust(30) + ")"
 
 
-def workout_comtxt(pos, comtxt, blockstate):
-    if comtxt == "<no comment>":
-        return ""
-
-    if not comtxt:
-        comtxt = err.src_code_from_node_place(pos)
-    comtxt = compress_and_clean(comtxt)
-    if comtxt == blockstate.prev_comtxt:
-        comtxt = ""
-    else:
-        blockstate.prev_comtxt = comtxt
-    return comtxt
-
-
 @dataclasses.dataclass
 class StatBase(abc.ABC):
-    _comtxt: str
+    _comment: str
 
-    # empty comment means use src if possible.
-    # <no comment> means no comment
-    def __init__(self, comtxt=""):
+    def __init__(self, comment_txt=None):
         self.pos = err.state.last_pos
-        self._comtxt = comtxt
+
+        # if specifically asked for none, then we're done.
+        if comment_txt == "<none>":
+            self._comment = ""
+        else:
+            # no comment supplied, then use source line.
+            if not comment_txt:
+                comment_txt = err.src_code_from_node_place(self.pos)
+            comment_txt = compress_and_clean(comment_txt)
+            self._comment = comment_txt
 
     def to_line_lhs(self) -> list[str]:
-        return []  # no cover
+        raise AssertionError
 
-    @lib.g2l
+    @gbl.g2l
     def to_full_lines(self, blockstate):
-        comtxt = workout_comtxt(self.pos, self._comtxt, blockstate)
+        comtxt = self._comment
+        if comtxt == blockstate.prev_comtxt:
+            comtxt = ""
+        else:
+            blockstate.prev_comtxt = comtxt
 
         for code_txt, com_txt in itertools.zip_longest(
             self.to_line_lhs(),
@@ -134,12 +129,13 @@ class Nest:
     slist: list[StatBase]
     cur: "Nest" = typing.cast("Nest", None)
 
-    def __init__(self, in_pytest=False):
+    def __init__(self):
         self.prev = Nest.cur
-        if not in_pytest and Nest.cur:
-            self.first_label = self.prev.first_label + 1000
-        else:
+        if gbl.config.tin_test or not Nest.cur:
             self.first_label = 1000
+        else:
+            self.first_label = self.prev.first_label + 1000
+
         Nest.cur = self
         self.next_label = self.first_label
         self.slist = []
@@ -153,7 +149,7 @@ class Nest:
     def add_stat(cls, stat):
         Nest.cur.slist.append(stat)
 
-    @lib.g2l
+    @gbl.g2l
     def to_full_lines(self):
         class BS:
             prev_comtxt = ""
@@ -176,7 +172,18 @@ class CommentLines(StatBase):
 
     def to_full_lines(self, _):
         lines = list(map(str, self.lines))
-        lines = lib.pad_to_same_width(lines)
+
+        def max_str_len(lines):
+            return len(max(lines, key=len, default=""))
+
+        def pad_to_same_width(lines):
+            wid = max_str_len(lines)
+            res = []
+            for line in lines:
+                res.append(line.ljust(wid))
+            return res
+
+        lines = pad_to_same_width(lines)
 
         for line in lines:
             if line.strip():
@@ -186,7 +193,7 @@ class CommentLines(StatBase):
 
 
 def add_stat(stat):
-    logger.info(f"Adding {stat}")
+    gbl.log(f"Adding {stat}")
     Nest.add_stat(stat)
 
 
@@ -232,9 +239,10 @@ class If(StatBase):
 class Code(StatBase):
     txt: str
 
-    def __init__(self, txt, ctxt):
-        super().__init__(ctxt)
-        self.txt = txt
+    def __init__(self, txtargs, comment_txt=""):
+        super().__init__(comment_txt=comment_txt)
+
+        self.txt = lib.unwind(txtargs)
 
     def to_line_lhs(self):
         yield NORMAL_PREFIX + self.txt
@@ -245,7 +253,7 @@ class Dprint(StatBase):
     txt: str
 
     def __init__(self, txt):
-        super().__init__("<no comment>")
+        super().__init__("<none>")
         self.txt = txt
 
     def to_line_lhs(self):
@@ -262,7 +270,7 @@ class Set(StatBase):
         self.lhs = lhs
         self.rhs = rhs
 
-    @lib.g2l
+    @gbl.g2l
     def to_line_lhs(self):
         lhs = self.lhs.to_gcode(nd.NodeModifier.EMPTY)
         rhs = self.rhs.to_gcode(nd.NodeModifier.ARGUMENT)
@@ -274,14 +282,21 @@ def append_set(dst, src, comtxt=""):
         add_stat(Set(dst, src, comtxt))
 
 
-def code(txt, comtxt: str = ""):
-    if isinstance(txt, str):
-        add_stat(Code(txt, comtxt))
-        return
+def code(*txtargs, comment_txt: str = ""):
+    add_stat(Code(txtargs, comment_txt=comment_txt))
 
-    for line in txt:
-        code(str(line), comtxt)
-        comtxt = ""
+
+def codenl(txtlst, comtxt: str = ""):
+    if isinstance(txtlst, str):
+        add_stat(Code(txtlst, comtxt))
+    else:
+        for txt in txtlst:
+            codenl(txt, comtxt)
+            comtxt = ""
+
+
+# take list of args and chain them
+# and then join. Take care with strings.
 
 
 @dataclasses.dataclass

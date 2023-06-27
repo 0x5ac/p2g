@@ -8,7 +8,6 @@ from p2g import gbl
 from p2g import op
 from p2g import stat
 from p2g import walkbase
-from p2g import walkns
 
 
 class Marker:
@@ -38,7 +37,7 @@ def formal_kwargs(formalspec, formals, kwargs, pos) -> dict[str, typing.Any]:
         elif formalspec.kwarg:
             func_kwarg[key] = value
         else:
-            err.compiler("bad arguments.", err_pos=pos)
+            err.compiler("Bad arguments.", err_pos=pos)
 
     if formalspec.kwarg:
         final_dict[formalspec.kwarg.arg] = func_kwarg
@@ -49,7 +48,7 @@ def check_missing(final_dict, formalspec, pos):
     # check for missing args
     for formal in itertools.chain(formalspec.args, formalspec.kwonlyargs):
         if formal.arg not in final_dict:
-            err.compiler(f"Missing argument {formal.arg}", err_pos=pos)
+            err.compiler(f"Missing argument '{formal.arg}'.", err_pos=pos)
 
 
 def get_defaults(walker, formals):
@@ -82,7 +81,7 @@ def gather_func_formals(func_def, *args, **kwargs):
         final_dict[formalspec.vararg.arg] = args[len(formalspec.args) :]
     else:
         if len(args) > len(formalspec.args):
-            err.compiler("bad arguments", err_pos=pos)
+            err.compiler("Bad arguments.", err_pos=pos)
 
     for i in range(min(len(args), len(formalspec.args))):
         final_dict[formalspec.args[i].arg] = args[i]
@@ -116,7 +115,7 @@ def inline(func_def, *args, **kwargs):
     walker.ns = func_def.lexical_scope
     res = None
 
-    with walker.pushpopns(walkns.FunctionNS()):
+    with walker.pushpopns(walkbase.FunctionNS()):
         formals_dict = gather_func_formals(func_def, *args, **kwargs)
 
         walker.ns.guts.update(formals_dict)
@@ -136,7 +135,7 @@ class FuncDefWrap:
 
     node: ast.AST
     walker: "WalkFunc"
-    lexical_scope: walkns.ANamespace
+    lexical_scope: walkbase.ANamespace
     call: bool
 
     gen: list[stat.StatBase]
@@ -145,10 +144,6 @@ class FuncDefWrap:
         self.call = False
         self.gen = []
         self.func_name = node.name
-        if 0:
-            for decorator in reversed(node.decorator_list):
-                dec_function = walker.visit(decorator)
-                node = dec_function(node)
 
         self.file_name = walker.module_ns["__file__"]
 
@@ -225,16 +220,18 @@ def digest_top(walker, func_name, srcpath, job_name, args):
     except KeyError:
         err.compiler(f"No such function '{func_name}' in '{srcpath}'.")
 
-    if not gbl.config.in_pytest:
-        stat.add_stat(stat.Code(job_name, srcpath.stem.upper()))
-
-    if gbl.config.bp_on_error:  # no cover
-        inline(desc, *args)
-    else:
-        try:
+    def insides():
+        if gbl.config.bp_on_error:  # no cover
             inline(desc, *args)
-        except (AttributeError, IndexError) as exn:
-            err.compiler(exn)
+        else:
+            try:
+                inline(desc, *args)
+            except (AttributeError, IndexError) as exn:
+                err.compiler(exn)
 
-    if not gbl.config.in_pytest:
-        stat.add_stat(stat.Code("M30", None))
+    if gbl.config.boiler_plate and job_name:
+        stat.code([job_name], comment_txt=func_name)
+        insides()
+        stat.add_stat(stat.Code("M30", "<none>"))
+    else:
+        insides()

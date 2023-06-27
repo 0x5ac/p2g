@@ -1,20 +1,18 @@
 #! /usr/bin/env python
-import contextlib
 import datetime
 import pathlib
+import re
 import shutil
 import sys
 
 import docopt
 
-from loguru import logger
+import p2g
 
-from p2g import debug
 from p2g import err
 from p2g import gbl
 from p2g import lib
 from p2g import makestdvars
-from p2g import version
 from p2g import walk
 
 
@@ -22,191 +20,199 @@ DOC = """
 Turns a python program into a gcode program.
 
 Usage:
-   p2g [options] gen <srcfile>
-   p2g [options] ngen <srcfile>
-   p2g [options] test 
-   p2g [options] examples
-   p2g [options] version
-   p2g [options] stdvars [--txt=<txtfile>] [--dev=<devfile>] [--py=<pyfile>] [--org=<orgfile>]
+   p2g [--function=<fname> ]
+       [--job=<jobname>]
+       [options] gen <srcfile> [<outfile>]
+#
+#       Read from python <srcfile>, emit G-Code.
+#
+#         Output file name may include {time} which will create a decrementing
+#         prefix for the output file which makes looking for the .nc in a
+#         crowded directory simpler.
+#
+#       Examples:
+#          p2g gen foo.py ~/_nc_/{time}O001-foo.nc
+#             Makes an output of the form ~/_nc_/001234O001-foo.nc
+#
+#          p2g gen --func=thisone -
+#             Read from stdin, look for the 'thisone' function and write to
+#             to stdout.
+#
+   p2g examples <exampledir>
+#         Create <exampledir>, populate with examples and compile.
+#
+#         Examples:
+#           p2g examples showme
+#             Copies the examples into ./showme and then runs
+#              p2g gen showme/vicecenter.py
+#              p2g gen showme/checkprobe.py
+#
+   p2g doc
+#         Send readme.txt to console.
+#
+   p2g help
+#         Show complete command line help.
+#
+   p2g version
+#         Show version.
+#
+   p2g location
+#         Show which p2g is running.
+#
+#      For maintenance:
+           p2g [options] stdvars [--txt=<txt>] [--dev=<dev>]
+                                 [--py=<py>] [--org=<org>]
+#               Recreate internal files.
 
-Try:
-   p2g gen -o ../nc/O05AC.nc vf3/vicecenter.py
-       Read vicecenter.py starting at the last function in file.
-       Turn into gcode in ../nc/O05AC.nc
+ Options:
+  --narrow                    Narrow output; formatted to fit in the
+                              narrow space of the CNC machine's program
+                              display.
+#
+#      For maintenance:
+           --no-boiler-plate  Turn of job entry and terminal M30.
+           --break            Breakpoint on error.
+           --debug            Enter debugging code.
+           --verbose          Too much.
+           --logio            Even more.
 
-   p2g ngen -o ../nc/O05AC.nc vf3/vicecenter.py
-       Same as the 'gen' command, save the output is formatted
-       to fit in the narrow space in the CNC machine's program
-       display.
 
-   p2g gen --func=main vf3/probecheck.py > vf3/probecheck.nc
-        Run through probecheck.py(main) and make vf3/probecheck.nc
-
-   p2g test
-        Run internal test.
-
-   p2g examples
-        Copies the examples into the current directory and then runs
-        p2g  gen vicecenter.py
-        p2g  gen checkprobe.py
-
-   p2g stdvars
-       Regenerate machine specific definitions.
-
-Options:
-    -o <file> --out=<file>   Output file, [default: <stdout>]
-    --outdir <dir>           Output directory, [default: .]
-    -h --help                This.
-    -q --quiet               Make less noise.
-    --relative-paths         Errors contain paths relative to current directory.
-    --relative-lines         Errors contain linenumbers relative to start of function.
-    --job=<pattern>             Job name, [default: O0001]
-    --function=<name>        Function to compile, [default: <last function in file>]
-    --debug                  Enter debugging code. [default: False]
-    --recursive              Notify when called by self. [default: False]
-    --logfile=<logfile>      Turn on logger.and send to <logfile> [default: <stdout>]
-    --loglevel=<loglevel>    Set logger.level [default: ERROR]
-    --break                  Breakpoint on error.
-
-    output pattern may include <time> which will create a decrementing
-    prefix for the output file which makes looking for the .nc in a
-    crowded directory simpler.
-
-    eg  --out="~/_nc_/<time>O001-foo.nc" foo.py
-    makes an output of the form ~/_nc_/001234O001-foo.nc
-
-    Output directory is used as a prefix for out, as well as output
-    for examples.
 """
 
 
-def do_examples():
-    here_dir = pathlib.Path(__file__).parent
+def do_examples(outdir):
+    find_examples = lib.find_ours("vicecenter.py")
+    dst_dir = outdir.resolve()
+    example_dir = find_examples.parent
+    example_files = example_dir.glob("[a-z]*.py")
 
-    example_dir = here_dir / "examples"
-    examples = example_dir.glob("[a-z]*.py")
-
-    outdir = gbl.opts["--outdir"]
     outdir.mkdir(exist_ok=True, parents=True)
 
-    srcnames = []
-    for src in examples:
-        dst_name = outdir / src.parts[-1]
-        lib.qprint(f"Copying {src} {dst_name}")
+    for src in example_files:
+        dst_name = outdir / src.name
+        gbl.sprint(f"Copying {src} {dst_name}")
         shutil.copy(src, dst_name)
-        srcnames.append(dst_name)
+
     for job in ["vicecenter", "probecalibrate"]:
-        top_name = outdir / (job + ".py")
-        out_name = outdir / (job + ".nc")
+        rootname = dst_dir / job
         sysargs = [
-            "--out",
-            str(out_name),
             "gen",
-            str(top_name),
+            rootname.with_suffix(".py"),
+            rootname.with_suffix(".nc"),
         ]
 
-        lib.qprint(f"Running {' '.join(sysargs)}")
-        main(sysargs)
+        gbl.sprint(f"Running {sysargs[0]} {sysargs[1]} {sysargs[2]}")
+        recur(sysargs)
 
 
-def setup_logger():
-    loglevel = gbl.opts["--loglevel"]
-
-    logfile = gbl.opts["--logfile"]
-    if logfile == "<stdout>":
-        logfile = sys.stdout
-
-    logger.remove()
-    logger.add(
-        logfile,
-        level=loglevel,
-        format="{message}",
-    )
-    logger.info(f"Logging on {gbl.opts['--loglevel']} {logfile}")
+def do_doc():
+    doc = lib.find_ours("readme.txt").read_text()
+    gbl.sprint(doc.replace("</code>", "]").replace("<code>", "["))
 
 
-def output_file_name():
+def calculate_output_file_name(provided_filename):
+    # if provided_filename is empty then output is stdout.
+    if provided_filename is None:
+        return "-"
+
     now = datetime.datetime.now()
     prev_midnight = now.replace(hour=0, minute=0, second=0, microsecond=0)
     next_midnight = 24 * 60
     mins_togo = next_midnight - (now - prev_midnight).seconds // 60
 
-    out_name = "-"
-
-    if gbl.opts["--out"] != "<stdout>":
-        out_name = gbl.opts["--outdir"] / pathlib.Path(gbl.opts["--out"])
-
-    out_name = str(out_name).replace("<time>", f"{mins_togo:05d}")
-    return out_name
+    return provided_filename.replace("{time}", f"{mins_togo:05d}")
 
 
-def do_gen():
-    gbl.config.in_pytest = False
+def do_gen(src_name, job_name, func_name, output_name):
+    if func_name is None:
+        func_name = "<last>"
 
-    src_name = gbl.opts["<srcfile>"]
+    job_name = job_name if job_name else "O0001"
+
+    output_name = calculate_output_file_name(output_name)
     src_path = pathlib.Path(src_name)
-    job_name = src_path.stem
 
-    if gbl.opts["--job"] != "<srcfilename>":
-        job_name = gbl.opts["--job"]
-
-    func_name = gbl.opts["--function"]
-
-    output_name = gbl.opts["--out"]
-
-    logger.info(f"src: {src_path}")
-    logger.info(f"fnc: {func_name}")
-    logger.info(f"job: {job_name}")
-    logger.info(f"output: {output_name}")
+    gbl.log(f"src: {src_path}")
+    gbl.log(f"fnc: {func_name}")
+    gbl.log(f"job: {job_name}")
+    gbl.log(f"output: {output_name}")
     try:
-        res = walk.compile2g(func_name, src_path, job_name=job_name, in_pytest=False)
+        res = walk.compile2g(func_name, src_path, job_name=job_name)
         lib.write_nl_lines(res, output_name)
         return 0
     except err.CompilerError as exn:
         exn.report_error(absolute_lines=True)
-    except FileNotFoundError as exn:
-        print(exn, file=sys.stderr)
-
-    # when inside self return with no error
-    # even if there was one, message is in stderr.
-    if gbl.opts["--recursive"]:
-        return 0
     return 1
 
 
-def main(options=None):
-    gbl.opts = docopt.docopt(DOC, options)
+def inner_main(options: list[str]):
+    # remove comments from source to docopt.
 
-    gbl.config.debug = gbl.opts["--debug"]
-    gbl.config.opt_relative_paths = gbl.opts["--relative-paths"]
-    gbl.config.opt_relative_lines = gbl.opts["--relative-lines"]
-    gbl.config.bp_on_error = gbl.opts["--break"]
+    parseable_opts = re.sub("#.*\n", "", DOC)
+    options = [str(v) for v in options]
 
-    gbl.opts["--outdir"] = pathlib.Path(gbl.opts["--outdir"])
+    opts = docopt.docopt(parseable_opts, help=False, argv=options)
 
-    setup_logger()
-    logger.info(options)
-    gbl.opts["--out"] = output_file_name()
+    gbl.config = gbl.config._replace(
+        debug=opts["--debug"],
+        bp_on_error=opts["--break"],
+        verbose=(opts["--verbose"]),
+        logio=(opts["--logio"]),
+    )
 
-    if gbl.opts["version"]:
-        with lib.openw(gbl.opts["--out"]) as out:
-            print(f"Version: p2g {version.__version__}", file=out)
+    res = 0
+    # find first options which are set and start with a letter - ie
+    # the command - there can only be one.
+    match [k for (k, v) in opts.items() if v and k[0].isalpha()]:
+        case [] | ["help"]:
+            gbl.sprint(DOC.strip("\n").replace("#", " "))
 
-    if gbl.opts["examples"]:
-        do_examples()
-    elif gbl.opts["stdvars"]:
-        makestdvars.makestdvars(
-            gbl.opts["--txt"],
-            gbl.opts["--dev"],
-            gbl.opts["--py"],
-            gbl.opts["--org"],
-        )
-    elif gbl.opts["gen"]:
-        gbl.config.opt_narrow_output = False
-        return do_gen()
-    elif gbl.opts["ngen"]:
-        gbl.config.opt_narrow_output = True
-        return do_gen()
-    elif gbl.opts["test"]:
-        debug.run_test(gbl.opts["<srcfile>"])
-    return 0
+        case ["version"]:
+            gbl.sprint(f"Version: p2g {p2g.VERSION}")
+
+        case ["location"]:
+            gbl.sprint(f"{pathlib.Path(__file__).parent}")
+
+        case ["examples"]:
+            do_examples(pathlib.Path(opts["<exampledir>"]))
+
+        case ["stdvars"]:
+            makestdvars.makestdvars(
+                opts["--txt"],
+                opts["--dev"],
+                opts["--py"],
+                opts["--org"],
+            )
+
+        case ["doc"]:
+            do_doc()
+
+        case ["gen"]:
+            gbl.config = gbl.config._replace(
+                narrow_output=gbl.config.narrow_output or opts["--narrow"],
+                boiler_plate=gbl.config.boiler_plate and not opts["--no-boiler-plate"],
+            )
+
+            res = do_gen(
+                src_name=opts["<srcfile>"],
+                job_name=opts["--job"],
+                func_name=opts["--function"],
+                output_name=opts["<outfile>"],
+            )
+
+    return res
+
+
+def main():
+    with gbl.save_config(narrow_output=False):
+        return inner_main(sys.argv[1:])
+
+
+def recur(options: list[str]):
+    with gbl.save_config(narrow_output=False, tin_test=True, boiler_plate=True):
+        return inner_main(options)
+
+
+def nrecur(options: list[str]):
+    with gbl.save_config(narrow_output=False, tin_test=False, boiler_plate=False):
+        return inner_main(options)

@@ -1,0 +1,39 @@
+name: test and coverage
+
+on:
+  push:
+    branches:
+      - master
+# Cancel running jobs for the same workflow and branch.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: on ubuntu
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11"]
+        os: [ubuntu-latest]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Python ${{ matrix.python-version }} 
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+      - name: Install deps and build
+        run: |
+          make 
+
+      - name: Run tests
+        run: |
+          make test
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+
+

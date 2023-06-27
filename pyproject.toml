@@ -3,12 +3,12 @@
 
 
 name = "p2g"
-version = "0.2.2"
+version = "0.2.12"
 description = "Transpile python into cnc gcode."
 authors = ["sac <sac@0x5ac.com>"]
-readme = "README.rst"
+readme = "readme.md" 
 license = "MIT"
-keywords = ["cnc", "gcode", "mill", "haas"]
+keywords = ["cnc", "gcode", "mill", "haas", "g-code", "probe", "vf"]
 classifiers = [
 "Development Status :: 3 - Alpha",
 "Intended Audience :: Manufacturing",
@@ -21,19 +21,20 @@ homepage = 'https://github.com/0x5ac/p2g'
 
 
 packages = [
-    { include = "p2g", format = "sdist"},
-
+    { include = "p2g",    format = "sdist"},
 ]
+exclude = ["p2g/doc/*.tmp"]
+
 
 
 [tool.poetry.dependencies]
 
 python = "^3.10"
 docopt = "^0.6.2"
-pytest =  "^7.3.1"
+
 typeguard = "^3.0.2"
 rich = "^13.3.4"
-loguru = "^0.7.0"
+
 [tool.poetry.scripts]
 p2g = "p2g.main:main"
 
@@ -55,11 +56,19 @@ mccabe = "^0.7.0"
 wrapt = "^1.15.0"
 dill = "^0.3.6"
 autoflake = "^2.1.1"
+ruff = "^0.0.272"
+pyright = "^1.1.314"
 
+[tool.deptry]
+ignore_missing = [ "csearch" , "defs", "pytest" ]
+ignore_obsolete = [  "typeguard" ]
+extend_exclude = [ 'p2g/tests' ] 
 [tool.pyright]
 disable = "N802"
 ignore = ["N802"]
 include = ["p2g/*.py"]
+exclude= [ "p2g/tests" , "p2g/doc", "p2g/examples"]
+omit = ['p2g/tests/*.py']
 [tool.isort]
 force_alphabetical_sort_within_sections = true
 #force_single_line = true
@@ -69,21 +78,15 @@ known_localfolder = "p2g"
 lines_after_imports = 2
 float_to_top = true
 force_single_line = true
-src_paths = ["p2g"]
+src_paths = ["p2g","tests"]
+skip = ["tests/test_meta.py"]
 
 
 
 [tool.black]
 line-length=90
 
-
-[tool.pylama]
-linters = "mccabe,mypy,pycodestyle,pydocstyle,isort"
-max_line_length = 100
-ignore = "W0611,E501,D212,C0116,W0611,D100,D104,D101,C0115,C0114,D103,D105,D107,D102,N802,E800,B601,G004,E203,D209,D205,D400,E402"
-ignore-errors="E203"
-exclude= [ "p2g/tests", "p2g/doc" ]
-[tool.mypy]
+[tool.mypy] 
 ignore_missing_imports = true
 check_untyped_defs = true
 exclude= [ "p2g/tests" , "p2g/doc", "p2g/examples"]
@@ -118,7 +121,7 @@ disable = [
 ]
 
 good-names = "_,fn,el,ns,ch,i,n"
-ignore = ['p2g/tests']
+ignore = ['tests']
 [tool.pytest.ini_options]
 
 testpaths="p2g/tests"
@@ -138,7 +141,7 @@ addopts="-p no:pylama -p no:pytest_pylama --cov=p2g --cov-append --tb=short -m '
 
 [tool.coverage.report]
 include = ["p2g/*.py"]
-exclude_lines = ["NotImplemented", "for debug",  "no cover","@(abc\\.)?abstractmethod" ]
+exclude_lines = ["NotImplemented", "AssertionError", "for debug",  "no cover","@(abc\\.)?abstractmethod" ]
 
 omit = ["p2g/tests/*.py","p2g/examples/*.py","p2g/__main__.py"]
 

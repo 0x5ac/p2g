@@ -17,26 +17,68 @@ from .coords import Const
 from .coords import Fixed
 from .coords import Var
 from .goto import goto
-from .main import main
+
+# from .ptest import must_be
 from .ptest import check_golden
 from .ptest import check_golden_nodec
-from .ptest import must_be
 from .ptest import must_be_cc
 from .scalar import Scalar
 from .stat import code
+from .stat import codenl
 from .stat import com
 from .stat import comment
 from .stat import dprint
 from .symbol import Table
 from .vector import RValueVec
 from .vector import Vec
-
-# ruff: noqa: F401
-# noqa: F401
-from .version import __version__
 from .visible import address
 from .visible import alias
 from .visible import as_address
 from .visible import base_addr
 from .visible import message
 from .visible import set_wcs
+
+
+fish__all__ = [
+    "NAMES",
+    "abs",
+    "acos",
+    "asin",
+    "atan",
+    "cos",
+    "exists",
+    "exp",
+    "fix",
+    "fup",
+    "ground",
+    "ln",
+    "sin",
+    "sqrt",
+    "tan",
+    "Const",
+    "Fixed",
+    "Var",
+    "goto",
+    "check_golden",
+    "check_golden_nodec",
+    "must_be",
+    "must_be_cc",
+    "Scalar",
+    "code",
+    "codenl",
+    "com",
+    "comment",
+    "dprint",
+    "Table",
+    "RValueVec",
+    "Vec",
+    "address",
+    "alias",
+    "as_address",
+    "base_addr",
+    "message",
+    "set_wcs",
+]
+
+
+VERSION = "0.2.12"

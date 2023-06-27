@@ -1,11 +1,8 @@
 import functools
 import inspect
-from loguru import logger
 import itertools
 import pathlib
 import typing
-
-import pytest
 
 from p2g import err
 from p2g import gbl
@@ -94,7 +91,7 @@ def find_differences(
     return diffs
 
 
-@lib.g2l
+@gbl.g2l
 def format_differences(marks, golden_data: list[str], callow_data: list[str]):
     fromto = slice(max(min(marks) - 4, 0), min(marks) + 10)
 
@@ -122,7 +119,7 @@ def format_differences(marks, golden_data: list[str], callow_data: list[str]):
 def writelines(fn, suffix, txt, comment):
     path = make_file_path(fn, suffix)
     print(f"WRRTIGIN {comment} to ", path)
-    logger.error(f"Ptest error, writing to {comment}")
+    gbl.log(f"Ptest error, writing to {comment}")
     return path.write_text(lib.nljoin(txt))
 
 
@@ -131,7 +128,7 @@ def writelines(fn, suffix, txt, comment):
 
 
 def make_decorated_source_seed(fn, callow_data):
-    tofix = ["@p2g.must_be("]
+    tofix = ["@must_be("]
     for line in callow_data:
         quotechar = '"'
         if quotechar in line:
@@ -140,7 +137,7 @@ def make_decorated_source_seed(fn, callow_data):
             tofix.append(quotechar + line + quotechar + ",")
     tofix.append(")\n")
 
-    lines = lib.splitnl(inspect.getsource(fn))
+    lines = gbl.splitnl(inspect.getsource(fn))
 
     while lines and not lines[0].startswith("def"):
         lines = lines[1:]
@@ -149,23 +146,19 @@ def make_decorated_source_seed(fn, callow_data):
 
 
 # compile fn, return generated errors or text.
-@lib.g2l
+@gbl.g2l
 def get_all_comp_outputs(fn):
     try:
-        outlines = walk.compile2g(
-            fn.__name__,
-            inspect.getsourcefile(fn),
-            job_name=None,
-            in_pytest=True,
-        )
+        outlines = walk.compile2g(fn.__name__, inspect.getsourcefile(fn), job_name=None)
     except err.CompilerError as exn:
         outlines = exn.error_lines(absolute_lines=False, topfn=fn)
+
     return outlines
 
 
-@lib.g2l
+@gbl.g2l
 def read_and_trim(path):
-    lines = lib.splitnl(path.read_text())
+    lines = gbl.splitnl(path.read_text())
     for line in lines:
         yield line
 
@@ -178,7 +171,7 @@ def read_and_trim(path):
 
 
 def check_must_be_worker(fn, gold_data, check_comments=False):
-    callow_data = get_all_comp_outputs(fn)
+    callow_data = list(get_all_comp_outputs(fn))
 
     markers = find_differences(gold_data, callow_data, check_comments)
 
@@ -196,15 +189,15 @@ def check_must_be_worker(fn, gold_data, check_comments=False):
     if gbl.config.debug:  # for debug
         err.compiler(f"ptest error {lib.nljoin(etext)}")
 
-    pytest.fail(lib.nljoin(etext))  # for debug
+    assert False, lib.nljoin(etext)  # for debug
 
 
 def check_golden_worker(fn, check_comments):
-    callow = get_all_comp_outputs(fn)
+    callow = list(get_all_comp_outputs(fn))
 
     gold_path = make_file_path(fn, ".nc")
     if gold_path.exists():
-        gold_data = read_and_trim(gold_path)
+        gold_data = list(read_and_trim(gold_path))
 
         markers = find_differences(gold_data, callow, check_comments)
         if not markers:
@@ -220,7 +213,7 @@ def check_golden_worker(fn, check_comments):
                 print(line)
             err.compiler(f"ptest error {lib.nljoin(etext)}")
 
-        pytest.fail(lib.nljoin(etext))
+        assert False, lib.nljoin(etext)
 
     else:
         # no source gold, make it.
@@ -271,3 +264,9 @@ def must_be_cc(*text):
         return must_be__
 
     return must_be_
+
+
+def init_for_pytest():
+    gbl.config = gbl.config._replace(
+        narrow_output=True,
+    )

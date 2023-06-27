@@ -55,13 +55,17 @@ class MacroVar:
         suffix = ""
         self.last = None
         if isinstance(self.size, NAXES):
+            self.size_as_text = "naxes"
             self.last = NAXES
             suffix = "…"
         else:
             self.last = self.addr + self.size - 1
+            # that's a non breaking space
+            self.size_as_text = f"{self.size:5}"
+
             if self.last != self.addr:
                 suffix = f" … #{self.last:5}"
-        self.range_as_text = f"#{self.addr:5}{suffix}"
+        self.range_as_text = f"#{self.addr:5}{suffix}".center(15)
 
     def for_regen(self):
         funcname = self.__class__.__qualname__
@@ -82,7 +86,11 @@ class MacroVar:
         )
 
     def for_org(self):
-        return f"| ={self.name}= | ~{self.size}~ | ~{self.range_as_text}~ |\n"
+        return (
+            f"| <code>{self.name}</code> "
+            + f"| <code>{self.size_as_text}</code>"
+            + f"| <code>{self.range_as_text}</code> |\n"
+        )
 
     def for_py_out(self):
         return f"# {self.addr} .. {self.last} {self.name} .."
@@ -138,9 +146,11 @@ class Alias(MacroVar):
         super().__init__(key="A", addr=src.addr, size=src.size, alias=src)
 
     def for_regen(self):
+        assert self.alias is not None
         return f"{def_prefix(self.name.ljust(20))} = alias({def_prefix}{self.alias.name})"
 
     def for_py_out(self):
+        assert self.alias is not None
         return f"{def_prefix(self.name)} = {MAKE_PFX}alias({def_prefix(self.alias.name)})"
 
     def for_txt(self):
@@ -425,7 +435,7 @@ def txt_out(outname, names):
         if el.alias:
             el = el.alias
 
-    with open(outname, "w", encoding="utf-8") as out:
+    with lib.openw(outname) as out:
         console = rich.console.Console(file=out)
         console.print(guts, style=None)
         print("Generated ", outname)
@@ -439,21 +449,13 @@ def regen_out(outname, defs):
 
 def org_out(outname, defs):
     with lib.openw(outname) as out:
-        #        out.write("1 2 3\n")
-
-        #        out.write("#+begin_example\n")
-
-        out.write("| Name | Size | Address |\n")
-        out.write("| / | <r> |  |\n")
-
+        out.write(
+            "| <code>Name</code>          |  <code>Size</code> | <code>Address</code>         |\n"
+        )
+        out.write("| --- | --- | --- |\n")
         for el in sorted(defs.interesting):
             if el.name != "-":
                 out.write(el.for_org())
-
-        out.write("|------|------|---------|\n")
-
-
-#        out.write("#+end_example\n")
 
 
 def py_out(target_filename, defs):

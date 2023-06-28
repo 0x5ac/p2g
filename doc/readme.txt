@@ -805,7 +805,7 @@ _________________
   |          # I'm not recommending replacing
   |          # add with multiply, but it would work.
   |          def __add__(self, other):
-  |                return self.val * other
+  |                return self.val * other + 3
   | 
   | def cool():
   |       com ("You can do surprising things.")
@@ -816,7 +816,7 @@ _________________
   | 
   |       objp.adjust(TOOL_OFFSET)
   | 
-  |       q = Y(another) + objp.thisone
+  |       q = Y(another) + (objp.thisone,objp.b)
   |       dprint(f"{q[0]}{q[1]}")
   | 
   `----
@@ -827,7 +827,7 @@ _________________
   |   #100= 100.                      (   avariable = Var[100]        )
   |   #101= 7.                        (   another = Var[7,8]          )
   |   #102= 8.
-  | DPRNT[[#101*[#100+#5081]][#102*[#100+#5081]]]
+  | DPRNT[[#101*[#100+#5081]+3.][#102*[#5082+34.]+3.]]
   |   M30
   `----
 
@@ -935,158 +935,155 @@ _________________
 
   Names predefined in p2g.haas:
 
-  ,----
 
-  `----
-  ,----
-  | | <code>Name</code>          |  <code>Size</code> | <code>Address</code>         |
-  | | --- | --- | --- |
-  | | <code>NULL</code> | <code>    1</code>| <code>     #    0    </code> |
-  | | <code>MACRO_ARGUMENTS</code> | <code>   33</code>| <code>#    1 … #   33</code> |
-  | | <code>GP_SAVED1</code> | <code>  100</code>| <code>#  100 … #  199</code> |
-  | | <code>GP_SAVED2</code> | <code>   50</code>| <code>#  500 … #  549</code> |
-  | | <code>PROBE_CALIBRATION1</code> | <code>    6</code>| <code>#  550 … #  555</code> |
-  | | <code>PROBE_R</code> | <code>    3</code>| <code>#  556 … #  558</code> |
-  | | <code>PROBE_CALIBRATION2</code> | <code>   22</code>| <code>#  559 … #  580</code> |
-  | | <code>GP_SAVED3</code> | <code>  119</code>| <code>#  581 … #  699</code> |
-  | | <code>GP_SAVED4</code> | <code>  200</code>| <code>#  800 … #  999</code> |
-  | | <code>INPUTS</code> | <code>   64</code>| <code># 1000 … # 1063</code> |
-  | | <code>MAX_LOADS_XYZAB</code> | <code>    5</code>| <code># 1064 … # 1068</code> |
-  | | <code>RAW_ANALOG</code> | <code>   10</code>| <code># 1080 … # 1089</code> |
-  | | <code>FILTERED_ANALOG</code> | <code>    8</code>| <code># 1090 … # 1097</code> |
-  | | <code>SPINDLE_LOAD</code> | <code>    1</code>| <code>     # 1098    </code> |
-  | | <code>MAX_LOADS_CTUVW</code> | <code>    5</code>| <code># 1264 … # 1268</code> |
-  | | <code>TOOL_TBL_FLUTES</code> | <code>  200</code>| <code># 1601 … # 1800</code> |
-  | | <code>TOOL_TBL_VIBRATION</code> | <code>  200</code>| <code># 1801 … # 2000</code> |
-  | | <code>TOOL_TBL_OFFSETS</code> | <code>  200</code>| <code># 2001 … # 2200</code> |
-  | | <code>TOOL_TBL_WEAR</code> | <code>  200</code>| <code># 2201 … # 2400</code> |
-  | | <code>TOOL_TBL_DROFFSET</code> | <code>  200</code>| <code># 2401 … # 2600</code> |
-  | | <code>TOOL_TBL_DRWEAR</code> | <code>  200</code>| <code># 2601 … # 2800</code> |
-  | | <code>ALARM</code> | <code>    1</code>| <code>     # 3000    </code> |
-  | | <code>T_MS</code> | <code>    1</code>| <code>     # 3001    </code> |
-  | | <code>T_HR</code> | <code>    1</code>| <code>     # 3002    </code> |
-  | | <code>SINGLE_BLOCK_OFF</code> | <code>    1</code>| <code>     # 3003    </code> |
-  | | <code>FEED_HOLD_OFF</code> | <code>    1</code>| <code>     # 3004    </code> |
-  | | <code>MESSAGE</code> | <code>    1</code>| <code>     # 3006    </code> |
-  | | <code>YEAR_MONTH_DAY</code> | <code>    1</code>| <code>     # 3011    </code> |
-  | | <code>HOUR_MINUTE_SECOND</code> | <code>    1</code>| <code>     # 3012    </code> |
-  | | <code>POWER_ON_TIME</code> | <code>    1</code>| <code>     # 3020    </code> |
-  | | <code>CYCLE_START_TIME</code> | <code>    1</code>| <code>     # 3021    </code> |
-  | | <code>FEED_TIMER</code> | <code>    1</code>| <code>     # 3022    </code> |
-  | | <code>CUR_PART_TIMER</code> | <code>    1</code>| <code>     # 3023    </code> |
-  | | <code>LAST_COMPLETE_PART_TIMER</code> | <code>    1</code>| <code>     # 3024    </code> |
-  | | <code>LAST_PART_TIMER</code> | <code>    1</code>| <code>     # 3025    </code> |
-  | | <code>TOOL_IN_SPIDLE</code> | <code>    1</code>| <code>     # 3026    </code> |
-  | | <code>SPINDLE_RPM</code> | <code>    1</code>| <code>     # 3027    </code> |
-  | | <code>PALLET_LOADED</code> | <code>    1</code>| <code>     # 3028    </code> |
-  | | <code>SINGLE_BLOCK</code> | <code>    1</code>| <code>     # 3030    </code> |
-  | | <code>AGAP</code> | <code>    1</code>| <code>     # 3031    </code> |
-  | | <code>BLOCK_DELETE</code> | <code>    1</code>| <code>     # 3032    </code> |
-  | | <code>OPT_STOP</code> | <code>    1</code>| <code>     # 3033    </code> |
-  | | <code>TIMER_CELL_SAFE</code> | <code>    1</code>| <code>     # 3196    </code> |
-  | | <code>TOOL_TBL_DIAMETER</code> | <code>  200</code>| <code># 3201 … # 3400</code> |
-  | | <code>TOOL_TBL_COOLANT_POSITION</code> | <code>  200</code>| <code># 3401 … # 3600</code> |
-  | | <code>M30_COUNT1</code> | <code>    1</code>| <code>     # 3901    </code> |
-  | | <code>M30_COUNT2</code> | <code>    1</code>| <code>     # 3902    </code> |
-  | | <code>LAST_BLOCK_G</code> | <code>   21</code>| <code># 4001 … # 4021</code> |
-  | | <code>LAST_BLOCK_ADDRESS</code> | <code>   26</code>| <code># 4101 … # 4126</code> |
-  | | <code>LAST_TARGET_POS</code> | <code>naxes</code>| <code>    # 5001…    </code> |
-  | | <code>MACHINE_POS</code> | <code>naxes</code>| <code>    # 5021…    </code> |
-  | | <code>MACHINE</code> | <code>naxes</code>| <code>    # 5021…    </code> |
-  | | <code>G53</code> | <code>naxes</code>| <code>    # 5021…    </code> |
-  | | <code>WORK_POS</code> | <code>naxes</code>| <code>    # 5041…    </code> |
-  | | <code>WORK</code> | <code>naxes</code>| <code>    # 5041…    </code> |
-  | | <code>SKIP_POS</code> | <code>naxes</code>| <code>    # 5061…    </code> |
-  | | <code>PROBE</code> | <code>naxes</code>| <code>    # 5061…    </code> |
-  | | <code>TOOL_OFFSET</code> | <code>   20</code>| <code># 5081 … # 5100</code> |
-  | | <code>G52</code> | <code>naxes</code>| <code>    # 5201…    </code> |
-  | | <code>G54</code> | <code>naxes</code>| <code>    # 5221…    </code> |
-  | | <code>G55</code> | <code>naxes</code>| <code>    # 5241…    </code> |
-  | | <code>G56</code> | <code>naxes</code>| <code>    # 5261…    </code> |
-  | | <code>G57</code> | <code>naxes</code>| <code>    # 5281…    </code> |
-  | | <code>G58</code> | <code>naxes</code>| <code>    # 5301…    </code> |
-  | | <code>G59</code> | <code>naxes</code>| <code>    # 5321…    </code> |
-  | | <code>TOOL_TBL_FEED_TIMERS</code> | <code>  100</code>| <code># 5401 … # 5500</code> |
-  | | <code>TOOL_TBL_TOTAL_TIMERS</code> | <code>  100</code>| <code># 5501 … # 5600</code> |
-  | | <code>TOOL_TBL_LIFE_LIMITS</code> | <code>  100</code>| <code># 5601 … # 5700</code> |
-  | | <code>TOOL_TBL_LIFE_COUNTERS</code> | <code>  100</code>| <code># 5701 … # 5800</code> |
-  | | <code>TOOL_TBL_LIFE_MAX_LOADS</code> | <code>  100</code>| <code># 5801 … # 5900</code> |
-  | | <code>TOOL_TBL_LIFE_LOAD_LIMITS</code> | <code>  100</code>| <code># 5901 … # 6000</code> |
-  | | <code>NGC_CF</code> | <code>    1</code>| <code>     # 6198    </code> |
-  | | <code>G154_P1</code> | <code>naxes</code>| <code>    # 7001…    </code> |
-  | | <code>G154_P2</code> | <code>naxes</code>| <code>    # 7021…    </code> |
-  | | <code>G154_P3</code> | <code>naxes</code>| <code>    # 7041…    </code> |
-  | | <code>G154_P4</code> | <code>naxes</code>| <code>    # 7061…    </code> |
-  | | <code>G154_P5</code> | <code>naxes</code>| <code>    # 7081…    </code> |
-  | | <code>G154_P6</code> | <code>naxes</code>| <code>    # 7101…    </code> |
-  | | <code>G154_P7</code> | <code>naxes</code>| <code>    # 7121…    </code> |
-  | | <code>G154_P8</code> | <code>naxes</code>| <code>    # 7141…    </code> |
-  | | <code>G154_P9</code> | <code>naxes</code>| <code>    # 7161…    </code> |
-  | | <code>G154_P10</code> | <code>naxes</code>| <code>    # 7181…    </code> |
-  | | <code>G154_P11</code> | <code>naxes</code>| <code>    # 7201…    </code> |
-  | | <code>G154_P12</code> | <code>naxes</code>| <code>    # 7221…    </code> |
-  | | <code>G154_P13</code> | <code>naxes</code>| <code>    # 7241…    </code> |
-  | | <code>G154_P14</code> | <code>naxes</code>| <code>    # 7261…    </code> |
-  | | <code>G154_P15</code> | <code>naxes</code>| <code>    # 7281…    </code> |
-  | | <code>G154_P16</code> | <code>naxes</code>| <code>    # 7301…    </code> |
-  | | <code>G154_P17</code> | <code>naxes</code>| <code>    # 7321…    </code> |
-  | | <code>G154_P18</code> | <code>naxes</code>| <code>    # 7341…    </code> |
-  | | <code>G154_P19</code> | <code>naxes</code>| <code>    # 7361…    </code> |
-  | | <code>G154_P20</code> | <code>naxes</code>| <code>    # 7381…    </code> |
-  | | <code>PALLET_PRIORITY</code> | <code>  100</code>| <code># 7501 … # 7600</code> |
-  | | <code>PALLET_STATUS</code> | <code>  100</code>| <code># 7601 … # 7700</code> |
-  | | <code>PALLET_PROGRAM</code> | <code>  100</code>| <code># 7701 … # 7800</code> |
-  | | <code>PALLET_USAGE</code> | <code>  100</code>| <code># 7801 … # 7900</code> |
-  | | <code>ATM_ID</code> | <code>    1</code>| <code>     # 8500    </code> |
-  | | <code>ATM_PERCENT</code> | <code>    1</code>| <code>     # 8501    </code> |
-  | | <code>ATM_TOTAL_AVL_USAGE</code> | <code>    1</code>| <code>     # 8502    </code> |
-  | | <code>ATM_TOTAL_AVL_HOLE_COUNT</code> | <code>    1</code>| <code>     # 8503    </code> |
-  | | <code>ATM_TOTAL_AVL_FEED_TIME</code> | <code>    1</code>| <code>     # 8504    </code> |
-  | | <code>ATM_TOTAL_AVL_TOTAL_TIME</code> | <code>    1</code>| <code>     # 8505    </code> |
-  | | <code>ATM_NEXT_TOOL_NUMBER</code> | <code>    1</code>| <code>     # 8510    </code> |
-  | | <code>ATM_NEXT_TOOL_LIFE</code> | <code>    1</code>| <code>     # 8511    </code> |
-  | | <code>ATM_NEXT_TOOL_AVL_USAGE</code> | <code>    1</code>| <code>     # 8512    </code> |
-  | | <code>ATM_NEXT_TOOL_HOLE_COUNT</code> | <code>    1</code>| <code>     # 8513    </code> |
-  | | <code>ATM_NEXT_TOOL_FEED_TIME</code> | <code>    1</code>| <code>     # 8514    </code> |
-  | | <code>ATM_NEXT_TOOL_TOTAL_TIME</code> | <code>    1</code>| <code>     # 8515    </code> |
-  | | <code>TOOL_ID</code> | <code>    1</code>| <code>     # 8550    </code> |
-  | | <code>TOOL_FLUTES</code> | <code>    1</code>| <code>     # 8551    </code> |
-  | | <code>TOOL_MAX_VIBRATION</code> | <code>    1</code>| <code>     # 8552    </code> |
-  | | <code>TOOL_LENGTH_OFFSETS</code> | <code>    1</code>| <code>     # 8553    </code> |
-  | | <code>TOOL_LENGTH_WEAR</code> | <code>    1</code>| <code>     # 8554    </code> |
-  | | <code>TOOL_DIAMETER_OFFSETS</code> | <code>    1</code>| <code>     # 8555    </code> |
-  | | <code>TOOL_DIAMETER_WEAR</code> | <code>    1</code>| <code>     # 8556    </code> |
-  | | <code>TOOL_ACTUAL_DIAMETER</code> | <code>    1</code>| <code>     # 8557    </code> |
-  | | <code>TOOL_COOLANT_POSITION</code> | <code>    1</code>| <code>     # 8558    </code> |
-  | | <code>TOOL_FEED_TIMER</code> | <code>    1</code>| <code>     # 8559    </code> |
-  | | <code>TOOL_TOTAL_TIMER</code> | <code>    1</code>| <code>     # 8560    </code> |
-  | | <code>TOOL_LIFE_LIMIT</code> | <code>    1</code>| <code>     # 8561    </code> |
-  | | <code>TOOL_LIFE_COUNTER</code> | <code>    1</code>| <code>     # 8562    </code> |
-  | | <code>TOOL_LIFE_MAX_LOAD</code> | <code>    1</code>| <code>     # 8563    </code> |
-  | | <code>TOOL_LIFE_LOAD_LIMIT</code> | <code>    1</code>| <code>     # 8564    </code> |
-  | | <code>THERMAL_COMP_ACC</code> | <code>    1</code>| <code>     # 9000    </code> |
-  | | <code>THERMAL_SPINDLE_COMP_ACC</code> | <code>    1</code>| <code>     # 9016    </code> |
-  | | <code>GVARIABLES3</code> | <code> 1000</code>| <code>#10000 … #10999</code> |
-  | | <code>INPUTS1</code> | <code>  256</code>| <code>#11000 … #11255</code> |
-  | | <code>OUTPUT1</code> | <code>  256</code>| <code>#12000 … #12255</code> |
-  | | <code>FILTERED_ANALOG1</code> | <code>   13</code>| <code>#13000 … #13012</code> |
-  | | <code>COOLANT_LEVEL</code> | <code>    1</code>| <code>     #13013    </code> |
-  | | <code>FILTERED_ANALOG2</code> | <code>   50</code>| <code>#13014 … #13063</code> |
-  | | <code>SETTING</code> | <code>10000</code>| <code>#20000 … #29999</code> |
-  | | <code>PARAMETER</code> | <code>10000</code>| <code>#30000 … #39999</code> |
-  | | <code>TOOL_TYP</code> | <code>  200</code>| <code>#50001 … #50200</code> |
-  | | <code>TOOL_MATERIAL</code> | <code>  200</code>| <code>#50201 … #50400</code> |
-  | | <code>CURRENT_OFFSET</code> | <code>  200</code>| <code>#50601 … #50800</code> |
-  | | <code>CURRENT_OFFSET2</code> | <code>  200</code>| <code>#50801 … #51000</code> |
-  | | <code>VPS_TEMPLATE_OFFSET</code> | <code>  100</code>| <code>#51301 … #51400</code> |
-  | | <code>WORK_MATERIAL</code> | <code>  200</code>| <code>#51401 … #51600</code> |
-  | | <code>VPS_FEEDRATE</code> | <code>  200</code>| <code>#51601 … #51800</code> |
-  | | <code>APPROX_LENGTH</code> | <code>  200</code>| <code>#51801 … #52000</code> |
-  | | <code>APPROX_DIAMETER</code> | <code>  200</code>| <code>#52001 … #52200</code> |
-  | | <code>EDGE_MEASURE_HEIGHT</code> | <code>  200</code>| <code>#52201 … #52400</code> |
-  | | <code>TOOL_TOLERANCE</code> | <code>  200</code>| <code>#52401 … #52600</code> |
-  | | <code>PROBE_TYPE</code> | <code>  200</code>| <code>#52601 … #52800</code> |
-  `----
+   <code>Name</code>                       <code>Size</code>   <code>Address</code>         
+   ---                                     ---                 ---                          
+   <code>NULL</code>                       <code>    1</code>  <code>     #    0    </code> 
+   <code>MACRO_ARGUMENTS</code>            <code>   33</code>  <code>#    1 … #   33</code> 
+   <code>GP_SAVED1</code>                  <code>  100</code>  <code>#  100 … #  199</code> 
+   <code>GP_SAVED2</code>                  <code>   50</code>  <code>#  500 … #  549</code> 
+   <code>PROBE_CALIBRATION1</code>         <code>    6</code>  <code>#  550 … #  555</code> 
+   <code>PROBE_R</code>                    <code>    3</code>  <code>#  556 … #  558</code> 
+   <code>PROBE_CALIBRATION2</code>         <code>   22</code>  <code>#  559 … #  580</code> 
+   <code>GP_SAVED3</code>                  <code>  119</code>  <code>#  581 … #  699</code> 
+   <code>GP_SAVED4</code>                  <code>  200</code>  <code>#  800 … #  999</code> 
+   <code>INPUTS</code>                     <code>   64</code>  <code># 1000 … # 1063</code> 
+   <code>MAX_LOADS_XYZAB</code>            <code>    5</code>  <code># 1064 … # 1068</code> 
+   <code>RAW_ANALOG</code>                 <code>   10</code>  <code># 1080 … # 1089</code> 
+   <code>FILTERED_ANALOG</code>            <code>    8</code>  <code># 1090 … # 1097</code> 
+   <code>SPINDLE_LOAD</code>               <code>    1</code>  <code>     # 1098    </code> 
+   <code>MAX_LOADS_CTUVW</code>            <code>    5</code>  <code># 1264 … # 1268</code> 
+   <code>TOOL_TBL_FLUTES</code>            <code>  200</code>  <code># 1601 … # 1800</code> 
+   <code>TOOL_TBL_VIBRATION</code>         <code>  200</code>  <code># 1801 … # 2000</code> 
+   <code>TOOL_TBL_OFFSETS</code>           <code>  200</code>  <code># 2001 … # 2200</code> 
+   <code>TOOL_TBL_WEAR</code>              <code>  200</code>  <code># 2201 … # 2400</code> 
+   <code>TOOL_TBL_DROFFSET</code>          <code>  200</code>  <code># 2401 … # 2600</code> 
+   <code>TOOL_TBL_DRWEAR</code>            <code>  200</code>  <code># 2601 … # 2800</code> 
+   <code>ALARM</code>                      <code>    1</code>  <code>     # 3000    </code> 
+   <code>T_MS</code>                       <code>    1</code>  <code>     # 3001    </code> 
+   <code>T_HR</code>                       <code>    1</code>  <code>     # 3002    </code> 
+   <code>SINGLE_BLOCK_OFF</code>           <code>    1</code>  <code>     # 3003    </code> 
+   <code>FEED_HOLD_OFF</code>              <code>    1</code>  <code>     # 3004    </code> 
+   <code>MESSAGE</code>                    <code>    1</code>  <code>     # 3006    </code> 
+   <code>YEAR_MONTH_DAY</code>             <code>    1</code>  <code>     # 3011    </code> 
+   <code>HOUR_MINUTE_SECOND</code>         <code>    1</code>  <code>     # 3012    </code> 
+   <code>POWER_ON_TIME</code>              <code>    1</code>  <code>     # 3020    </code> 
+   <code>CYCLE_START_TIME</code>           <code>    1</code>  <code>     # 3021    </code> 
+   <code>FEED_TIMER</code>                 <code>    1</code>  <code>     # 3022    </code> 
+   <code>CUR_PART_TIMER</code>             <code>    1</code>  <code>     # 3023    </code> 
+   <code>LAST_COMPLETE_PART_TIMER</code>   <code>    1</code>  <code>     # 3024    </code> 
+   <code>LAST_PART_TIMER</code>            <code>    1</code>  <code>     # 3025    </code> 
+   <code>TOOL_IN_SPIDLE</code>             <code>    1</code>  <code>     # 3026    </code> 
+   <code>SPINDLE_RPM</code>                <code>    1</code>  <code>     # 3027    </code> 
+   <code>PALLET_LOADED</code>              <code>    1</code>  <code>     # 3028    </code> 
+   <code>SINGLE_BLOCK</code>               <code>    1</code>  <code>     # 3030    </code> 
+   <code>AGAP</code>                       <code>    1</code>  <code>     # 3031    </code> 
+   <code>BLOCK_DELETE</code>               <code>    1</code>  <code>     # 3032    </code> 
+   <code>OPT_STOP</code>                   <code>    1</code>  <code>     # 3033    </code> 
+   <code>TIMER_CELL_SAFE</code>            <code>    1</code>  <code>     # 3196    </code> 
+   <code>TOOL_TBL_DIAMETER</code>          <code>  200</code>  <code># 3201 … # 3400</code> 
+   <code>TOOL_TBL_COOLANT_POSITION</code>  <code>  200</code>  <code># 3401 … # 3600</code> 
+   <code>M30_COUNT1</code>                 <code>    1</code>  <code>     # 3901    </code> 
+   <code>M30_COUNT2</code>                 <code>    1</code>  <code>     # 3902    </code> 
+   <code>LAST_BLOCK_G</code>               <code>   21</code>  <code># 4001 … # 4021</code> 
+   <code>LAST_BLOCK_ADDRESS</code>         <code>   26</code>  <code># 4101 … # 4126</code> 
+   <code>LAST_TARGET_POS</code>            <code>naxes</code>  <code>    # 5001…    </code> 
+   <code>MACHINE_POS</code>                <code>naxes</code>  <code>    # 5021…    </code> 
+   <code>MACHINE</code>                    <code>naxes</code>  <code>    # 5021…    </code> 
+   <code>G53</code>                        <code>naxes</code>  <code>    # 5021…    </code> 
+   <code>WORK_POS</code>                   <code>naxes</code>  <code>    # 5041…    </code> 
+   <code>WORK</code>                       <code>naxes</code>  <code>    # 5041…    </code> 
+   <code>SKIP_POS</code>                   <code>naxes</code>  <code>    # 5061…    </code> 
+   <code>PROBE</code>                      <code>naxes</code>  <code>    # 5061…    </code> 
+   <code>TOOL_OFFSET</code>                <code>   20</code>  <code># 5081 … # 5100</code> 
+   <code>G52</code>                        <code>naxes</code>  <code>    # 5201…    </code> 
+   <code>G54</code>                        <code>naxes</code>  <code>    # 5221…    </code> 
+   <code>G55</code>                        <code>naxes</code>  <code>    # 5241…    </code> 
+   <code>G56</code>                        <code>naxes</code>  <code>    # 5261…    </code> 
+   <code>G57</code>                        <code>naxes</code>  <code>    # 5281…    </code> 
+   <code>G58</code>                        <code>naxes</code>  <code>    # 5301…    </code> 
+   <code>G59</code>                        <code>naxes</code>  <code>    # 5321…    </code> 
+   <code>TOOL_TBL_FEED_TIMERS</code>       <code>  100</code>  <code># 5401 … # 5500</code> 
+   <code>TOOL_TBL_TOTAL_TIMERS</code>      <code>  100</code>  <code># 5501 … # 5600</code> 
+   <code>TOOL_TBL_LIFE_LIMITS</code>       <code>  100</code>  <code># 5601 … # 5700</code> 
+   <code>TOOL_TBL_LIFE_COUNTERS</code>     <code>  100</code>  <code># 5701 … # 5800</code> 
+   <code>TOOL_TBL_LIFE_MAX_LOADS</code>    <code>  100</code>  <code># 5801 … # 5900</code> 
+   <code>TOOL_TBL_LIFE_LOAD_LIMITS</code>  <code>  100</code>  <code># 5901 … # 6000</code> 
+   <code>NGC_CF</code>                     <code>    1</code>  <code>     # 6198    </code> 
+   <code>G154_P1</code>                    <code>naxes</code>  <code>    # 7001…    </code> 
+   <code>G154_P2</code>                    <code>naxes</code>  <code>    # 7021…    </code> 
+   <code>G154_P3</code>                    <code>naxes</code>  <code>    # 7041…    </code> 
+   <code>G154_P4</code>                    <code>naxes</code>  <code>    # 7061…    </code> 
+   <code>G154_P5</code>                    <code>naxes</code>  <code>    # 7081…    </code> 
+   <code>G154_P6</code>                    <code>naxes</code>  <code>    # 7101…    </code> 
+   <code>G154_P7</code>                    <code>naxes</code>  <code>    # 7121…    </code> 
+   <code>G154_P8</code>                    <code>naxes</code>  <code>    # 7141…    </code> 
+   <code>G154_P9</code>                    <code>naxes</code>  <code>    # 7161…    </code> 
+   <code>G154_P10</code>                   <code>naxes</code>  <code>    # 7181…    </code> 
+   <code>G154_P11</code>                   <code>naxes</code>  <code>    # 7201…    </code> 
+   <code>G154_P12</code>                   <code>naxes</code>  <code>    # 7221…    </code> 
+   <code>G154_P13</code>                   <code>naxes</code>  <code>    # 7241…    </code> 
+   <code>G154_P14</code>                   <code>naxes</code>  <code>    # 7261…    </code> 
+   <code>G154_P15</code>                   <code>naxes</code>  <code>    # 7281…    </code> 
+   <code>G154_P16</code>                   <code>naxes</code>  <code>    # 7301…    </code> 
+   <code>G154_P17</code>                   <code>naxes</code>  <code>    # 7321…    </code> 
+   <code>G154_P18</code>                   <code>naxes</code>  <code>    # 7341…    </code> 
+   <code>G154_P19</code>                   <code>naxes</code>  <code>    # 7361…    </code> 
+   <code>G154_P20</code>                   <code>naxes</code>  <code>    # 7381…    </code> 
+   <code>PALLET_PRIORITY</code>            <code>  100</code>  <code># 7501 … # 7600</code> 
+   <code>PALLET_STATUS</code>              <code>  100</code>  <code># 7601 … # 7700</code> 
+   <code>PALLET_PROGRAM</code>             <code>  100</code>  <code># 7701 … # 7800</code> 
+   <code>PALLET_USAGE</code>               <code>  100</code>  <code># 7801 … # 7900</code> 
+   <code>ATM_ID</code>                     <code>    1</code>  <code>     # 8500    </code> 
+   <code>ATM_PERCENT</code>                <code>    1</code>  <code>     # 8501    </code> 
+   <code>ATM_TOTAL_AVL_USAGE</code>        <code>    1</code>  <code>     # 8502    </code> 
+   <code>ATM_TOTAL_AVL_HOLE_COUNT</code>   <code>    1</code>  <code>     # 8503    </code> 
+   <code>ATM_TOTAL_AVL_FEED_TIME</code>    <code>    1</code>  <code>     # 8504    </code> 
+   <code>ATM_TOTAL_AVL_TOTAL_TIME</code>   <code>    1</code>  <code>     # 8505    </code> 
+   <code>ATM_NEXT_TOOL_NUMBER</code>       <code>    1</code>  <code>     # 8510    </code> 
+   <code>ATM_NEXT_TOOL_LIFE</code>         <code>    1</code>  <code>     # 8511    </code> 
+   <code>ATM_NEXT_TOOL_AVL_USAGE</code>    <code>    1</code>  <code>     # 8512    </code> 
+   <code>ATM_NEXT_TOOL_HOLE_COUNT</code>   <code>    1</code>  <code>     # 8513    </code> 
+   <code>ATM_NEXT_TOOL_FEED_TIME</code>    <code>    1</code>  <code>     # 8514    </code> 
+   <code>ATM_NEXT_TOOL_TOTAL_TIME</code>   <code>    1</code>  <code>     # 8515    </code> 
+   <code>TOOL_ID</code>                    <code>    1</code>  <code>     # 8550    </code> 
+   <code>TOOL_FLUTES</code>                <code>    1</code>  <code>     # 8551    </code> 
+   <code>TOOL_MAX_VIBRATION</code>         <code>    1</code>  <code>     # 8552    </code> 
+   <code>TOOL_LENGTH_OFFSETS</code>        <code>    1</code>  <code>     # 8553    </code> 
+   <code>TOOL_LENGTH_WEAR</code>           <code>    1</code>  <code>     # 8554    </code> 
+   <code>TOOL_DIAMETER_OFFSETS</code>      <code>    1</code>  <code>     # 8555    </code> 
+   <code>TOOL_DIAMETER_WEAR</code>         <code>    1</code>  <code>     # 8556    </code> 
+   <code>TOOL_ACTUAL_DIAMETER</code>       <code>    1</code>  <code>     # 8557    </code> 
+   <code>TOOL_COOLANT_POSITION</code>      <code>    1</code>  <code>     # 8558    </code> 
+   <code>TOOL_FEED_TIMER</code>            <code>    1</code>  <code>     # 8559    </code> 
+   <code>TOOL_TOTAL_TIMER</code>           <code>    1</code>  <code>     # 8560    </code> 
+   <code>TOOL_LIFE_LIMIT</code>            <code>    1</code>  <code>     # 8561    </code> 
+   <code>TOOL_LIFE_COUNTER</code>          <code>    1</code>  <code>     # 8562    </code> 
+   <code>TOOL_LIFE_MAX_LOAD</code>         <code>    1</code>  <code>     # 8563    </code> 
+   <code>TOOL_LIFE_LOAD_LIMIT</code>       <code>    1</code>  <code>     # 8564    </code> 
+   <code>THERMAL_COMP_ACC</code>           <code>    1</code>  <code>     # 9000    </code> 
+   <code>THERMAL_SPINDLE_COMP_ACC</code>   <code>    1</code>  <code>     # 9016    </code> 
+   <code>GVARIABLES3</code>                <code> 1000</code>  <code>#10000 … #10999</code> 
+   <code>INPUTS1</code>                    <code>  256</code>  <code>#11000 … #11255</code> 
+   <code>OUTPUT1</code>                    <code>  256</code>  <code>#12000 … #12255</code> 
+   <code>FILTERED_ANALOG1</code>           <code>   13</code>  <code>#13000 … #13012</code> 
+   <code>COOLANT_LEVEL</code>              <code>    1</code>  <code>     #13013    </code> 
+   <code>FILTERED_ANALOG2</code>           <code>   50</code>  <code>#13014 … #13063</code> 
+   <code>SETTING</code>                    <code>10000</code>  <code>#20000 … #29999</code> 
+   <code>PARAMETER</code>                  <code>10000</code>  <code>#30000 … #39999</code> 
+   <code>TOOL_TYP</code>                   <code>  200</code>  <code>#50001 … #50200</code> 
+   <code>TOOL_MATERIAL</code>              <code>  200</code>  <code>#50201 … #50400</code> 
+   <code>CURRENT_OFFSET</code>             <code>  200</code>  <code>#50601 … #50800</code> 
+   <code>CURRENT_OFFSET2</code>            <code>  200</code>  <code>#50801 … #51000</code> 
+   <code>VPS_TEMPLATE_OFFSET</code>        <code>  100</code>  <code>#51301 … #51400</code> 
+   <code>WORK_MATERIAL</code>              <code>  200</code>  <code>#51401 … #51600</code> 
+   <code>VPS_FEEDRATE</code>               <code>  200</code>  <code>#51601 … #51800</code> 
+   <code>APPROX_LENGTH</code>              <code>  200</code>  <code>#51801 … #52000</code> 
+   <code>APPROX_DIAMETER</code>            <code>  200</code>  <code>#52001 … #52200</code> 
+   <code>EDGE_MEASURE_HEIGHT</code>        <code>  200</code>  <code>#52201 … #52400</code> 
+   <code>TOOL_TOLERANCE</code>             <code>  200</code>  <code>#52401 … #52600</code> 
+   <code>PROBE_TYPE</code>                 <code>  200</code>  <code>#52601 … #52800</code> 
+  None None None None
 
 
 

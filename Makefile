@@ -141,7 +141,7 @@ gitrel:
 	make
 	git commit -m 'release' -a
 	git tag v$(shell $(POETRY) version -s)
-	git push github
+#	git push github
 
 
 .PHONY:

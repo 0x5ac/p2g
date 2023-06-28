@@ -8,7 +8,7 @@
 ---
 
 
-### Version 0.2.21
+### Version 0.2.22
 
 
 ## Introduction
@@ -28,22 +28,22 @@ It comes with a set of macro variable definitions for a Haas mill with NCD. And 
 
 # Table of Contents
 
-1.  [p2g - Python 2 G-code](#org79d17b8)
-        1.  [Version 0.2.21](#orgf3e8cfc)
-    1.  [Introduction](#org6577d37)
-    2.  [Usage:](#org46949e3)
-    3.  [Install:](#org024229d)
-    4.  [A taste.](#org9183b08)
-    5.  [Variables](#org83b041f)
-    6.  [Coordinates](#org373ae7f)
-    7.  [Expressions](#org89e76f2)
-    8.  [Axes](#org3e00c2a)
-    9.  [Goto.](#org233edf1)
-    10. [Printing](#org02c645d)
-    11. [Symbol Tables.](#org0e7c785)
-    12. [Notes.](#org4cb1a17)
-    13. [HAAS macro var definitions](#org9d63b98)
-    14. [Why:](#orgba62107)
+1.  [p2g - Python 2 G-code](#org97537e5)
+        1.  [Version 0.2.22](#org17aeb90)
+    1.  [Introduction](#org08951b6)
+    2.  [Usage:](#org34c65c6)
+    3.  [Install:](#org9eea24e)
+    4.  [A taste.](#org8a12284)
+    5.  [Variables](#org033c093)
+    6.  [Coordinates](#org18b173e)
+    7.  [Expressions](#org0fdb1fb)
+    8.  [Axes](#org0ea5706)
+    9.  [Goto.](#org63b7d90)
+    10. [Printing](#org6c54aa6)
+    11. [Symbol Tables.](#orga5a5310)
+    12. [Notes.](#orgb1c4a6b)
+    13. [HAAS macro var definitions](#orgb68e01e)
+    14. [Why:](#orge56e4ae)
 
 ---
 

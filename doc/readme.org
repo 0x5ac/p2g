@@ -1052,10 +1052,6 @@ Names predefined in p2g.haas:
 | <code>EDGE_MEASURE_HEIGHT</code>       | <code>  200</code> | <code>#52201 … #52400</code> |
 | <code>TOOL_TOLERANCE</code>            | <code>  200</code> | <code>#52401 … #52600</code> |
 | <code>PROBE_TYPE</code>                | <code>  200</code> | <code>#52601 … #52800</code> |
-None
-None
-None
-None
 
 
 

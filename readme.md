@@ -3,33 +3,33 @@
 
 # Table of Contents
 
-1.  [p2g - Python 2 G-code](#orgeb90d82)
-    1.  [Introduction](#org6245a7d)
-    2.  [Usage:](#orgf2c4ce8)
-    3.  [Install:](#org280cc13)
-    4.  [A taste.](#orga7a6daf)
-    5.  [Variables](#org267b2c0)
-    6.  [Coordinates](#orgee3ba30)
-    7.  [Expressions](#org478042d)
-    8.  [Axes](#orgd879010)
-    9.  [Goto.](#org5eb8dde)
-    10. [Printing](#org169692c)
-    11. [Symbol Tables.](#orgd8b621b)
-    12. [Notes.](#org82d1427)
-    13. [HAAS macro var definitions](#orgf8f725b)
-    14. [Why:](#orga5ac77f)
+1.  [p2g - Python 2 G-code](#org682d023)
+    1.  [Introduction](#org21b6f0a)
+    2.  [Usage:](#orgab77617)
+    3.  [Install:](#orgd6976cb)
+    4.  [A taste.](#org7a5a44d)
+    5.  [Variables](#org2739bb1)
+    6.  [Coordinates](#org3503c31)
+    7.  [Expressions](#orgb10ca40)
+    8.  [Axes](#orgc45c268)
+    9.  [Goto.](#org6aa5f0c)
+    10. [Printing](#org5cb87cb)
+    11. [Symbol Tables.](#org224740f)
+    12. [Notes.](#orgbf1c87f)
+    13. [HAAS macro var definitions](#org9ab295a)
+    14. [Why:](#orgf28a3da)
 
 ---
 
 
-<a id="orgeb90d82"></a>
+<a id="org682d023"></a>
 
 # p2g - Python 2 G-code
 
 ---
 
 
-<a id="org6245a7d"></a>
+<a id="org21b6f0a"></a>
 
 ## Introduction
 
@@ -46,7 +46,7 @@ It comes with a set of macro variable definitions for a Haas mill with NCD. And 
 ---
 
 
-<a id="orgf2c4ce8"></a>
+<a id="orgab77617"></a>
 
 ## Usage:
 
@@ -114,7 +114,7 @@ Usage:
 ---
 
 
-<a id="org280cc13"></a>
+<a id="orgd6976cb"></a>
 
 ## Install:
 
@@ -163,7 +163,7 @@ N1002
 ---
 
 
-<a id="orga7a6daf"></a>
+<a id="org7a5a44d"></a>
 
 ## A taste.
 
@@ -237,7 +237,7 @@ N1001                             (     message[ALARM, f"too far {sch.name}."])
 ---
 
 
-<a id="org267b2c0"></a>
+<a id="org2739bb1"></a>
 
 ## Variables
 
@@ -302,7 +302,7 @@ def ex2():
 ---
 
 
-<a id="orgee3ba30"></a>
+<a id="org3503c31"></a>
 
 ## Coordinates
 
@@ -396,7 +396,7 @@ def co1():
 ---
 
 
-<a id="org478042d"></a>
+<a id="orgb10ca40"></a>
 
 ## Expressions
 
@@ -471,7 +471,7 @@ def exp11():
 ---
 
 
-<a id="orgd879010"></a>
+<a id="orgc45c268"></a>
 
 ## Axes
 
@@ -553,7 +553,7 @@ def axes():
 ---
 
 
-<a id="org5eb8dde"></a>
+<a id="org6aa5f0c"></a>
 
 ## Goto.
 
@@ -674,7 +674,7 @@ def goto1():
 ---
 
 
-<a id="org169692c"></a>
+<a id="org5cb87cb"></a>
 
 ## Printing
 
@@ -713,7 +713,7 @@ N2002
 ---
 
 
-<a id="orgd8b621b"></a>
+<a id="org224740f"></a>
 
 ## Symbol Tables.
 
@@ -762,7 +762,7 @@ def stest():
 ---
 
 
-<a id="org82d1427"></a>
+<a id="orgbf1c87f"></a>
 
 ## Notes.
 
@@ -907,7 +907,7 @@ N1003
 ---
 
 
-<a id="orgf8f725b"></a>
+<a id="org9ab295a"></a>
 
 ## HAAS macro var definitions
 
@@ -1066,7 +1066,7 @@ None None None None
 ---
 
 
-<a id="orga5ac77f"></a>
+<a id="orgf28a3da"></a>
 
 ## Why:
 

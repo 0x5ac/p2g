@@ -14,8 +14,6 @@ build:
           - py-scrutinizer-run
           - command: pylint-run p2g
 
-checks:
-  python:
 
 checks:
      python:

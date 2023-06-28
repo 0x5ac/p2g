@@ -140,9 +140,9 @@ gitrel:
 	make clean
 	make
 	git commit -m 'release' -a
-	git push github
 	git tag v$(shell $(POETRY) version -s)
-	git push github --tags
+	git push github
+
 
 .PHONY:
 bump: pyproject.toml

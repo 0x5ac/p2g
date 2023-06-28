@@ -6,43 +6,24 @@
                         _______________________
 
 
-[file:https://codecov.io/gh/0x5ac/p2g/branch/master/graph/badge.svg?token=FKR0R7P8U1]
-[file:https://img.shields.io/badge/License-MIT%20v3-blue.svg]
-<https://github.com/0x5ac/p2g/actions/workflows/build.yml/badge.svg>
-
-
-Table of Contents
-_________________
-
-1. p2g - Python 2 G-code
-.. 1. Introduction
-.. 2. Usage:
-.. 3. Install:
-.. 4. A taste.
-.. 5. Variables
-.. 6. Coordinates
-.. 7. Expressions
-.. 8. Axes
-.. 9. Goto.
-.. 10. Printing
-.. 11. Symbol Tables.
-.. 12. Notes.
-.. 13. HAAS macro var definitions
-.. 14. Why:
 ------------------------------------------------------------------------
+[file:https://codecov.io/gh/0x5ac/p2g/branch/master/graph/badge.svg?token=FKR0R7P8U1]
+* <file:https://img.shields.io/badge/License-MIT%20v3-blue.svg> *
+<file:https://github.com/0x5ac/p2g/actions/workflows/build.yml/badge.svg>
 
 
 [file:https://codecov.io/gh/0x5ac/p2g/branch/master/graph/badge.svg?token=FKR0R7P8U1]
-<https://codecov.io/gh/0x5ac/p2g>
-
-[file:https://img.shields.io/badge/License-MIT%20v3-blue.svg]
-<https://codecov.io/gh/0x5ac/p2g>
+<file:https://codecov.io/gh/0x5ac/p2g>
 
 
 1 p2g - Python 2 G-code
 =======================
 
   ----------------------------------------------------------------------
+
+
+1.0.1 Version 0.2.21
+--------------------
 
 
 1.1 Introduction
@@ -66,7 +47,26 @@ _________________
 
   It comes with a set of macro variable definitions for a Haas mill with
   NCD.  And a few example settings for my own VF-3SSYT.
+  ----------------------------------------------------------------------
+  Table of Contents
+  _________________
 
+  1. p2g - Python 2 G-code
+  ..... 1. Version 0.2.21
+  .. 1. Introduction
+  .. 2. Usage:
+  .. 3. Install:
+  .. 4. A taste.
+  .. 5. Variables
+  .. 6. Coordinates
+  .. 7. Expressions
+  .. 8. Axes
+  .. 9. Goto.
+  .. 10. Printing
+  .. 11. Symbol Tables.
+  .. 12. Notes.
+  .. 13. HAAS macro var definitions
+  .. 14. Why:
   ----------------------------------------------------------------------
 
 
@@ -1083,7 +1083,6 @@ _________________
    <code>EDGE_MEASURE_HEIGHT</code>        <code>  200</code>  <code>#52201 … #52400</code> 
    <code>TOOL_TOLERANCE</code>             <code>  200</code>  <code>#52401 … #52600</code> 
    <code>PROBE_TYPE</code>                 <code>  200</code>  <code>#52601 … #52800</code> 
-  None None None None
 
 
 

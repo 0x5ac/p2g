@@ -1,7 +1,7 @@
 [tool.poetry]
 
 name = "p2g"
-version = "0.2.16"
+version = "0.2.21"
 description = "Transpile python into cnc gcode."
 authors = ["sac <sac@0x5ac.com>"]
 readme = "readme.md" 
@@ -128,18 +128,16 @@ addopts="-p no:pylama -p no:pytest_pylama --cov=p2g --cov-append --tb=short -m '
 [tool.coverage.run]
 
 
-
 [tool.coverage.report]
 include = ["p2g/*.py"]
 exclude_lines = ["NotImplemented", "AssertionError", "for debug",  "no cover","@(abc\\.)?abstractmethod" ]
-
 omit = ["tests/*.py","examples/*.py","p2g/__main__.py"]
 
 
 [tool.flake8]
 ignore = ['E231', 'E241', "T201", "SCS109", "B601", "IF100","SCS108", "S101","W503",
 'G004','E203', 'R504']
-exclude= ['p2g/tests', 'p2g/examples', 'p2g/doc']
+exclude= ['tests', 'examples', 'doc']
 per-file-ignores = [
     '__init__.py:F401',
     '__main__.py:E402',     #  module level import not at top of file

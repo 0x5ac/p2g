@@ -3,18 +3,19 @@
 #+TITLE: p2g - Python 2 G-code
 #+AUTHOR: sac@0x5ac.com
 
-
-
-[[https://codecov.io/gh/0x5ac/p2g][file:https://codecov.io/gh/0x5ac/p2g/branch/master/graph/badge.svg?token=FKR0R7P8U1]]
-[[https://codecov.io/gh/0x5ac/p2g][file:https://img.shields.io/badge/License-MIT%20v3-blue.svg]]
-[[https://github.com/0x5ac/p2g/actions/workflows/build.yml/badge.svg]]
-
-
 #+OPTIONS: num:3
-#+TOC: headlines 10 
+
 -----------------------------------
+[[file:https://codecov.io/gh/0x5ac/p2g][file:https://codecov.io/gh/0x5ac/p2g/branch/master/graph/badge.svg?token=FKR0R7P8U1]] *
+[[file:https://img.shields.io/badge/License-MIT%20v3-blue.svg]] *
+[[file:https://github.com/0x5ac/p2g/actions/workflows/build.yml/badge.svg]]
+
 * p2g - Python 2 G-code
 -----------------------------------
+
+*** Version 0.2.21
+
+
 ** Introduction
 Many styli died to bring us this information.
 
@@ -34,7 +35,8 @@ compilation can be used in the source, classes, dicts, and so on.
 
 It comes with a set of macro variable definitions for a Haas mill with
 NCD.  And a few example settings for my own VF-3SSYT.
-
+-----------------------------------
+#+TOC: headlines 10 
 -----------------------------------
 ** Usage:
 #+NAME: usage

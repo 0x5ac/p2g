@@ -93,7 +93,7 @@ $(SRC_DIR)/haas.py: $(SRC_DIR)/makestdvars.py
 $(DOC_DIR)/haas.txt: p2g/makestdvars.py
 	$(PG) p2g stdvars --txt=$@ 
 
-$(DOC_DIR)/haas.org: $(SRC_DIR)/makestdvars.py
+$(DOC_DIR)/haas.org: $(SRC_DIR)/makestdvars.py pyproject.toml
 	$(PG) p2g stdvars --org=$@ 
 
 HAVE_EMACS=$(and  $(shell which $(EMACS)),$(wildcard $(OX_GFM_DIR)/*),1)
@@ -133,34 +133,27 @@ endif
 # release:
 VERSION=$(shell cat pyproject.toml | grep "^version =" | sed 's:version = "\(.*\)":\1:g')
 
-.PHONY:
-bump-tag:
+
+
+gitrel:
+	make bump
+	make clean
+	make
+	git commit -m 'release' -a
+	git push
 	git tag $(shell $(POETRY) version -s)
-.PHONY: 
-bump: | bump-inc  bump-install  bump-tag
-
+	git push --tags
+	
 .PHONY:
 
-bump-install:
-	sed -i $(SRC_DIR)/__init__.py -e 'sX^VERSION.*XVERSION = "$(shell $(POETRY) version -s)"Xg' 
-
-.PHONY:
-bump-inc:
+bump-inc:: pyproject.toml
+	sed -i $(SRC_DIR)/__init__.py -e 'sX^VERSION.*XVERSION = "$(shell $(POETRY) version -s)"Xg'
+	sed -i $(DOC_DIR)/readme.org -e 'sX^\*\*\* Version.*X*** Version $(shell $(POETRY) version -s)Xg' 
 	$(POETRY) version patch
-
 
 .PHONY:
 build: clean compiled-doc lint
 	$(POETRY) build 
-
-.PHONY:
-bcheck: build
-	pip install --force dist/*gz
-	type p2g
-	$(PR)	p2g test	> test.output 2>&1
-	diff -u test.output.prev test.output
-	cp test.output test.output.prev
-
 
 .PHONY:
 publish:dist/p2g-$(VERSION).tar.gz

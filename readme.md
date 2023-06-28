@@ -1,35 +1,15 @@
-[![img](https://codecov.io/gh/0x5ac/p2g/branch/master/graph/badge.svg?token=FKR0R7P8U1)](https://codecov.io/gh/0x5ac/p2g) [![img](https://img.shields.io/badge/License-MIT%20v3-blue.svg)](https://codecov.io/gh/0x5ac/p2g) ![img](https://github.com/0x5ac/p2g/actions/workflows/build.yml/badge.svg)
-
-
-# Table of Contents
-
-1.  [p2g - Python 2 G-code](#org682d023)
-    1.  [Introduction](#org21b6f0a)
-    2.  [Usage:](#orgab77617)
-    3.  [Install:](#orgd6976cb)
-    4.  [A taste.](#org7a5a44d)
-    5.  [Variables](#org2739bb1)
-    6.  [Coordinates](#org3503c31)
-    7.  [Expressions](#orgb10ca40)
-    8.  [Axes](#orgc45c268)
-    9.  [Goto.](#org6aa5f0c)
-    10. [Printing](#org5cb87cb)
-    11. [Symbol Tables.](#org224740f)
-    12. [Notes.](#orgbf1c87f)
-    13. [HAAS macro var definitions](#org9ab295a)
-    14. [Why:](#orgf28a3da)
-
 ---
 
+[![img](https://codecov.io/gh/0x5ac/p2g/branch/master/graph/badge.svg?token=FKR0R7P8U1)](https://codecov.io/gh/0x5ac/p2g) \* ![img](https://img.shields.io/badge/License-MIT%20v3-blue.svg) \* ![img](https://github.com/0x5ac/p2g/actions/workflows/build.yml/badge.svg)
 
-<a id="org682d023"></a>
 
 # p2g - Python 2 G-code
 
 ---
 
 
-<a id="org21b6f0a"></a>
+### Version 0.2.21
+
 
 ## Introduction
 
@@ -46,7 +26,27 @@ It comes with a set of macro variable definitions for a Haas mill with NCD. And 
 ---
 
 
-<a id="orgab77617"></a>
+# Table of Contents
+
+1.  [p2g - Python 2 G-code](#org28301c8)
+        1.  [Version 0.2.21](#orgf80edbf)
+    1.  [Introduction](#org53d28ad)
+    2.  [Usage:](#org78efecb)
+    3.  [Install:](#org6903ce5)
+    4.  [A taste.](#org0e14f79)
+    5.  [Variables](#org3e6b770)
+    6.  [Coordinates](#orgac2ef64)
+    7.  [Expressions](#org32245d7)
+    8.  [Axes](#org9307277)
+    9.  [Goto.](#org1be185f)
+    10. [Printing](#orgc94d69b)
+    11. [Symbol Tables.](#org1d4e1bb)
+    12. [Notes.](#orgcb05975)
+    13. [HAAS macro var definitions](#org568610f)
+    14. [Why:](#org5ba954a)
+
+---
+
 
 ## Usage:
 
@@ -114,8 +114,6 @@ Usage:
 ---
 
 
-<a id="orgd6976cb"></a>
-
 ## Install:
 
 ```
@@ -162,8 +160,6 @@ N1002
 
 ---
 
-
-<a id="org7a5a44d"></a>
 
 ## A taste.
 
@@ -237,8 +233,6 @@ N1001                             (     message[ALARM, f"too far {sch.name}."])
 ---
 
 
-<a id="org2739bb1"></a>
-
 ## Variables
 
 -   Give names to macro variables at a known address:
@@ -301,8 +295,6 @@ def ex2():
 
 ---
 
-
-<a id="org3503c31"></a>
 
 ## Coordinates
 
@@ -396,8 +388,6 @@ def co1():
 ---
 
 
-<a id="orgb10ca40"></a>
-
 ## Expressions
 
 Python expressions turn into G-Code as you may expect, save that native Python uses radians for trig, and G-Code uses degrees, so folding is done in degrees.
@@ -470,8 +460,6 @@ def exp11():
 
 ---
 
-
-<a id="orgc45c268"></a>
 
 ## Axes
 
@@ -552,8 +540,6 @@ def axes():
 
 ---
 
-
-<a id="org6aa5f0c"></a>
 
 ## Goto.
 
@@ -674,8 +660,6 @@ def goto1():
 ---
 
 
-<a id="org5cb87cb"></a>
-
 ## Printing
 
 Turns Python f string prints into G-code DPRNT. Make sure that your print string does not have any characters in it that your machine considers to be illegal in a DPRNT string.
@@ -712,8 +696,6 @@ N2002
 
 ---
 
-
-<a id="org224740f"></a>
 
 ## Symbol Tables.
 
@@ -761,8 +743,6 @@ def stest():
 
 ---
 
-
-<a id="orgbf1c87f"></a>
 
 ## Notes.
 
@@ -906,8 +886,6 @@ N1003
 
 ---
 
-
-<a id="org9ab295a"></a>
 
 ## HAAS macro var definitions
 
@@ -1061,12 +1039,8 @@ Names predefined in p2g.haas:
 | <code>TOOL\_TOLERANCE</code>               | <code>  200</code> | <code>#52401 … #52600</code> |
 | <code>PROBE\_TYPE</code>                   | <code>  200</code> | <code>#52601 … #52800</code> |
 
-None None None None
-
 ---
 
-
-<a id="orgf28a3da"></a>
 
 ## Why:
 

@@ -3,33 +3,33 @@
 
 # Table of Contents
 
-1.  [p2g - Python 2 G-code](#orgafc8570)
-    1.  [Introduction](#orgfd37a56)
-    2.  [Usage:](#orgf5eca4a)
-    3.  [Install:](#org4aed6b6)
-    4.  [A taste.](#orgb1fb3b0)
-    5.  [Coordinates](#orgf5b84c8)
-    6.  [Variables](#org6bf9b12)
-    7.  [Expressions](#orgeaeb6df)
-    8.  [Axes](#orgba228fd)
-    9.  [Printing](#org69f1b54)
-    10. [Symbol Tables.](#org0409cfa)
-    11. [Goto.](#org2e30063)
-    12. [Notes.](#orgd0e6d66)
-    13. [HAAS macro var definitions](#orgb53d92d)
-    14. [Why:](#org226c735)
+1.  [p2g - Python 2 G-code](#orgbf6c7f6)
+    1.  [Introduction](#org88e620c)
+    2.  [Usage:](#org20d02de)
+    3.  [Install:](#org2c1a9cf)
+    4.  [A taste.](#org17e2d38)
+    5.  [Variables](#orge9178f9)
+    6.  [Coordinates](#org8e42442)
+    7.  [Expressions](#org191e4a9)
+    8.  [Axes](#org4a41b55)
+    9.  [Goto.](#orga322ec4)
+    10. [Printing](#orgc33f9c0)
+    11. [Symbol Tables.](#org9fa66cf)
+    12. [Notes.](#org9d92115)
+    13. [HAAS macro var definitions](#org4b62f9a)
+    14. [Why:](#orge96148e)
 
 ---
 
 
-<a id="orgafc8570"></a>
+<a id="orgbf6c7f6"></a>
 
 # p2g - Python 2 G-code
 
 ---
 
 
-<a id="orgfd37a56"></a>
+<a id="org88e620c"></a>
 
 ## Introduction
 
@@ -46,7 +46,7 @@ It comes with a set of macro variable definitions for a Haas mill with NCD. And 
 ---
 
 
-<a id="orgf5eca4a"></a>
+<a id="org20d02de"></a>
 
 ## Usage:
 
@@ -54,65 +54,67 @@ It comes with a set of macro variable definitions for a Haas mill with NCD. And 
 Turns a python program into a gcode program.
 
 Usage:
-   p2g  [--function=<fname> ]
-        [--job=<jobname>]
-        [options] gen <srcfile> [<outfile>]
+   p2g [--function=<fname> ]
+       [--job=<jobname>]
+       [options] gen <srcfile> [<outfile>]
  
-    Read from python <srcfile>, emit G-Code.
+        Read from python <srcfile>, emit G-Code.
  
-      Output file name may include {time} which will create a decrementing
-      prefix for the output file which makes looking for the .nc in a
-      crowded directory simpler.
+          Output file name may include {time} which will create a decrementing
+          prefix for the output file which makes looking for the .nc in a
+          crowded directory simpler.
  
-    Examples:
-       p2g gen foo.py ~/_nc_/{time}O001-foo.nc
-         Makes an output of the form ~/_nc_/001234O001-foo.nc
+        Examples:
+           p2g gen foo.py ~/_nc_/{time}O001-foo.nc
+              Makes an output of the form ~/_nc_/001234O001-foo.nc
  
-       p2g gen --func=thisone -
-         Read from stdin, look for the 'thisone' function and write to
-         to stdout.
+           p2g gen --func=thisone -
+              Read from stdin, look for the 'thisone' function and write to
+              to stdout.
  
    p2g examples <exampledir>
-    Create <exampledir>, populate with examples and compile.
+          Create <exampledir>, populate with examples and compile.
  
-    Examples:
-     p2g examples showme
-       Copies the examples into ./showme and then runs
-         p2g  gen showme/vicecenter.py
-         p2g  gen showme/checkprobe.py
+          Examples:
+            p2g examples showme
+              Copies the examples into ./showme and then runs
+               p2g gen showme/vicecenter.py
+               p2g gen showme/checkprobe.py
  
    p2g doc
-     Send readme.txt to console.
+          Send readme.txt to console.
  
    p2g help
-      Show complete command line help.
+          Show complete command line help.
  
    p2g version
-       Show version.
+          Show version.
  
    p2g location
-       Show which p2g is running.
+          Show which p2g is running.
  
-    For maintenance:
-      p2g [options] stdvars [--txt=<txt>] [--dev=<dev>] [--py=<py>] [--org=<org>]
-         Recreate internal files.
+       For maintenance:
+     p2g [options] stdvars [--txt=<txt>] [--dev=<dev>]
+                           [--py=<py>] [--org=<org>]
+                Recreate internal files.
 
  Options:
-  --narrow                    Narrow output; formatted to fit in the narrow space
-                              of the CNC machine's program display.
+  --narrow                    Narrow output; formatted to fit in the
+                              narrow space of the CNC machine's program
+                              display.
  
-  For maintenance:
-   --no-boiler-plate  Turn of job entry and terminal M30.
-   --break            Breakpoint on error.
-   --debug            Enter debugging code.
-   --verbose          Too much.
-   --logio            Even more.
+       For maintenance:
+           --no-boiler-plate  Turn of job entry and terminal M30.
+           --break            Breakpoint on error.
+           --debug            Enter debugging code.
+           --verbose          Too much.
+           --logio            Even more.
 ```
 
 ---
 
 
-<a id="org4aed6b6"></a>
+<a id="org2c1a9cf"></a>
 
 ## Install:
 
@@ -130,34 +132,38 @@ something smaller:
 
 ```
 $ cat > tst.py <<EOF
-import p2g
+```
+
+```python
+import p2g 
 def t():
   x = p2g.Var(9)
   for y in range(10):
     x += y
-EOF
-$ p2g gen tst.py
+#EOF
 ```
 
-yields
+```
+p2g gen tst.py
+```
 
 ```
-  O0001                           ( TST                           )
+  O0001                           ( t                             )
   #100= 9.                        (   x = Var[9]                  )
   #102= 0.                        (   for y in range[10]:         )
-N2000
-  IF [#102 GE 10.] GOTO 2002
+N1000
+  IF [#102 GE 10.] GOTO 1002
   #100= #100 + #102               ( x += y                        )
   #102= #102 + 1.
-  GOTO 2000
-N2002
+  GOTO 1000
+N1002
   M30
 ```
 
 ---
 
 
-<a id="orgb1fb3b0"></a>
+<a id="org17e2d38"></a>
 
 ## A taste.
 
@@ -231,71 +237,7 @@ N1001                             (     message[ALARM, f"too far {sch.name}."])
 ---
 
 
-<a id="orgf5b84c8"></a>
-
-## Coordinates
-
-Describe position, with axis by location, in sequence or by name.
-
-```python
-from p2g import *       # this is the common header
-from p2g.haas import *  # to all the examples
-
-def co1():
-    axis.NAMES = 'xyza*c'    
-    com ("Coords by order.")
-    p1 = Fixed[3](1, 2, 3, addr=100)
-
-    com ("Coords by axis name.")
-    p2 = Fixed[3](z=333, y=222, x=111, addr=200)
-    p2.x = 17
-
-    com ("Coords by index.")      
-    p1.xyz = p2[2]
-    p2[1:3] = 7
-
-    com ("Mixemup.")
-    p1.yz = p2.yz[1]
-
-    com ("Rotaries.")
-    p4 = Fixed[6]()
-    p4.a = 180
-    p4.c = asin (0.5)
-
-```
-
-⇨ `p2g gen co1.py` ⇨
-
-```
-  O0001                           ( co1                           )
-( Coords by order. )
-  #100= 1.                        ( p1 = Fixed[3][1, 2, 3, addr=100])
-  #101= 2.
-  #102= 3.
-( Coords by axis name. )
-  #200= 111.                      ( p2 = Fixed[3][z=333, y=222, x=111, addr=200])
-  #201= 222.
-  #202= 333.
-  #200= 17.                       ( p2.x = 17                     )
-( Coords by index. )
-  #100= #202                      ( p1.xyz = p2[2]                )
-  #101= #202
-  #102= #202
-  #201= 7.                        ( p2[1:3] = 7                   )
-  #202= 7.
-( Mixemup. )
-  #101= #202                      ( p1.yz = p2.yz[1]              )
-  #102= #202
-( Rotaries. )
-  #103= 180.                      ( p4.a = 180                    )
-  #105= 30.                       ( p4.c = asin [0.5]             )
-  M30
-```
-
----
-
-
-<a id="org6bf9b12"></a>
+<a id="orge9178f9"></a>
 
 ## Variables
 
@@ -360,7 +302,101 @@ def ex2():
 ---
 
 
-<a id="orgeaeb6df"></a>
+<a id="org8e42442"></a>
+
+## Coordinates
+
+Describe position, with axis by location, in sequence or by name.
+
+```python
+from p2g import *       # this is the common header
+from p2g.haas import *  # to all the examples
+
+def co1():
+    com ("Describe 3 variables at 3000")    
+    dst = Fixed[3](addr=3000)
+    com ("Fill with 1,2,3")
+    dst.var = (1,2,3)
+
+
+    com ("Set by parts")
+    dst.y = 7
+    dst.z = 71
+    dst.x = 19
+
+    offset = Const(0.101,0.102,0.103)
+    com ("Arithmetic")
+    dst.var += (1,2,3)
+    dst.var -= offset
+    dst.var %= sin(asin(offset) + 7)
+
+    com ("When describing a location:")
+    com ("Coords by order.")
+    p1 = Fixed[3](1, 2, 3, addr=100)
+
+    com ("Coords by axis name.")
+    p2 = Fixed[3](z=333, y=222, x=111, addr=200)
+    p2.x = 17
+
+    com ("Coords by index.")      
+    p1.xyz = p2[2]
+    p2[1:3] = 7
+
+    com ("Mix them up.")
+    p1.yz = p2.yz[1]
+
+
+```
+
+⇨ `p2g gen co1.py` ⇨
+
+```
+  O0001                           ( co1                           )
+( Describe 3 variables at 3000 )
+( Fill with 1,2,3 )
+  #3000= 1.                       ( dst.var = [1,2,3]             )
+  #3001= 2.
+  #3002= 3.
+( Set by parts )
+  #3001= 7.                       ( dst.y = 7                     )
+  #3002= 71.                      ( dst.z = 71                    )
+  #3000= 19.                      ( dst.x = 19                    )
+( Arithmetic )
+  #3000= #3000 + 1.               ( dst.var += [1,2,3]            )
+  #3001= #3001 + 2.
+  #3002= #3002 + 3.
+  #3000= #3000 - 0.101            ( dst.var -= offset             )
+  #3001= #3001 - 0.102
+  #3002= #3002 - 0.103
+  #3000= #3000 MOD 0.2215         ( dst.var %= sin[asin[offset] + 7])
+  #3001= #3001 MOD 0.2225
+  #3002= #3002 MOD 0.2235
+( When describing a location: )
+( Coords by order. )
+  #100= 1.                        ( p1 = Fixed[3][1, 2, 3, addr=100])
+  #101= 2.
+  #102= 3.
+( Coords by axis name. )
+  #200= 111.                      ( p2 = Fixed[3][z=333, y=222, x=111, addr=200])
+  #201= 222.
+  #202= 333.
+  #200= 17.                       ( p2.x = 17                     )
+( Coords by index. )
+  #100= #202                      ( p1.xyz = p2[2]                )
+  #101= #202
+  #102= #202
+  #201= 7.                        ( p2[1:3] = 7                   )
+  #202= 7.
+( Mix them up. )
+  #101= #202                      ( p1.yz = p2.yz[1]              )
+  #102= #202
+  M30
+```
+
+---
+
+
+<a id="org191e4a9"></a>
 
 ## Expressions
 
@@ -435,7 +471,7 @@ def exp11():
 ---
 
 
-<a id="orgba228fd"></a>
+<a id="org4a41b55"></a>
 
 ## Axes
 
@@ -459,6 +495,12 @@ def a5():
    G55.var += tmp1
    p2g.com ("")
    G55.ac *= 2.0
+
+   com ("Rotaries.")
+   p4 = Fixed[6]()
+   p4.a = 180
+   p4.c = asin (0.5)
+
 
 
 def a3():
@@ -495,112 +537,23 @@ def axes():
 
   #5244= #5244 * 2.               (    G55.ac *= 2.0              )
   #5246= #5246 * 2.
+( Rotaries. )
+  #103= 180.                      (    p4.a = 180                 )
+  #105= 30.                       (    p4.c = asin [0.5]          )
 ( Filling to number of axes. )
   #5241= 0.                       (    G55.var = [0]              )
   #5242= 0.
   #5243= 0.
-  #100= #5241 * 34.               (    tmp = Var[G55 * 34]        )
-  #101= #5242 * 34.
-  #102= #5243 * 34.
+  #106= #5241 * 34.               (    tmp = Var[G55 * 34]        )
+  #107= #5242 * 34.
+  #108= #5243 * 34.
   M30
 ```
 
 ---
 
 
-<a id="org69f1b54"></a>
-
-## Printing
-
-Turns Python f string prints into G-code DPRNT. Make sure that your print string does not have any characters in it that your machine considers to be illegal in a DPRNT string.
-
-```python
-from p2g import *
-from p2g.haas import *
-
-def exprnt():
-  x = Var(2)
-  y = Var(27)  
-
-  for q in range(10):
-    dprint(f"X is {x:3.1f}, Y+Q is {y+q:5.2f}")
-
-
-```
-
-⇨ `p2g gen exprnt.py` ⇨
-
-```
-  O0001                           ( exprnt                        )
-  #100= 2.                        (   x = Var[2]                  )
-  #101= 27.                       (   y = Var[27]                 )
-  #103= 0.                        (   for q in range[10]:         )
-N2000
-  IF [#103 GE 10.] GOTO 2002
-DPRNT[X*is*[#100][31],*Y+Q*is*[#101+#103][52]]
-  #103= #103 + 1.                 ( dprint[f"X is {x:3.1f}, Y+Q is {y+q:5.2f}"])
-  GOTO 2000
-N2002
-  M30
-```
-
----
-
-
-<a id="org0409cfa"></a>
-
-## Symbol Tables.
-
-Set the global `p2g.symbol.Table.print` to get a symbol table in the output file.
-
-```python
-import p2g
-
-
-x1 = -7
-
-
-MACHINE_ABS_ABOVE_OTS = p2g.Const(x=x1, y=8, z=9)
-MACHINE_ABS_ABOVE_SEARCH_ROTARY_LHS_5X8 = p2g.Const(100, 101, 102)
-MACHINE_ABS_ABOVE_VICE = p2g.Const(x=17, y=18, z=19)
-RAW_ANALOG = p2g.Fixed[10](addr=1080)
-fish = 10
-not_used = 12
-
-def stest():
-    p2g.symbol.Table.print = True    
-    p2g.comment("Only used symbols are in output table.")
-    p2g.Var(MACHINE_ABS_ABOVE_OTS)
-    p2g.Var(MACHINE_ABS_ABOVE_VICE * fish)
-    v1 = p2g.Var()
-    v1 += RAW_ANALOG[7]
-```
-
-⇨ \`p2g gen stest.py\` ⇨
-
-```
-( RAW_ANALOG                              : #1080[10]               )
-( v1                                      :  #106.x                 )
-( MACHINE_ABS_ABOVE_OTS                   :  -7.000,  8.000,  9.000 )
-( MACHINE_ABS_ABOVE_SEARCH_ROTARY_LHS_5X8 : 100.000,101.000,102.000 )
-( MACHINE_ABS_ABOVE_VICE                  :  17.000, 18.000, 19.000 )
-  O0001                           ( stest                         )
-
-( Only used symbols are in output table. )
-  #100= -7.                       ( Var[MACHINE_ABS_ABOVE_OTS]    )
-  #101= 8.
-  #102= 9.
-  #103= 170.                      ( Var[MACHINE_ABS_ABOVE_VICE * fish])
-  #104= 180.
-  #105= 190.
-  #106= #106 + #1087              ( v1 += RAW_ANALOG[7]           )
-  M30
-```
-
----
-
-
-<a id="org2e30063"></a>
+<a id="orga322ec4"></a>
 
 ## Goto.
 
@@ -721,7 +674,95 @@ def goto1():
 ---
 
 
-<a id="orgd0e6d66"></a>
+<a id="orgc33f9c0"></a>
+
+## Printing
+
+Turns Python f string prints into G-code DPRNT. Make sure that your print string does not have any characters in it that your machine considers to be illegal in a DPRNT string.
+
+```python
+from p2g import *
+from p2g.haas import *
+
+def exprnt():
+  x = Var(2)
+  y = Var(27)  
+
+  for q in range(10):
+    dprint(f"X is {x:3.1f}, Y+Q is {y+q:5.2f}")
+
+
+```
+
+⇨ `p2g gen exprnt.py` ⇨
+
+```
+  O0001                           ( exprnt                        )
+  #100= 2.                        (   x = Var[2]                  )
+  #101= 27.                       (   y = Var[27]                 )
+  #103= 0.                        (   for q in range[10]:         )
+N2000
+  IF [#103 GE 10.] GOTO 2002
+DPRNT[X*is*[#100][31],*Y+Q*is*[#101+#103][52]]
+  #103= #103 + 1.                 ( dprint[f"X is {x:3.1f}, Y+Q is {y+q:5.2f}"])
+  GOTO 2000
+N2002
+  M30
+```
+
+---
+
+
+<a id="org9fa66cf"></a>
+
+## Symbol Tables.
+
+Set the global `p2g.symbol.Table.print` to get a symbol table in the output file.
+
+```python
+import p2g
+x1 = -7
+MACHINE_ABS_ABOVE_OTS = p2g.Const(x=x1, y=8, z=9)
+MACHINE_ABS_ABOVE_SEARCH_ROTARY_LHS_5X8 = p2g.Const(100, 101, 102)
+MACHINE_ABS_ABOVE_VICE = p2g.Const(x=17, y=18, z=19)
+RAW_ANALOG = p2g.Fixed[10](addr=1080)
+fish = 10
+not_used = 12
+
+def stest():
+    p2g.symbol.Table.print = True    
+    p2g.comment("Only used symbols are in output table.")
+    p2g.Var(MACHINE_ABS_ABOVE_OTS)
+    p2g.Var(MACHINE_ABS_ABOVE_VICE * fish)
+    v1 = p2g.Var()
+    v1 += RAW_ANALOG[7]
+```
+
+⇨ \`p2g gen stest.py\` ⇨
+
+```
+( RAW_ANALOG                              : #1080[10]               )
+( v1                                      :  #106.x                 )
+( MACHINE_ABS_ABOVE_OTS                   :  -7.000,  8.000,  9.000 )
+( MACHINE_ABS_ABOVE_SEARCH_ROTARY_LHS_5X8 : 100.000,101.000,102.000 )
+( MACHINE_ABS_ABOVE_VICE                  :  17.000, 18.000, 19.000 )
+  O0001                           ( stest                         )
+
+( Only used symbols are in output table. )
+  #100= -7.                       ( Var[MACHINE_ABS_ABOVE_OTS]    )
+  #101= 8.
+  #102= 9.
+  #103= 170.                      ( Var[MACHINE_ABS_ABOVE_VICE * fish])
+  #104= 180.
+  #105= 190.
+  #106= #106 + #1087              ( v1 += RAW_ANALOG[7]           )
+  M30
+```
+
+---
+
+
+<a id="org9d92115"></a>
 
 ## Notes.
 
@@ -736,24 +777,43 @@ from p2g.haas import *
 
 class X():
          def __init__(self, a,b):
-               self.a = a
+               self.thisone = a
                self.b = b
          def adjust(self, tof):
-               self.a += tof.x
+               self.thisone += tof.x
                self.b += tof.y
+
+class Y():
+         def __init__(self, a):
+               self.val = a
+         def adjust(self, tof):
+               self.val += tof
+         # an example of overloading.
+         # I'm not recommending replacing
+         # add with multiply, but it would work.
+         def __add__(self, other):
+               return self.val * other
 
 def cool():
       com ("You can do surprising things.")
-      p = X(12,34)
 
-      p.adjust(TOOL_OFFSET)
-      tmp = Var(p.a, p.b)
+      avariable = Var(100)
+      objp = X(avariable,34)
+      another = Var(7,8)
+
+      objp.adjust(TOOL_OFFSET)
+
+      q = Y(another) + objp.thisone
+      dprint(f"{q[0]}{q[1]}")
+
 ```
 
       O0001                           ( cool                          )
     ( You can do surprising things. )
-      #100= #5081 + 12.               (   tmp = Var[p.a, p.b]         )
-      #101= #5082 + 34.
+      #100= 100.                      (   avariable = Var[100]        )
+      #101= 7.                        (   another = Var[7,8]          )
+      #102= 8.
+    DPRNT[[#101*[#100+#5081]][#102*[#100+#5081]]]
       M30
 
 ```python
@@ -811,13 +871,13 @@ from p2g.haas import *
 def beware1():
    com ("It's easy to forget that only macro variables will get into",
       "the output code. Other code will go away.")
-   x = 123
+   x = 123  # not a var
    y = Var(7)
    if x==23 :  # look here
      y = 9
 
    com ("Should look like:")
-   x = Var(123)
+   x = Var(123)  # is a var
    y = Var(7)
    if x==23 :  # look here
      y = 9
@@ -832,179 +892,185 @@ def beware1():
 ( the output code. Other code will go away.                   )
   #100= 7.                        (    y = Var[7]                 )
 ( Should look like: )
-  #101= 123.                      (    x = Var[123]               )
+  #101= 123.                      (    x = Var[123]  # is a var   )
   #102= 7.                        (    y = Var[7]                 )
   #100= #102
-  IF [#101 NE 23.] GOTO 2002      (    if x==23 :  # look here    )
+  IF [#101 NE 23.] GOTO 1002      (    if x==23 :  # look here    )
   #100= 9.                        (  y = 9                        )
-  GOTO 2003
-N2002
+  GOTO 1003
+N1002
   #100= 99.                       (  y = 99                       )
-N2003
+N1003
   M30
 ```
 
 ---
 
 
-<a id="orgb53d92d"></a>
+<a id="org4b62f9a"></a>
 
 ## HAAS macro var definitions
 
 Names predefined in p2g.haas:
 
-| <code>Name</code>                          | <code>Size</code>  | <code>Address</code>         |
-| ---                                        | ---                | ---                          |
-| <code>NULL</code>                          | <code>    1</code> | <code>     #    0    </code> |
-| <code>MACRO\_ARGUMENTS</code>              | <code>   33</code> | <code>#    1 … #   33</code> |
-| <code>GP\_SAVED1</code>                    | <code>  100</code> | <code>#  100 … #  199</code> |
-| <code>GP\_SAVED2</code>                    | <code>   50</code> | <code>#  500 … #  549</code> |
-| <code>PROBE\_CALIBRATION1</code>           | <code>    6</code> | <code>#  550 … #  555</code> |
-| <code>PROBE\_R</code>                      | <code>    3</code> | <code>#  556 … #  558</code> |
-| <code>PROBE\_CALIBRATION2</code>           | <code>   22</code> | <code>#  559 … #  580</code> |
-| <code>GP\_SAVED3</code>                    | <code>  119</code> | <code>#  581 … #  699</code> |
-| <code>GP\_SAVED4</code>                    | <code>  200</code> | <code>#  800 … #  999</code> |
-| <code>INPUTS</code>                        | <code>   64</code> | <code># 1000 … # 1063</code> |
-| <code>MAX\_LOADS\_XYZAB</code>             | <code>    5</code> | <code># 1064 … # 1068</code> |
-| <code>RAW\_ANALOG</code>                   | <code>   10</code> | <code># 1080 … # 1089</code> |
-| <code>FILTERED\_ANALOG</code>              | <code>    8</code> | <code># 1090 … # 1097</code> |
-| <code>SPINDLE\_LOAD</code>                 | <code>    1</code> | <code>     # 1098    </code> |
-| <code>MAX\_LOADS\_CTUVW</code>             | <code>    5</code> | <code># 1264 … # 1268</code> |
-| <code>TOOL\_TBL\_FLUTES</code>             | <code>  200</code> | <code># 1601 … # 1800</code> |
-| <code>TOOL\_TBL\_VIBRATION</code>          | <code>  200</code> | <code># 1801 … # 2000</code> |
-| <code>TOOL\_TBL\_OFFSETS</code>            | <code>  200</code> | <code># 2001 … # 2200</code> |
-| <code>TOOL\_TBL\_WEAR</code>               | <code>  200</code> | <code># 2201 … # 2400</code> |
-| <code>TOOL\_TBL\_DROFFSET</code>           | <code>  200</code> | <code># 2401 … # 2600</code> |
-| <code>TOOL\_TBL\_DRWEAR</code>             | <code>  200</code> | <code># 2601 … # 2800</code> |
-| <code>ALARM</code>                         | <code>    1</code> | <code>     # 3000    </code> |
-| <code>T\_MS</code>                         | <code>    1</code> | <code>     # 3001    </code> |
-| <code>T\_HR</code>                         | <code>    1</code> | <code>     # 3002    </code> |
-| <code>SINGLE\_BLOCK\_OFF</code>            | <code>    1</code> | <code>     # 3003    </code> |
-| <code>FEED\_HOLD\_OFF</code>               | <code>    1</code> | <code>     # 3004    </code> |
-| <code>MESSAGE</code>                       | <code>    1</code> | <code>     # 3006    </code> |
-| <code>YEAR\_MONTH\_DAY</code>              | <code>    1</code> | <code>     # 3011    </code> |
-| <code>HOUR\_MINUTE\_SECOND</code>          | <code>    1</code> | <code>     # 3012    </code> |
-| <code>POWER\_ON\_TIME</code>               | <code>    1</code> | <code>     # 3020    </code> |
-| <code>CYCLE\_START\_TIME</code>            | <code>    1</code> | <code>     # 3021    </code> |
-| <code>FEED\_TIMER</code>                   | <code>    1</code> | <code>     # 3022    </code> |
-| <code>CUR\_PART\_TIMER</code>              | <code>    1</code> | <code>     # 3023    </code> |
-| <code>LAST\_COMPLETE\_PART\_TIMER</code>   | <code>    1</code> | <code>     # 3024    </code> |
-| <code>LAST\_PART\_TIMER</code>             | <code>    1</code> | <code>     # 3025    </code> |
-| <code>TOOL\_IN\_SPIDLE</code>              | <code>    1</code> | <code>     # 3026    </code> |
-| <code>SPINDLE\_RPM</code>                  | <code>    1</code> | <code>     # 3027    </code> |
-| <code>PALLET\_LOADED</code>                | <code>    1</code> | <code>     # 3028    </code> |
-| <code>SINGLE\_BLOCK</code>                 | <code>    1</code> | <code>     # 3030    </code> |
-| <code>AGAP</code>                          | <code>    1</code> | <code>     # 3031    </code> |
-| <code>BLOCK\_DELETE</code>                 | <code>    1</code> | <code>     # 3032    </code> |
-| <code>OPT\_STOP</code>                     | <code>    1</code> | <code>     # 3033    </code> |
-| <code>TIMER\_CELL\_SAFE</code>             | <code>    1</code> | <code>     # 3196    </code> |
-| <code>TOOL\_TBL\_DIAMETER</code>           | <code>  200</code> | <code># 3201 … # 3400</code> |
-| <code>TOOL\_TBL\_COOLANT\_POSITION</code>  | <code>  200</code> | <code># 3401 … # 3600</code> |
-| <code>M30\_COUNT1</code>                   | <code>    1</code> | <code>     # 3901    </code> |
-| <code>M30\_COUNT2</code>                   | <code>    1</code> | <code>     # 3902    </code> |
-| <code>LAST\_BLOCK\_G</code>                | <code>   21</code> | <code># 4001 … # 4021</code> |
-| <code>LAST\_BLOCK\_ADDRESS</code>          | <code>   26</code> | <code># 4101 … # 4126</code> |
-| <code>LAST\_TARGET\_POS</code>             | <code>naxes</code> | <code>    # 5001…    </code> |
-| <code>MACHINE\_POS</code>                  | <code>naxes</code> | <code>    # 5021…    </code> |
-| <code>MACHINE</code>                       | <code>naxes</code> | <code>    # 5021…    </code> |
-| <code>G53</code>                           | <code>naxes</code> | <code>    # 5021…    </code> |
-| <code>WORK\_POS</code>                     | <code>naxes</code> | <code>    # 5041…    </code> |
-| <code>WORK</code>                          | <code>naxes</code> | <code>    # 5041…    </code> |
-| <code>SKIP\_POS</code>                     | <code>naxes</code> | <code>    # 5061…    </code> |
-| <code>PROBE</code>                         | <code>naxes</code> | <code>    # 5061…    </code> |
-| <code>TOOL\_OFFSET</code>                  | <code>   20</code> | <code># 5081 … # 5100</code> |
-| <code>G52</code>                           | <code>naxes</code> | <code>    # 5201…    </code> |
-| <code>G54</code>                           | <code>naxes</code> | <code>    # 5221…    </code> |
-| <code>G55</code>                           | <code>naxes</code> | <code>    # 5241…    </code> |
-| <code>G56</code>                           | <code>naxes</code> | <code>    # 5261…    </code> |
-| <code>G57</code>                           | <code>naxes</code> | <code>    # 5281…    </code> |
-| <code>G58</code>                           | <code>naxes</code> | <code>    # 5301…    </code> |
-| <code>G59</code>                           | <code>naxes</code> | <code>    # 5321…    </code> |
-| <code>TOOL\_TBL\_FEED\_TIMERS</code>       | <code>  100</code> | <code># 5401 … # 5500</code> |
-| <code>TOOL\_TBL\_TOTAL\_TIMERS</code>      | <code>  100</code> | <code># 5501 … # 5600</code> |
-| <code>TOOL\_TBL\_LIFE\_LIMITS</code>       | <code>  100</code> | <code># 5601 … # 5700</code> |
-| <code>TOOL\_TBL\_LIFE\_COUNTERS</code>     | <code>  100</code> | <code># 5701 … # 5800</code> |
-| <code>TOOL\_TBL\_LIFE\_MAX\_LOADS</code>   | <code>  100</code> | <code># 5801 … # 5900</code> |
-| <code>TOOL\_TBL\_LIFE\_LOAD\_LIMITS</code> | <code>  100</code> | <code># 5901 … # 6000</code> |
-| <code>NGC\_CF</code>                       | <code>    1</code> | <code>     # 6198    </code> |
-| <code>G154\_P1</code>                      | <code>naxes</code> | <code>    # 7001…    </code> |
-| <code>G154\_P2</code>                      | <code>naxes</code> | <code>    # 7021…    </code> |
-| <code>G154\_P3</code>                      | <code>naxes</code> | <code>    # 7041…    </code> |
-| <code>G154\_P4</code>                      | <code>naxes</code> | <code>    # 7061…    </code> |
-| <code>G154\_P5</code>                      | <code>naxes</code> | <code>    # 7081…    </code> |
-| <code>G154\_P6</code>                      | <code>naxes</code> | <code>    # 7101…    </code> |
-| <code>G154\_P7</code>                      | <code>naxes</code> | <code>    # 7121…    </code> |
-| <code>G154\_P8</code>                      | <code>naxes</code> | <code>    # 7141…    </code> |
-| <code>G154\_P9</code>                      | <code>naxes</code> | <code>    # 7161…    </code> |
-| <code>G154\_P10</code>                     | <code>naxes</code> | <code>    # 7181…    </code> |
-| <code>G154\_P11</code>                     | <code>naxes</code> | <code>    # 7201…    </code> |
-| <code>G154\_P12</code>                     | <code>naxes</code> | <code>    # 7221…    </code> |
-| <code>G154\_P13</code>                     | <code>naxes</code> | <code>    # 7241…    </code> |
-| <code>G154\_P14</code>                     | <code>naxes</code> | <code>    # 7261…    </code> |
-| <code>G154\_P15</code>                     | <code>naxes</code> | <code>    # 7281…    </code> |
-| <code>G154\_P16</code>                     | <code>naxes</code> | <code>    # 7301…    </code> |
-| <code>G154\_P17</code>                     | <code>naxes</code> | <code>    # 7321…    </code> |
-| <code>G154\_P18</code>                     | <code>naxes</code> | <code>    # 7341…    </code> |
-| <code>G154\_P19</code>                     | <code>naxes</code> | <code>    # 7361…    </code> |
-| <code>G154\_P20</code>                     | <code>naxes</code> | <code>    # 7381…    </code> |
-| <code>PALLET\_PRIORITY</code>              | <code>  100</code> | <code># 7501 … # 7600</code> |
-| <code>PALLET\_STATUS</code>                | <code>  100</code> | <code># 7601 … # 7700</code> |
-| <code>PALLET\_PROGRAM</code>               | <code>  100</code> | <code># 7701 … # 7800</code> |
-| <code>PALLET\_USAGE</code>                 | <code>  100</code> | <code># 7801 … # 7900</code> |
-| <code>ATM\_ID</code>                       | <code>    1</code> | <code>     # 8500    </code> |
-| <code>ATM\_PERCENT</code>                  | <code>    1</code> | <code>     # 8501    </code> |
-| <code>ATM\_TOTAL\_AVL\_USAGE</code>        | <code>    1</code> | <code>     # 8502    </code> |
-| <code>ATM\_TOTAL\_AVL\_HOLE\_COUNT</code>  | <code>    1</code> | <code>     # 8503    </code> |
-| <code>ATM\_TOTAL\_AVL\_FEED\_TIME</code>   | <code>    1</code> | <code>     # 8504    </code> |
-| <code>ATM\_TOTAL\_AVL\_TOTAL\_TIME</code>  | <code>    1</code> | <code>     # 8505    </code> |
-| <code>ATM\_NEXT\_TOOL\_NUMBER</code>       | <code>    1</code> | <code>     # 8510    </code> |
-| <code>ATM\_NEXT\_TOOL\_LIFE</code>         | <code>    1</code> | <code>     # 8511    </code> |
-| <code>ATM\_NEXT\_TOOL\_AVL\_USAGE</code>   | <code>    1</code> | <code>     # 8512    </code> |
-| <code>ATM\_NEXT\_TOOL\_HOLE\_COUNT</code>  | <code>    1</code> | <code>     # 8513    </code> |
-| <code>ATM\_NEXT\_TOOL\_FEED\_TIME</code>   | <code>    1</code> | <code>     # 8514    </code> |
-| <code>ATM\_NEXT\_TOOL\_TOTAL\_TIME</code>  | <code>    1</code> | <code>     # 8515    </code> |
-| <code>TOOL\_ID</code>                      | <code>    1</code> | <code>     # 8550    </code> |
-| <code>TOOL\_FLUTES</code>                  | <code>    1</code> | <code>     # 8551    </code> |
-| <code>TOOL\_MAX\_VIBRATION</code>          | <code>    1</code> | <code>     # 8552    </code> |
-| <code>TOOL\_LENGTH\_OFFSETS</code>         | <code>    1</code> | <code>     # 8553    </code> |
-| <code>TOOL\_LENGTH\_WEAR</code>            | <code>    1</code> | <code>     # 8554    </code> |
-| <code>TOOL\_DIAMETER\_OFFSETS</code>       | <code>    1</code> | <code>     # 8555    </code> |
-| <code>TOOL\_DIAMETER\_WEAR</code>          | <code>    1</code> | <code>     # 8556    </code> |
-| <code>TOOL\_ACTUAL\_DIAMETER</code>        | <code>    1</code> | <code>     # 8557    </code> |
-| <code>TOOL\_COOLANT\_POSITION</code>       | <code>    1</code> | <code>     # 8558    </code> |
-| <code>TOOL\_FEED\_TIMER</code>             | <code>    1</code> | <code>     # 8559    </code> |
-| <code>TOOL\_TOTAL\_TIMER</code>            | <code>    1</code> | <code>     # 8560    </code> |
-| <code>TOOL\_LIFE\_LIMIT</code>             | <code>    1</code> | <code>     # 8561    </code> |
-| <code>TOOL\_LIFE\_COUNTER</code>           | <code>    1</code> | <code>     # 8562    </code> |
-| <code>TOOL\_LIFE\_MAX\_LOAD</code>         | <code>    1</code> | <code>     # 8563    </code> |
-| <code>TOOL\_LIFE\_LOAD\_LIMIT</code>       | <code>    1</code> | <code>     # 8564    </code> |
-| <code>THERMAL\_COMP\_ACC</code>            | <code>    1</code> | <code>     # 9000    </code> |
-| <code>THERMAL\_SPINDLE\_COMP\_ACC</code>   | <code>    1</code> | <code>     # 9016    </code> |
-| <code>GVARIABLES3</code>                   | <code> 1000</code> | <code>#10000 … #10999</code> |
-| <code>INPUTS1</code>                       | <code>  256</code> | <code>#11000 … #11255</code> |
-| <code>OUTPUT1</code>                       | <code>  256</code> | <code>#12000 … #12255</code> |
-| <code>FILTERED\_ANALOG1</code>             | <code>   13</code> | <code>#13000 … #13012</code> |
-| <code>COOLANT\_LEVEL</code>                | <code>    1</code> | <code>     #13013    </code> |
-| <code>FILTERED\_ANALOG2</code>             | <code>   50</code> | <code>#13014 … #13063</code> |
-| <code>SETTING</code>                       | <code>10000</code> | <code>#20000 … #29999</code> |
-| <code>PARAMETER</code>                     | <code>10000</code> | <code>#30000 … #39999</code> |
-| <code>TOOL\_TYP</code>                     | <code>  200</code> | <code>#50001 … #50200</code> |
-| <code>TOOL\_MATERIAL</code>                | <code>  200</code> | <code>#50201 … #50400</code> |
-| <code>CURRENT\_OFFSET</code>               | <code>  200</code> | <code>#50601 … #50800</code> |
-| <code>CURRENT\_OFFSET2</code>              | <code>  200</code> | <code>#50801 … #51000</code> |
-| <code>VPS\_TEMPLATE\_OFFSET</code>         | <code>  100</code> | <code>#51301 … #51400</code> |
-| <code>WORK\_MATERIAL</code>                | <code>  200</code> | <code>#51401 … #51600</code> |
-| <code>VPS\_FEEDRATE</code>                 | <code>  200</code> | <code>#51601 … #51800</code> |
-| <code>APPROX\_LENGTH</code>                | <code>  200</code> | <code>#51801 … #52000</code> |
-| <code>APPROX\_DIAMETER</code>              | <code>  200</code> | <code>#52001 … #52200</code> |
-| <code>EDGE\_MEASURE\_HEIGHT</code>         | <code>  200</code> | <code>#52201 … #52400</code> |
-| <code>TOOL\_TOLERANCE</code>               | <code>  200</code> | <code>#52401 … #52600</code> |
-| <code>PROBE\_TYPE</code>                   | <code>  200</code> | <code>#52601 … #52800</code> |
+```python
+
+```
+
+```
+| <code>Name</code>          |  <code>Size</code> | <code>Address</code>         |
+| --- | --- | --- |
+| <code>NULL</code> | <code>    1</code>| <code>     #    0    </code> |
+| <code>MACRO_ARGUMENTS</code> | <code>   33</code>| <code>#    1 … #   33</code> |
+| <code>GP_SAVED1</code> | <code>  100</code>| <code>#  100 … #  199</code> |
+| <code>GP_SAVED2</code> | <code>   50</code>| <code>#  500 … #  549</code> |
+| <code>PROBE_CALIBRATION1</code> | <code>    6</code>| <code>#  550 … #  555</code> |
+| <code>PROBE_R</code> | <code>    3</code>| <code>#  556 … #  558</code> |
+| <code>PROBE_CALIBRATION2</code> | <code>   22</code>| <code>#  559 … #  580</code> |
+| <code>GP_SAVED3</code> | <code>  119</code>| <code>#  581 … #  699</code> |
+| <code>GP_SAVED4</code> | <code>  200</code>| <code>#  800 … #  999</code> |
+| <code>INPUTS</code> | <code>   64</code>| <code># 1000 … # 1063</code> |
+| <code>MAX_LOADS_XYZAB</code> | <code>    5</code>| <code># 1064 … # 1068</code> |
+| <code>RAW_ANALOG</code> | <code>   10</code>| <code># 1080 … # 1089</code> |
+| <code>FILTERED_ANALOG</code> | <code>    8</code>| <code># 1090 … # 1097</code> |
+| <code>SPINDLE_LOAD</code> | <code>    1</code>| <code>     # 1098    </code> |
+| <code>MAX_LOADS_CTUVW</code> | <code>    5</code>| <code># 1264 … # 1268</code> |
+| <code>TOOL_TBL_FLUTES</code> | <code>  200</code>| <code># 1601 … # 1800</code> |
+| <code>TOOL_TBL_VIBRATION</code> | <code>  200</code>| <code># 1801 … # 2000</code> |
+| <code>TOOL_TBL_OFFSETS</code> | <code>  200</code>| <code># 2001 … # 2200</code> |
+| <code>TOOL_TBL_WEAR</code> | <code>  200</code>| <code># 2201 … # 2400</code> |
+| <code>TOOL_TBL_DROFFSET</code> | <code>  200</code>| <code># 2401 … # 2600</code> |
+| <code>TOOL_TBL_DRWEAR</code> | <code>  200</code>| <code># 2601 … # 2800</code> |
+| <code>ALARM</code> | <code>    1</code>| <code>     # 3000    </code> |
+| <code>T_MS</code> | <code>    1</code>| <code>     # 3001    </code> |
+| <code>T_HR</code> | <code>    1</code>| <code>     # 3002    </code> |
+| <code>SINGLE_BLOCK_OFF</code> | <code>    1</code>| <code>     # 3003    </code> |
+| <code>FEED_HOLD_OFF</code> | <code>    1</code>| <code>     # 3004    </code> |
+| <code>MESSAGE</code> | <code>    1</code>| <code>     # 3006    </code> |
+| <code>YEAR_MONTH_DAY</code> | <code>    1</code>| <code>     # 3011    </code> |
+| <code>HOUR_MINUTE_SECOND</code> | <code>    1</code>| <code>     # 3012    </code> |
+| <code>POWER_ON_TIME</code> | <code>    1</code>| <code>     # 3020    </code> |
+| <code>CYCLE_START_TIME</code> | <code>    1</code>| <code>     # 3021    </code> |
+| <code>FEED_TIMER</code> | <code>    1</code>| <code>     # 3022    </code> |
+| <code>CUR_PART_TIMER</code> | <code>    1</code>| <code>     # 3023    </code> |
+| <code>LAST_COMPLETE_PART_TIMER</code> | <code>    1</code>| <code>     # 3024    </code> |
+| <code>LAST_PART_TIMER</code> | <code>    1</code>| <code>     # 3025    </code> |
+| <code>TOOL_IN_SPIDLE</code> | <code>    1</code>| <code>     # 3026    </code> |
+| <code>SPINDLE_RPM</code> | <code>    1</code>| <code>     # 3027    </code> |
+| <code>PALLET_LOADED</code> | <code>    1</code>| <code>     # 3028    </code> |
+| <code>SINGLE_BLOCK</code> | <code>    1</code>| <code>     # 3030    </code> |
+| <code>AGAP</code> | <code>    1</code>| <code>     # 3031    </code> |
+| <code>BLOCK_DELETE</code> | <code>    1</code>| <code>     # 3032    </code> |
+| <code>OPT_STOP</code> | <code>    1</code>| <code>     # 3033    </code> |
+| <code>TIMER_CELL_SAFE</code> | <code>    1</code>| <code>     # 3196    </code> |
+| <code>TOOL_TBL_DIAMETER</code> | <code>  200</code>| <code># 3201 … # 3400</code> |
+| <code>TOOL_TBL_COOLANT_POSITION</code> | <code>  200</code>| <code># 3401 … # 3600</code> |
+| <code>M30_COUNT1</code> | <code>    1</code>| <code>     # 3901    </code> |
+| <code>M30_COUNT2</code> | <code>    1</code>| <code>     # 3902    </code> |
+| <code>LAST_BLOCK_G</code> | <code>   21</code>| <code># 4001 … # 4021</code> |
+| <code>LAST_BLOCK_ADDRESS</code> | <code>   26</code>| <code># 4101 … # 4126</code> |
+| <code>LAST_TARGET_POS</code> | <code>naxes</code>| <code>    # 5001…    </code> |
+| <code>MACHINE_POS</code> | <code>naxes</code>| <code>    # 5021…    </code> |
+| <code>MACHINE</code> | <code>naxes</code>| <code>    # 5021…    </code> |
+| <code>G53</code> | <code>naxes</code>| <code>    # 5021…    </code> |
+| <code>WORK_POS</code> | <code>naxes</code>| <code>    # 5041…    </code> |
+| <code>WORK</code> | <code>naxes</code>| <code>    # 5041…    </code> |
+| <code>SKIP_POS</code> | <code>naxes</code>| <code>    # 5061…    </code> |
+| <code>PROBE</code> | <code>naxes</code>| <code>    # 5061…    </code> |
+| <code>TOOL_OFFSET</code> | <code>   20</code>| <code># 5081 … # 5100</code> |
+| <code>G52</code> | <code>naxes</code>| <code>    # 5201…    </code> |
+| <code>G54</code> | <code>naxes</code>| <code>    # 5221…    </code> |
+| <code>G55</code> | <code>naxes</code>| <code>    # 5241…    </code> |
+| <code>G56</code> | <code>naxes</code>| <code>    # 5261…    </code> |
+| <code>G57</code> | <code>naxes</code>| <code>    # 5281…    </code> |
+| <code>G58</code> | <code>naxes</code>| <code>    # 5301…    </code> |
+| <code>G59</code> | <code>naxes</code>| <code>    # 5321…    </code> |
+| <code>TOOL_TBL_FEED_TIMERS</code> | <code>  100</code>| <code># 5401 … # 5500</code> |
+| <code>TOOL_TBL_TOTAL_TIMERS</code> | <code>  100</code>| <code># 5501 … # 5600</code> |
+| <code>TOOL_TBL_LIFE_LIMITS</code> | <code>  100</code>| <code># 5601 … # 5700</code> |
+| <code>TOOL_TBL_LIFE_COUNTERS</code> | <code>  100</code>| <code># 5701 … # 5800</code> |
+| <code>TOOL_TBL_LIFE_MAX_LOADS</code> | <code>  100</code>| <code># 5801 … # 5900</code> |
+| <code>TOOL_TBL_LIFE_LOAD_LIMITS</code> | <code>  100</code>| <code># 5901 … # 6000</code> |
+| <code>NGC_CF</code> | <code>    1</code>| <code>     # 6198    </code> |
+| <code>G154_P1</code> | <code>naxes</code>| <code>    # 7001…    </code> |
+| <code>G154_P2</code> | <code>naxes</code>| <code>    # 7021…    </code> |
+| <code>G154_P3</code> | <code>naxes</code>| <code>    # 7041…    </code> |
+| <code>G154_P4</code> | <code>naxes</code>| <code>    # 7061…    </code> |
+| <code>G154_P5</code> | <code>naxes</code>| <code>    # 7081…    </code> |
+| <code>G154_P6</code> | <code>naxes</code>| <code>    # 7101…    </code> |
+| <code>G154_P7</code> | <code>naxes</code>| <code>    # 7121…    </code> |
+| <code>G154_P8</code> | <code>naxes</code>| <code>    # 7141…    </code> |
+| <code>G154_P9</code> | <code>naxes</code>| <code>    # 7161…    </code> |
+| <code>G154_P10</code> | <code>naxes</code>| <code>    # 7181…    </code> |
+| <code>G154_P11</code> | <code>naxes</code>| <code>    # 7201…    </code> |
+| <code>G154_P12</code> | <code>naxes</code>| <code>    # 7221…    </code> |
+| <code>G154_P13</code> | <code>naxes</code>| <code>    # 7241…    </code> |
+| <code>G154_P14</code> | <code>naxes</code>| <code>    # 7261…    </code> |
+| <code>G154_P15</code> | <code>naxes</code>| <code>    # 7281…    </code> |
+| <code>G154_P16</code> | <code>naxes</code>| <code>    # 7301…    </code> |
+| <code>G154_P17</code> | <code>naxes</code>| <code>    # 7321…    </code> |
+| <code>G154_P18</code> | <code>naxes</code>| <code>    # 7341…    </code> |
+| <code>G154_P19</code> | <code>naxes</code>| <code>    # 7361…    </code> |
+| <code>G154_P20</code> | <code>naxes</code>| <code>    # 7381…    </code> |
+| <code>PALLET_PRIORITY</code> | <code>  100</code>| <code># 7501 … # 7600</code> |
+| <code>PALLET_STATUS</code> | <code>  100</code>| <code># 7601 … # 7700</code> |
+| <code>PALLET_PROGRAM</code> | <code>  100</code>| <code># 7701 … # 7800</code> |
+| <code>PALLET_USAGE</code> | <code>  100</code>| <code># 7801 … # 7900</code> |
+| <code>ATM_ID</code> | <code>    1</code>| <code>     # 8500    </code> |
+| <code>ATM_PERCENT</code> | <code>    1</code>| <code>     # 8501    </code> |
+| <code>ATM_TOTAL_AVL_USAGE</code> | <code>    1</code>| <code>     # 8502    </code> |
+| <code>ATM_TOTAL_AVL_HOLE_COUNT</code> | <code>    1</code>| <code>     # 8503    </code> |
+| <code>ATM_TOTAL_AVL_FEED_TIME</code> | <code>    1</code>| <code>     # 8504    </code> |
+| <code>ATM_TOTAL_AVL_TOTAL_TIME</code> | <code>    1</code>| <code>     # 8505    </code> |
+| <code>ATM_NEXT_TOOL_NUMBER</code> | <code>    1</code>| <code>     # 8510    </code> |
+| <code>ATM_NEXT_TOOL_LIFE</code> | <code>    1</code>| <code>     # 8511    </code> |
+| <code>ATM_NEXT_TOOL_AVL_USAGE</code> | <code>    1</code>| <code>     # 8512    </code> |
+| <code>ATM_NEXT_TOOL_HOLE_COUNT</code> | <code>    1</code>| <code>     # 8513    </code> |
+| <code>ATM_NEXT_TOOL_FEED_TIME</code> | <code>    1</code>| <code>     # 8514    </code> |
+| <code>ATM_NEXT_TOOL_TOTAL_TIME</code> | <code>    1</code>| <code>     # 8515    </code> |
+| <code>TOOL_ID</code> | <code>    1</code>| <code>     # 8550    </code> |
+| <code>TOOL_FLUTES</code> | <code>    1</code>| <code>     # 8551    </code> |
+| <code>TOOL_MAX_VIBRATION</code> | <code>    1</code>| <code>     # 8552    </code> |
+| <code>TOOL_LENGTH_OFFSETS</code> | <code>    1</code>| <code>     # 8553    </code> |
+| <code>TOOL_LENGTH_WEAR</code> | <code>    1</code>| <code>     # 8554    </code> |
+| <code>TOOL_DIAMETER_OFFSETS</code> | <code>    1</code>| <code>     # 8555    </code> |
+| <code>TOOL_DIAMETER_WEAR</code> | <code>    1</code>| <code>     # 8556    </code> |
+| <code>TOOL_ACTUAL_DIAMETER</code> | <code>    1</code>| <code>     # 8557    </code> |
+| <code>TOOL_COOLANT_POSITION</code> | <code>    1</code>| <code>     # 8558    </code> |
+| <code>TOOL_FEED_TIMER</code> | <code>    1</code>| <code>     # 8559    </code> |
+| <code>TOOL_TOTAL_TIMER</code> | <code>    1</code>| <code>     # 8560    </code> |
+| <code>TOOL_LIFE_LIMIT</code> | <code>    1</code>| <code>     # 8561    </code> |
+| <code>TOOL_LIFE_COUNTER</code> | <code>    1</code>| <code>     # 8562    </code> |
+| <code>TOOL_LIFE_MAX_LOAD</code> | <code>    1</code>| <code>     # 8563    </code> |
+| <code>TOOL_LIFE_LOAD_LIMIT</code> | <code>    1</code>| <code>     # 8564    </code> |
+| <code>THERMAL_COMP_ACC</code> | <code>    1</code>| <code>     # 9000    </code> |
+| <code>THERMAL_SPINDLE_COMP_ACC</code> | <code>    1</code>| <code>     # 9016    </code> |
+| <code>GVARIABLES3</code> | <code> 1000</code>| <code>#10000 … #10999</code> |
+| <code>INPUTS1</code> | <code>  256</code>| <code>#11000 … #11255</code> |
+| <code>OUTPUT1</code> | <code>  256</code>| <code>#12000 … #12255</code> |
+| <code>FILTERED_ANALOG1</code> | <code>   13</code>| <code>#13000 … #13012</code> |
+| <code>COOLANT_LEVEL</code> | <code>    1</code>| <code>     #13013    </code> |
+| <code>FILTERED_ANALOG2</code> | <code>   50</code>| <code>#13014 … #13063</code> |
+| <code>SETTING</code> | <code>10000</code>| <code>#20000 … #29999</code> |
+| <code>PARAMETER</code> | <code>10000</code>| <code>#30000 … #39999</code> |
+| <code>TOOL_TYP</code> | <code>  200</code>| <code>#50001 … #50200</code> |
+| <code>TOOL_MATERIAL</code> | <code>  200</code>| <code>#50201 … #50400</code> |
+| <code>CURRENT_OFFSET</code> | <code>  200</code>| <code>#50601 … #50800</code> |
+| <code>CURRENT_OFFSET2</code> | <code>  200</code>| <code>#50801 … #51000</code> |
+| <code>VPS_TEMPLATE_OFFSET</code> | <code>  100</code>| <code>#51301 … #51400</code> |
+| <code>WORK_MATERIAL</code> | <code>  200</code>| <code>#51401 … #51600</code> |
+| <code>VPS_FEEDRATE</code> | <code>  200</code>| <code>#51601 … #51800</code> |
+| <code>APPROX_LENGTH</code> | <code>  200</code>| <code>#51801 … #52000</code> |
+| <code>APPROX_DIAMETER</code> | <code>  200</code>| <code>#52001 … #52200</code> |
+| <code>EDGE_MEASURE_HEIGHT</code> | <code>  200</code>| <code>#52201 … #52400</code> |
+| <code>TOOL_TOLERANCE</code> | <code>  200</code>| <code>#52401 … #52600</code> |
+| <code>PROBE_TYPE</code> | <code>  200</code>| <code>#52601 … #52800</code> |
+```
 
 ---
 
 
-<a id="org226c735"></a>
+<a id="orge96148e"></a>
 
 ## Why:
 

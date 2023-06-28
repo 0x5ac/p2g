@@ -60,8 +60,8 @@ Usage:
 #         Show which p2g is running.
 #
 #      For maintenance:
-           p2g [options] stdvars [--txt=<txt>] [--dev=<dev>]
-                                 [--py=<py>] [--org=<org>]
+     p2g [options] stdvars [--txt=<txt>] [--dev=<dev>]
+                           [--py=<py>] [--org=<org>]
 #               Recreate internal files.
 
  Options:

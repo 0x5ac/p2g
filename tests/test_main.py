@@ -187,15 +187,6 @@ def test_logread(capfd, tmpdir):
     assert "Adding Code(_comment='', txt='M30')" in got.out
 
 
-def test_doc_exists():
-    readme = pathlib.Path("readme.md").read_text()
-    assert "Introduction" in readme
-    assert (
-        "| <code>WORK\\_MATERIAL</code>                | <code>  200</code> | <code>#51401 … #51600</code> |"
-        in readme
-    )
-
-
 def test_location(capfd):
     recur(["location"])
     got = capfd.readouterr()

@@ -116,7 +116,6 @@ good-names = "_,fn,el,ns,ch,i,n"
 ignore = ['tests']
 [tool.pytest.ini_options]
 
-testpaths="p2g/tests"
 filterwarnings = [
     "ignore:Module already imported so cannot be rewritten"
 ]

@@ -143,13 +143,13 @@ gitrel:
 	git push
 	git tag $(shell $(POETRY) version -s)
 	git push --tags
-	
-.PHONY:
 
-bump-inc:: pyproject.toml
+.PHONY:
+bump: pyproject.toml
+	$(POETRY) version patch
 	sed -i $(SRC_DIR)/__init__.py -e 'sX^VERSION.*XVERSION = "$(shell $(POETRY) version -s)"Xg'
 	sed -i $(DOC_DIR)/readme.org -e 'sX^\*\*\* Version.*X*** Version $(shell $(POETRY) version -s)Xg' 
-	$(POETRY) version patch
+
 
 .PHONY:
 build: clean compiled-doc lint

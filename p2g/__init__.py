@@ -19,9 +19,7 @@ from .coords import Var
 from .goto import goto
 
 # from .ptest import must_be
-from .ptest import check_golden
-from .ptest import check_golden_nodec
-from .ptest import must_be_cc
+
 from .scalar import Scalar
 from .stat import code
 from .stat import codenl

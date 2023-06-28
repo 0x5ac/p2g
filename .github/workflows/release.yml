@@ -24,7 +24,10 @@ jobs:
       run: |
         make dist
     - name: Send to pypi
+      env:
+        POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}    
       run: |
-        make publish
+       set
+       make publish
         
 

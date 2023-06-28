@@ -69,11 +69,9 @@ checks:
         classes_super_init_not_called: true
         classes_valid_slots: true
         code_rating: true
-        code_rating: true
         design_abstract_class_little_used: true
         design_abstract_class_not_used: true
         design_interface_not_implemented: true
-        duplicate_code: true
         duplicate_code: true
         exceptions_bad_except_order: true
         exceptions_bare_except: true

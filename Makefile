@@ -136,13 +136,13 @@ VERSION=$(shell cat pyproject.toml | grep "^version =" | sed 's:version = "\(.*\
 
 
 gitrel:
-	make bump
+#	make bump
 	make clean
 	make
 	git commit -m 'release' -a
-	git push
+	git push github
 	git tag v$(shell $(POETRY) version -s)
-	git push --tags
+	git push github --tags
 
 .PHONY:
 bump: pyproject.toml

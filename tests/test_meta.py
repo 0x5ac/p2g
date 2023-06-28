@@ -60,7 +60,7 @@ make_golden_path = golden_dir / "test_meta_test_native_transitory_golden.nc"
 
 # output file not there, so test fails,
 # but file is created
-@check_golden()
+@p2g.ptest.check_golden()
 def test_native_transitory_golden():
     CURSOR = p2g.Fixed(addr=100)
     CURSOR.x = 9
@@ -76,7 +76,7 @@ gold_compare_fail = golden_dir / "test_meta_test_native_gold_compare_fail.nc"
 # test when there is a file but its wrong.
 
 
-@check_golden()
+@p2g.ptest.check_golden()
 @pytest.mark.xfail
 def test_native_gold_compare_fail():
     # not going to match.

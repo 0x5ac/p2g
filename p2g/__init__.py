@@ -38,8 +38,7 @@ from .visible import base_addr
 from .visible import message
 from .visible import set_wcs
 
-
-fish__all__ = [
+__all__ = [
     "NAMES",
     "abs",
     "acos",
@@ -59,10 +58,6 @@ fish__all__ = [
     "Fixed",
     "Var",
     "goto",
-    "check_golden",
-    "check_golden_nodec",
-    "must_be",
-    "must_be_cc",
     "Scalar",
     "code",
     "codenl",

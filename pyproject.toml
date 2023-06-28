@@ -1,7 +1,5 @@
 [tool.poetry]
 
-
-
 name = "p2g"
 version = "0.2.16"
 description = "Transpile python into cnc gcode."
@@ -23,17 +21,13 @@ homepage = 'https://github.com/0x5ac/p2g'
 packages = [
     { include = "p2g",    format = "sdist"},
 ]
-exclude = ["p2g/doc/*.tmp"]
-
 
 
 [tool.poetry.dependencies]
-
 python = "^3.10"
-docopt = "^0.6.2"
-
 typeguard = "^3.0.2"
 rich = "^13.3.4"
+docopt = "^0.6.2"
 
 [tool.poetry.scripts]
 p2g = "p2g.main:main"
@@ -42,7 +36,6 @@ p2g = "p2g.main:main"
 pytest = {extras = ["all"], version = "^7.3.1"}
 pytest-cov = "^4.0.0"
 coverage = "^7.2.3"
-
 mypy = "^1.2.0"
 pylint = "^2.17.2"
 pydeps = "^1.12.1"
@@ -63,6 +56,7 @@ pyright = "^1.1.314"
 ignore_missing = [ "csearch" , "defs", "pytest" ]
 ignore_obsolete = [  "typeguard" ]
 extend_exclude = [ 'p2g/tests' ] 
+
 [tool.pyright]
 disable = "N802"
 ignore = ["N802"]
@@ -82,7 +76,6 @@ src_paths = ["p2g","tests"]
 skip = ["tests/test_meta.py"]
 
 
-
 [tool.black]
 line-length=90
 
@@ -93,7 +86,6 @@ exclude= [ "p2g/tests" , "p2g/doc", "p2g/examples"]
 
 [tool.pydocstyle]
 ignore  = "D103,D101,D107,D100,D102,D105, D104"
-
 
 
 [build-system]
@@ -136,14 +128,13 @@ addopts="-p no:pylama -p no:pytest_pylama --cov=p2g --cov-append --tb=short -m '
 
 [tool.coverage.run]
 
-#include = ["p2g/*.py"]
 
 
 [tool.coverage.report]
 include = ["p2g/*.py"]
 exclude_lines = ["NotImplemented", "AssertionError", "for debug",  "no cover","@(abc\\.)?abstractmethod" ]
 
-omit = ["p2g/tests/*.py","p2g/examples/*.py","p2g/__main__.py"]
+omit = ["tests/*.py","examples/*.py","p2g/__main__.py"]
 
 
 [tool.flake8]

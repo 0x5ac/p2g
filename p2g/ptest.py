@@ -35,6 +35,8 @@ def make_file_path(func, new_suffix) -> pathlib.Path:
         if (tests_dir / "golden").exists():
             break
     else:  # pragma: no cover
+        breakpoint()
+
         err.compiler("can't find tests")
 
     # generated_dir <- <somewhere>/tests/golden

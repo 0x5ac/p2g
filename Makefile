@@ -1,4 +1,3 @@
-CWD=$(shell  pwd)
 SRC_DIR=./p2g
 DOC_DIR=./doc
 EXAMPLE_DIR=./examples
@@ -6,6 +5,8 @@ TESTS_DIR=./tests
 EMACS?=emacs
 POETRY=poetry 
 PR=$(POETRY) run
+PG=$(POETRY) run
+#PG=python -m 
 COVERAGE=$(PR) coverage
 
 PYTEST=$(PR) pytest --cov=$(SRC_DIR) --cov-append
@@ -69,7 +70,7 @@ poetry-install: .poetry_and_deps_installed
 	$(ECHO) Poetry installed.
 
 .poetry_and_deps_installed: readme.md
-	python -m poetry install
+	$(POETRY) install
 	touch $@
 
 
@@ -81,19 +82,19 @@ compiled-examples:
 	$(ECHO) Examples ready.
 
 %.nc:%.py 
-	$(PR) p2g gen $<  $@
+	$(PG) p2g gen $<  $@
 
 ######################################################################
 # Doc and machine generated headers.
 
 $(SRC_DIR)/haas.py: $(SRC_DIR)/makestdvars.py 
-	$(PR) p2g stdvars --py=$@ 
+	$(PG) p2g stdvars --py=$@ 
 
 $(DOC_DIR)/haas.txt: p2g/makestdvars.py
-	$(PR) p2g stdvars --txt=$@ 
+	$(PG) p2g stdvars --txt=$@ 
 
 $(DOC_DIR)/haas.org: $(SRC_DIR)/makestdvars.py
-	$(PR) p2g stdvars --org=$@ 
+	$(PG) p2g stdvars --org=$@ 
 
 HAVE_EMACS=$(and  $(shell which $(EMACS)),$(wildcard $(OX_GFM_DIR)/*),1)
 

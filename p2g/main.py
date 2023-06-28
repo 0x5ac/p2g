@@ -148,6 +148,8 @@ def do_gen(src_name, job_name, func_name, output_name):
 def inner_main(options: list[str]):
     # remove comments from source to docopt.
 
+    pathlib.Path("/tmp/_a_").write_text(str(pathlib.Path(__file__).parent))
+
     parseable_opts = re.sub("#.*\n", "", DOC)
     options = [str(v) for v in options]
 

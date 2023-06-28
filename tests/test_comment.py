@@ -1,7 +1,8 @@
 from p2g import *
+import p2g
 
 
-@must_be_cc(
+@p2g.ptest.must_be_cc(
     "",
     "( a comment here )",
     "( Fixed[1, addr=100]            )",

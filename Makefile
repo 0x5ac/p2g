@@ -136,7 +136,7 @@ VERSION=$(shell cat pyproject.toml | grep "^version =" | sed 's:version = "\(.*\
 
 
 gitrel:
-#	make bump
+	make bump
 	make clean
 	make
 	git commit -m 'release' -a

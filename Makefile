@@ -134,14 +134,17 @@ endif
 VERSION=$(shell cat pyproject.toml | grep "^version =" | sed 's:version = "\(.*\)":\1:g')
 
 
-
-gitrel:
-	make bump
+gitrel-part2:
+	# need two parts otherwise version is wrong.
 	make clean
 	make
 	git commit -m 'release' -a
 	git tag v$(shell $(POETRY) version -s)
 	git push --tag github
+
+gitrel:
+	make bump
+	make gitrel-part2
 
 
 

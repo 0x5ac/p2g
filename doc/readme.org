@@ -3,20 +3,18 @@
 #+TITLE: p2g - Python 2 G-code
 #+AUTHOR: sac@0x5ac.com
 
-#+OPTIONS: num:3
 
 -----------------------------------
 [[file:https://codecov.io/gh/0x5ac/p2g/branch/master/graph/badge.svg?token=FKR0R7P8U1]]
 [[file:https://img.shields.io/badge/License-MIT%20v3-blue.svg]]
 [[file:https://github.com/0x5ac/p2g/actions/workflows/build.yml/badge.svg]]
 
+*** Version 0.2.29
 * p2g - Python 2 G-code
 -----------------------------------
 
-*** Version 0.2.29
 
-
-** Introduction
+** Introduction.
 Many styli died to bring us this information.
 
 This project makes it simpl(er) to ensure that
@@ -36,9 +34,11 @@ compilation can be used in the source, classes, dicts, and so on.
 It comes with a set of macro variable definitions for a Haas mill with
 NCD.  And a few example settings for my own VF-3SSYT.
 -----------------------------------
-#+TOC: headlines 10 
+#+TOC:  headlines:2
+
+
 -----------------------------------
-** Usage:
+** Usage.
 #+NAME: usage
 #+BEGIN_SRC python  :eval always :exports results :results output  :python poetry run p2g help
 
@@ -284,7 +284,7 @@ Example:
   M30
 #+end_example
 -----------------------------------
-** Coordinates
+** Coordinates.
 
 Describe position, with axis by location, in sequence or by name.
 #+NAME: co1

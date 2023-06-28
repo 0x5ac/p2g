@@ -113,7 +113,7 @@ disable = [
 ]
 
 good-names = "_,fn,el,ns,ch,i,n"
-ignore = ['tests']
+#ignore = ['tests']
 [tool.pytest.ini_options]
 
 filterwarnings = [

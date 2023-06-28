@@ -1,4 +1,3 @@
-from p2g import *
 import p2g
 
 
@@ -12,7 +11,7 @@ import p2g
 )
 def test_comment0():
     # causes blank line before
-    comment("a comment here")
-    Fixed(1, addr=100)
-    com("no blank")
-    Fixed(1, addr=100)
+    p2g.comment("a comment here")
+    p2g.Fixed(1, addr=100)
+    p2g.com("no blank")
+    p2g.Fixed(1, addr=100)

@@ -3,15 +3,15 @@
 ![img](https://codecov.io/gh/0x5ac/p2g/branch/master/graph/badge.svg?token=FKR0R7P8U1) ![img](https://img.shields.io/badge/License-MIT%20v3-blue.svg) ![img](https://github.com/0x5ac/p2g/actions/workflows/build.yml/badge.svg)
 
 
+### Version 0.2.29
+
+
 # p2g - Python 2 G-code
 
 ---
 
 
-### Version 0.2.29
-
-
-## Introduction
+## Introduction.
 
 Many styli died to bring us this information.
 
@@ -28,27 +28,26 @@ It comes with a set of macro variable definitions for a Haas mill with NCD. And 
 
 # Table of Contents
 
-1.  [p2g - Python 2 G-code](#orga2cb93f)
-        1.  [Version 0.2.29](#org1b05e9c)
-    1.  [Introduction](#org00fe1c8)
-    2.  [Usage:](#org3a8cfee)
-    3.  [Install:](#org66bb2be)
-    4.  [A taste.](#org7df2644)
-    5.  [Variables](#org246382c)
-    6.  [Coordinates](#org5da14f5)
-    7.  [Expressions](#orgb91204d)
-    8.  [Axes](#org0d66bd9)
-    9.  [Goto.](#orgaca3657)
-    10. [Printing](#org17336e9)
-    11. [Symbol Tables.](#org3fe0958)
-    12. [Notes.](#orgdaaf25c)
-    13. [HAAS macro var definitions](#org595de7e)
-    14. [Why:](#org0fa9b58)
+1.  [p2g - Python 2 G-code](#orge3f03f6)
+    1.  [Introduction.](#orgc57e7d5)
+    2.  [Usage.](#org48bf470)
+    3.  [Install:](#org4213164)
+    4.  [A taste.](#orgaa076ab)
+    5.  [Variables](#orgc8a01c1)
+    6.  [Coordinates.](#orgcb3a9e7)
+    7.  [Expressions](#org055e689)
+    8.  [Axes](#org60cce48)
+    9.  [Goto.](#org9f332ea)
+    10. [Printing](#org133580b)
+    11. [Symbol Tables.](#orgc9b3757)
+    12. [Notes.](#org68b44ad)
+    13. [HAAS macro var definitions](#org3c0f6ec)
+    14. [Why:](#org0bdcc4c)
 
 ---
 
 
-## Usage:
+## Usage.
 
 ```
 Turns a python program into a gcode program.
@@ -296,7 +295,7 @@ def ex2():
 ---
 
 
-## Coordinates
+## Coordinates.
 
 Describe position, with axis by location, in sequence or by name.
 

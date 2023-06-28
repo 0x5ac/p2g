@@ -12,18 +12,18 @@
 <file:https://github.com/0x5ac/p2g/actions/workflows/build.yml/badge.svg>
 
 
+0.0.1 Version 0.2.29
+--------------------
+
+
 1 p2g - Python 2 G-code
 =======================
 
   ----------------------------------------------------------------------
 
 
-1.0.1 Version 0.2.29
---------------------
-
-
-1.1 Introduction
-~~~~~~~~~~~~~~~~
+1.1 Introduction.
+~~~~~~~~~~~~~~~~~
 
   Many styli died to bring us this information.
 
@@ -48,13 +48,12 @@
   _________________
 
   1. p2g - Python 2 G-code
-  ..... 1. Version 0.2.29
-  .. 1. Introduction
-  .. 2. Usage:
+  .. 1. Introduction.
+  .. 2. Usage.
   .. 3. Install:
   .. 4. A taste.
   .. 5. Variables
-  .. 6. Coordinates
+  .. 6. Coordinates.
   .. 7. Expressions
   .. 8. Axes
   .. 9. Goto.
@@ -63,10 +62,12 @@
   .. 12. Notes.
   .. 13. HAAS macro var definitions
   .. 14. Why:
+
+
   ----------------------------------------------------------------------
 
 
-1.2 Usage:
+1.2 Usage.
 ~~~~~~~~~~
 
   ,----
@@ -315,8 +316,8 @@
   ----------------------------------------------------------------------
 
 
-1.6 Coordinates
-~~~~~~~~~~~~~~~
+1.6 Coordinates.
+~~~~~~~~~~~~~~~~
 
   Describe position, with axis by location, in sequence or by name.
   ,----

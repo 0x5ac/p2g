@@ -141,14 +141,21 @@ gitrel:
 	make
 	git commit -m 'release' -a
 	git tag v$(shell $(POETRY) version -s)
-#	git push github
+	git push --tag github
+
 
 
 .PHONY:
-bump: pyproject.toml
+update-pyproject:
+	# can't be with other lines cause of staleness
 	$(POETRY) version patch
+.PHONY:
+update-src:
 	sed -i $(SRC_DIR)/__init__.py -e 'sX^VERSION.*XVERSION = "$(shell $(POETRY) version -s)"Xg'
 	sed -i $(DOC_DIR)/readme.org -e 'sX^\*\*\* Version.*X*** Version $(shell $(POETRY) version -s)Xg' 
+
+.PHONY:
+bump: update-pyproject update-src pyproject.toml
 
 
 .PHONY:

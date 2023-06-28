@@ -13,7 +13,7 @@
 * p2g - Python 2 G-code
 -----------------------------------
 
-*** Version 0.2.24
+*** Version 0.2.27
 
 
 ** Introduction

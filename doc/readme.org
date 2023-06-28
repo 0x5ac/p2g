@@ -6,14 +6,14 @@
 #+OPTIONS: num:3
 
 -----------------------------------
-[[file:https://codecov.io/gh/0x5ac/p2g][file:https://codecov.io/gh/0x5ac/p2g/branch/master/graph/badge.svg?token=FKR0R7P8U1]] *
-[[file:https://img.shields.io/badge/License-MIT%20v3-blue.svg]] *
+[[file:https://codecov.io/gh/0x5ac/p2g/branch/master/graph/badge.svg?token=FKR0R7P8U1]]
+[[file:https://img.shields.io/badge/License-MIT%20v3-blue.svg]]
 [[file:https://github.com/0x5ac/p2g/actions/workflows/build.yml/badge.svg]]
 
 * p2g - Python 2 G-code
 -----------------------------------
 
-*** Version 0.2.22
+*** Version 0.2.23
 
 
 ** Introduction

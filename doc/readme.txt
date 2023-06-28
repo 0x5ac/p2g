@@ -7,13 +7,9 @@
 
 
 ------------------------------------------------------------------------
-[file:https://codecov.io/gh/0x5ac/p2g/branch/master/graph/badge.svg?token=FKR0R7P8U1]
-* <file:https://img.shields.io/badge/License-MIT%20v3-blue.svg> *
+<file:https://codecov.io/gh/0x5ac/p2g/branch/master/graph/badge.svg?token=FKR0R7P8U1>
+<file:https://img.shields.io/badge/License-MIT%20v3-blue.svg>
 <file:https://github.com/0x5ac/p2g/actions/workflows/build.yml/badge.svg>
-
-
-[file:https://codecov.io/gh/0x5ac/p2g/branch/master/graph/badge.svg?token=FKR0R7P8U1]
-<file:https://codecov.io/gh/0x5ac/p2g>
 
 
 1 p2g - Python 2 G-code
@@ -22,7 +18,7 @@
   ----------------------------------------------------------------------
 
 
-1.0.1 Version 0.2.22
+1.0.1 Version 0.2.23
 --------------------
 
 
@@ -52,7 +48,7 @@
   _________________
 
   1. p2g - Python 2 G-code
-  ..... 1. Version 0.2.22
+  ..... 1. Version 0.2.23
   .. 1. Introduction
   .. 2. Usage:
   .. 3. Install:

@@ -1,6 +1,6 @@
 ---
 
-[![img](https://codecov.io/gh/0x5ac/p2g/branch/master/graph/badge.svg?token=FKR0R7P8U1)](https://codecov.io/gh/0x5ac/p2g) \* ![img](https://img.shields.io/badge/License-MIT%20v3-blue.svg) \* ![img](https://github.com/0x5ac/p2g/actions/workflows/build.yml/badge.svg)
+![img](https://codecov.io/gh/0x5ac/p2g/branch/master/graph/badge.svg?token=FKR0R7P8U1) ![img](https://img.shields.io/badge/License-MIT%20v3-blue.svg) ![img](https://github.com/0x5ac/p2g/actions/workflows/build.yml/badge.svg)
 
 
 # p2g - Python 2 G-code
@@ -8,7 +8,7 @@
 ---
 
 
-### Version 0.2.22
+### Version 0.2.23
 
 
 ## Introduction
@@ -28,22 +28,22 @@ It comes with a set of macro variable definitions for a Haas mill with NCD. And 
 
 # Table of Contents
 
-1.  [p2g - Python 2 G-code](#org97537e5)
-        1.  [Version 0.2.22](#org17aeb90)
-    1.  [Introduction](#org08951b6)
-    2.  [Usage:](#org34c65c6)
-    3.  [Install:](#org9eea24e)
-    4.  [A taste.](#org8a12284)
-    5.  [Variables](#org033c093)
-    6.  [Coordinates](#org18b173e)
-    7.  [Expressions](#org0fdb1fb)
-    8.  [Axes](#org0ea5706)
-    9.  [Goto.](#org63b7d90)
-    10. [Printing](#org6c54aa6)
-    11. [Symbol Tables.](#orga5a5310)
-    12. [Notes.](#orgb1c4a6b)
-    13. [HAAS macro var definitions](#orgb68e01e)
-    14. [Why:](#orge56e4ae)
+1.  [p2g - Python 2 G-code](#org64a9bad)
+        1.  [Version 0.2.23](#org31ace24)
+    1.  [Introduction](#orgf7287c7)
+    2.  [Usage:](#org9b607e3)
+    3.  [Install:](#org8fc1ca3)
+    4.  [A taste.](#org5e4d51b)
+    5.  [Variables](#org2c28f9b)
+    6.  [Coordinates](#org1de9142)
+    7.  [Expressions](#org3bc9906)
+    8.  [Axes](#orgaf736fa)
+    9.  [Goto.](#orgd79ef1d)
+    10. [Printing](#org70e7526)
+    11. [Symbol Tables.](#org3c13d53)
+    12. [Notes.](#org9dc78ed)
+    13. [HAAS macro var definitions](#orgec40f11)
+    14. [Why:](#org18b6efa)
 
 ---
 

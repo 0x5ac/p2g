@@ -7,6 +7,7 @@ import sys
 from p2g.main import main
 from p2g.main import nrecur
 from p2g.main import recur
+import p2g
 
 
 def write_func(tmpdir: pathlib.Path):
@@ -21,26 +22,6 @@ def write_func(tmpdir: pathlib.Path):
     return tmpfile
 
 
-# sys.path.insert(0, ".")
-# sys.path.insert(0, "..")
-
-
-# def f(name):
-#     with p2g.lib.openw("-") as j:
-#         print("FISH", file=j)
-#         breakpoint()
-#     with p2g.lib.openw("-") as j:
-#         print("FISH", file=j)
-
-
-# def test_native_job_capfd_tmpdir_stdout(capfd):
-#     breakpoint()
-#     f("Tom")
-
-#     out, err = capfd.readouterr()
-#     assert out == "FISH\nFISH\n"
-
-
 def test_native_job_capfd_tmpdir_stdout(capfd, tmpdir):
     tmpfile = write_func(tmpdir)
     recur(["--job=O123", "--narrow", "gen", tmpfile, "-"])
@@ -48,12 +29,18 @@ def test_native_job_capfd_tmpdir_stdout(capfd, tmpdir):
     assert "O123" in tmpdata.out
 
 
+def check_version_str(vstr):
+    parts = vstr.split(".")
+    assert len(parts) > 2
+    assert parts[0].isdigit()
+
+
 def test_native_version_capfd(capfd):
     sys.argv = ["p2g", "version"]
 
     main()
     got = capfd.readouterr()
-    assert "Version: p2g" in got.out
+    check_version_str(got.out)
 
 
 def test_native_job_tmpdir(tmpdir):
@@ -147,7 +134,7 @@ def test_native_capfd_tmpdir_stdout(capfd, tmpdir):
 def test_native_logger_capfd_setup(capfd):
     recur(["version"])
     got = capfd.readouterr()
-    assert "Version:" in got.out
+    check_version_str(got.out)
 
 
 # @pytest.mark.skip
@@ -168,9 +155,15 @@ def test_native_capfd_help(capfd):
 
 
 def test_native_capfd_doc(capfd):
+    recur(["doc", "all"])
+    got = capfd.readouterr()
+    assert "Many styli" in got.out
+
+
+def test_native_doc_no_where(capfd):
     recur(["doc"])
     got = capfd.readouterr()
-    assert "P2G - PYTHON 2 G-CODE" in got.out
+    assert "Usage:" in got.out
 
 
 def test_logread(capfd, tmpdir):
@@ -188,6 +181,24 @@ def test_logread(capfd, tmpdir):
 
 
 def test_location(capfd):
+    sys.argv = ["somewhere"]
     recur(["location"])
+
     got = capfd.readouterr()
-    assert "/p2g" in got.out
+    assert "somewhere" in got.out
+
+
+def test_version_bump0(capfd):
+    p2g.VERSION = "1.2.3+7"
+    recur(["version", "--bump=3"])
+    got = capfd.readouterr()
+    print(got.out)
+    assert got.out == "1.2.3+8\n"
+
+
+def test_version_bump1(capfd):
+    p2g.VERSION = "1.2.3"
+    recur(["version", "--bump=3"])
+    got = capfd.readouterr()
+    print(got.out)
+    assert got.out == "1.2.3+1\n"

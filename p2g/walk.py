@@ -38,7 +38,7 @@ def handle_assign(self, target, val):
         self.visit_store(target, val)
         return
 
-    src_gen = iter(val)
+    src_gen = iter(val)  # pytype: disable=wrong-arg-types
     try:
         for dst_idx, dst_el in enumerate(target.elts):
             if isinstance(dst_el, ast.Starred):

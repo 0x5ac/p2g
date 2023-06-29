@@ -1,6 +1,4 @@
-VERSION=$(shell cat pyproject.toml | grep "^version =" | sed 's:version = "\(.*\)":\1:g')
-
-
+PATH=$(HOME)/.local/bin:/usr/bin
 SRC_DIR=./p2g
 DOC_DIR=./doc
 EXAMPLE_DIR=./examples
@@ -10,6 +8,9 @@ POETRY=poetry
 PR=$(POETRY) run
 P2G_SCRIPT=$(POETRY) run p2g
 
+THIS_VERSION=$(shell $(P2G_SCRIPT) version)
+NEXT_VERSION=$(shell $(P2G_SCRIPT) version  --bump 3)
+
 #PG=python -m 
 COVERAGE=$(PR) coverage
 
@@ -18,7 +19,9 @@ PYTEST=$(PR) pytest
 OX_GFM_DIR=~/.emacs.d/straight/build/ox-gfm
 
 
-ECHO=@ echo
+TITLE=@ echo
+MAYLOG=@
+HR=@echo  "********************************************************"
 ######################################################################
 
 GENERATED_SRC=$(SRC_DIR)/haas.py
@@ -65,40 +68,51 @@ COMPILED_DOC=\
 CONTROL_FILES=Makefile pyproject.toml .scrutinizer.yml 
 ALL_FOR_DIST=$(CONTROL_FILES) $(COMPILED_EXAMPLES)  $(COMPILED_DOC) $(GENERATED_SRC) $(SRC)
 
-top: poetry-install $(ALL_FOR_DIST)
-	$(ECHO) Ready for build dist.
+top: install-tools $(ALL_FOR_DIST) test
+	$(HR)
+	$(TITLE) Ready for build dist.
+	$(TITLE) 
+	
 ######################################################################
 # Init environment
 
 
 .PHONY:
-poetry-install: .poetry_installed .deps_installed
-	$(ECHO) Poetry installed.
+install-tools: .poetry_installed .deps_installed
+
 
 .deps_installed:
-	$(POETRY) install
-	touch $@
+	$(HR)
+	$(TITLE)
+	$(TITLE)  Install dependencies.
+	$(POETRY) -q install
+	$(MAYLOG)	touch $@
+
 
 .PHONY:
-download_poetry1:
-	- pip install --upgrade tox
-	- pip install --upgrade poetry
-.PHONY:
-download_poetry2:
-	curl -sSL https://install.python-poetry.org | python3 -	 --force
+install-poetry:
+	$(HR)
+	$(TITLE)
+	$(TITLE) Install poetry using pip.
+	pip install -q --force-reinstall --user --upgrade poetry
+	pip install -q --force-reinstall --user --upgrade tox
+
 
 .poetry_installed:
-	if [ ! $$(which poetry) ] ; then make download_poetry1 ; fi
-	if [ ! $$(which poetry) ] ; then make download_poetry2 ; fi	
-	touch $@
-
+	$(HR)
+	$(MAYLOG) if [ ! $$(which poetry) ] ; then make install-poetry ; fi
+	$(MAYLOG) 	touch $@
+	$(TITLE)
+	$(TITLE) Poetry installed in $$(which poetry)
 
 
 ######################################################################
 # Examples.
 .PHONY:
-compiled-examples: 
-	$(ECHO) Examples ready.
+compiled-examples:
+	$(HR)
+	$(TITLE)
+	$(TITLE) Examples ready.
 
 %.nc:%.py 
 	$(P2G_SCRIPT) gen $<  $@
@@ -119,10 +133,11 @@ HAVE_EMACS=$(and  $(shell which $(EMACS)),$(wildcard $(OX_GFM_DIR)/*),1)
 
 VPATH=$(DOC_DIR)
 
+
 ifeq ($(HAVE_EMACS),1)
 ELCOMMON=  --directory $(OX_GFM_DIR)					\
            -q 								\
-           --batch 							\
+           --batch                                                      \
            --eval  "(require 'ox-ascii)"				\
            --eval "(require 'ox-gfm)"					\
            --eval "(setq org-confirm-babel-evaluate nil)"		\
@@ -150,8 +165,17 @@ endif
 
 ######################################################################
 # release:
+#   first check for sanity.
 
+.PHONY:
+test: .tested_ok
 
+.tested_ok: $(ALL_FOR_DIST)
+	$(HR)
+	$(TITLE) Run pytest and coverage.
+	$(PYTEST)
+	$(COVERAGE) lcov -q
+	$(MAYLOG) touch $@
 
 gitrel-part2:
 	# need two parts otherwise version is wrong.
@@ -169,11 +193,13 @@ gitrel:
 update-pyproject:
 	# can't be with other lines cause of staleness
 	$(POETRY) version patch
-
 .PHONY:
+.ONESHELL: 
 update-src:
-	sed -i $(SRC_DIR)/__init__.py -e 'sX^VERSION.*XVERSION = "$(shell $(POETRY) version -s)"Xg'
-	sed -i $(DOC_DIR)/readme.org -e 'sX^\*\*\* Version.*X*** Version $(shell $(POETRY) version -s)Xg' 
+	echo $(THIS_VERSION)
+	echo $(NEXT_VERSION)
+#	sed -i $(SRC_DIR)/__init__.py -e 'sX^VERSION.*XVERSION = "$(NEXT_VERSION)"Xg'
+	sed -i $(DOC_DIR)/readme.org -e 'sX^Version.*X*** Version $(NEXT_VERSION)Xg' 
 
 .PHONY:
 bump: update-pyproject update-src pyproject.toml
@@ -189,7 +215,7 @@ publish:dist/p2g-$(VERSION).tar.gz
 
 .PHONY:
 dist: dist/p2g-$(VERSION).tar.gz
-	$(ECHO) Dist made.
+	$(TITLE) Dist made.
 
 
 dist/p2g-$(VERSION).tar.gz: pyproject.toml   $(ALL_FOR_DIST)
@@ -200,22 +226,7 @@ dist/p2g-$(VERSION).tar.gz: pyproject.toml   $(ALL_FOR_DIST)
 	$(POETRY) build
 	@ rm -rf  $(SRC_DIR)/doc $(SRC_DIR)/examples
 
-.PHONY:
-test-standard:
-	$(PYTEST) 
-
-.PHONY:
-coverage-reset:
-	rm -f .coverage
-.PHONY:
-coverage-convert:
-	$(COVERAGE) lcov -q
-.PHONY:
-coverage-report:
-	$(COVERAGE) report
-
-.PHONY:
-test: | top coverage-reset     test-standard coverage-convert
+ 
 
 
 ######################################################################
@@ -246,6 +257,7 @@ ruff:
 	 $(PR) ruff check  p2g | cat
 .PHONY:
 clean:
+	if [  $$(which p2g) ] ; then rm -f $$(which p2g); fi
 	git clean -fdx
 	rm -f $(COMPILED_EXAMPLES)
 
@@ -253,16 +265,36 @@ clean:
 cleanup: isort ssort autoflake
 
 .PHONY:
-checkdeps:
+deptry:
 	$(PR) deptry .
 
 
 .PHONY:
-lint: pyright mypy  flake8 pylint  ruff  checkdeps
+lint: pyright mypy  flake8 pylint  ruff  deptry  pytype
 
 
+.PHONY:
+pytype:
+	@# needs python < 3.11 
+	@#	pytype p2g
 
 
+# remove poetry and env and try from scratch
+.PHONY:
+TMPDIR=/tmp/pg2
+ab-initio: kill-env
+	rm -rf $(TMPDIR)
+	git clone hub:repos/vf3/p2g $(TMPDIR)
+	cd $(TMPDIR)
+	make
+
+
+kill-env:
+	pip -q uninstall -y p2g poetry
+	rm -rf ~/.cache/pypoetry/cache
+	rm -rf ~/.cache/pypoetry/virtualenvs
+	if [  $$(which poetry) ] ; then rm -f $$(which poetry); fi
+	if [  $$(which poetry) ] ; then rm -f $$(which poetry)  ; fi
 
 # Build my wips
 mall:
@@ -279,4 +311,6 @@ NSRC_DIR=/home/sac/vf3/progs/p2g/examples
 wip:  wip-probe
 
 wip-probe: $(DSTDIR)/.mark-probecalibrate
+
+
 

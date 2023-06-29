@@ -29,17 +29,20 @@ typeguard = "^3.0.2"
 rich = "^13.3.4"
 docopt = "^0.6.2"
 
+
 [tool.poetry.scripts]
 p2g = "p2g.main:main"
 
 [tool.poetry.group.dev.dependencies]
 pytest = {extras = ["all"], version = "^7.3.1"}
 pytest-cov = "^4.0.0"
+mypy = "^1.4.1"
+deptry = "^0.12.0"
 
 [tool.deptry]
-ignore_missing = [ "csearch" , "defs", "pytest" ]
-ignore_obsolete = [  "typeguard" ]
-extend_exclude = [ 'p2g/tests' ] 
+
+
+extend_exclude = [ 'tests' ,'examples']
 
 [tool.pyright]
 disable = "N802"
@@ -139,7 +142,7 @@ count = true
 [tool.ruff]
 ignore = [ "E501" ]
 ignore-init-module-imports = true
-exclude= [ "p2g/tests" , "p2g/doc", "p2g/examples"] 
+exclude= [ "p2g/__main__.py"]
 
 ################################################################################
 

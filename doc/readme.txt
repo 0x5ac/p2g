@@ -12,18 +12,14 @@
 <file:https://github.com/0x5ac/p2g/actions/workflows/build.yml/badge.svg>
 
 
-0.0.1 Version 0.2.30.0
+0.0.1 Version 0.2.42+7
 ----------------------
-
-
-1 p2g - Python 2 G-code
-=======================
 
   ----------------------------------------------------------------------
 
 
-1.1 Introduction.
-~~~~~~~~~~~~~~~~~
+1 Introduction.
+===============
 
   Many styli died to bring us this information.
 
@@ -43,32 +39,31 @@
 
   It comes with a set of macro variable definitions for a Haas mill with
   NCD.  And a few example settings for my own VF-3SSYT.
+
   ----------------------------------------------------------------------
   Table of Contents
   _________________
 
-  1. p2g - Python 2 G-code
-  .. 1. Introduction.
-  .. 2. Usage.
-  .. 3. Install:
-  .. 4. A taste.
-  .. 5. Variables
-  .. 6. Coordinates.
-  .. 7. Expressions
-  .. 8. Axes
-  .. 9. Goto.
-  .. 10. Printing
-  .. 11. Symbol Tables.
-  .. 12. Notes.
-  .. 13. HAAS macro var definitions
-  .. 14. Why:
-
+  1. Introduction.
+  2. Usage.
+  3. Install:
+  4. A taste.
+  5. Variables
+  6. Coordinates.
+  7. Expressions
+  8. Axes
+  9. Goto.
+  10. Printing
+  11. Symbol Tables.
+  12. Notes.
+  13. HAAS macro var definitions
+  14. Why:
 
   ----------------------------------------------------------------------
 
 
-1.2 Usage.
-~~~~~~~~~~
+2 Usage.
+========
 
   ,----
   | Turns a python program into a gcode program.
@@ -130,11 +125,12 @@
   |            --verbose          Too much.
   |            --logio            Even more.
   `----
+
   ----------------------------------------------------------------------
 
 
-1.3 Install:
-~~~~~~~~~~~~
+3 Install:
+==========
 
   ,----
   | $ pip install p2g
@@ -171,15 +167,11 @@
   |   M30
   `----
 
-
-
-
-
   ----------------------------------------------------------------------
 
 
-1.4 A taste.
-~~~~~~~~~~~~
+4 A taste.
+==========
 
   ,----
   | from p2g import *
@@ -253,8 +245,8 @@
   ----------------------------------------------------------------------
 
 
-1.5 Variables
-~~~~~~~~~~~~~
+5 Variables
+===========
 
   + Give names to macro variables at a known address:
 
@@ -316,8 +308,8 @@
   ----------------------------------------------------------------------
 
 
-1.6 Coordinates.
-~~~~~~~~~~~~~~~~
+6 Coordinates.
+==============
 
   Describe position, with axis by location, in sequence or by name.
   ,----
@@ -407,8 +399,8 @@
   ----------------------------------------------------------------------
 
 
-1.7 Expressions
-~~~~~~~~~~~~~~~
+7 Expressions
+=============
 
   Python expressions turn into G-Code as you may expect, save that
   native Python uses radians for trig, and G-Code uses degrees, so
@@ -478,11 +470,12 @@
   |   #105= [#113 + #114 + 3.] / COS[#115]
   |   M30
   `----
+
   ----------------------------------------------------------------------
 
 
-1.8 Axes
-~~~~~~~~
+8 Axes
+======
 
   Any number of axes are supported, default just being xy and z.
 
@@ -564,8 +557,8 @@
   ----------------------------------------------------------------------
 
 
-1.9 Goto.
-~~~~~~~~~
+9 Goto.
+=======
 
   Goto functions are constructed from parts, and make building blocks
   when partially applied.
@@ -684,8 +677,8 @@
   ----------------------------------------------------------------------
 
 
-1.10 Printing
-~~~~~~~~~~~~~
+10 Printing
+===========
 
   Turns Python f string prints into G-code DPRNT.  Make sure that your
   print string does not have any characters in it that your machine
@@ -720,12 +713,11 @@
   |   M30
   `----
 
-
   ----------------------------------------------------------------------
 
 
-1.11 Symbol Tables.
-~~~~~~~~~~~~~~~~~~~
+11 Symbol Tables.
+=================
 
   Set the global `p2g.symbol.Table.print' to get a symbol table in the
   output file.
@@ -768,12 +760,11 @@
   |   M30
   `----
 
-
   ----------------------------------------------------------------------
 
 
-1.12 Notes.
-~~~~~~~~~~~
+12 Notes.
+=========
 
   The entire thing is brittle; I've only used it to make code for my own
   limited purposes.
@@ -921,14 +912,11 @@
   |   M30
   `----
 
-
-
-
   ----------------------------------------------------------------------
 
 
-1.13 HAAS macro var definitions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+13 HAAS macro var definitions
+=============================
 
   Names predefined in p2g.haas:
 
@@ -1081,16 +1069,16 @@
    <code>TOOL_TOLERANCE</code>             <code>  200</code>  <code>#52401 … #52600</code> 
    <code>PROBE_TYPE</code>                 <code>  200</code>  <code>#52601 … #52800</code> 
 
-
-
   ----------------------------------------------------------------------
 
 
-1.14 Why:
-~~~~~~~~~
+14 Why:
+=======
 
   Waiting for a replacement stylus *and* tool setter to arrive, I
   wondered if were possible to replace the hundreds of inscrutible lines
   of Hass WIPS Renishaw G-code with just a few lines of Python?
 
   Maybe.
+
+  ----------------------------------------------------------------------

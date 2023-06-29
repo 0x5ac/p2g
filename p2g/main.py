@@ -4,7 +4,7 @@ import pathlib
 import re
 import shutil
 import sys
-
+import collections
 import docopt
 
 import p2g
@@ -47,22 +47,22 @@ Usage:
 #              p2g gen showme/vicecenter.py
 #              p2g gen showme/checkprobe.py
 #
-   p2g doc
-#         Send readme.txt to console.
+   p2g doc [ all | <heading> ] 
+#         Send all or parts of readme.txt to console.
 #
    p2g help
 #         Show complete command line help.
 #
-   p2g version
+   p2g [ --bump=<n> ] version 
 #         Show version.
 #
    p2g location
 #         Show which p2g is running.
 #
-#      For maintenance:
-     p2g [options] stdvars [--txt=<txt>] [--dev=<dev>]
+# For maintenance:
+   p2g [options] stdvars [--txt=<txt>] [--dev=<dev>]
                            [--py=<py>] [--org=<org>]
-#               Recreate internal files.
+#         Recreate internal files.
 
  Options:
   --narrow                    Narrow output; formatted to fit in the
@@ -75,7 +75,6 @@ Usage:
            --debug            Enter debugging code.
            --verbose          Too much.
            --logio            Even more.
-
 
 """
 
@@ -105,9 +104,32 @@ def do_examples(outdir):
         recur(sysargs)
 
 
-def do_doc():
+# chop readme.txt into bits given back by
+# choice of section.
+def do_doc(want):
     doc = lib.find_ours("readme.txt").read_text()
-    gbl.sprint(doc.replace("</code>", "]").replace("<code>", "["))
+    doc = doc.replace("</code>", "]").replace("<code>", "[")
+    lines = doc.split("\n")
+    by_section_name = collections.defaultdict(list)
+    section_name = ""
+    for line in lines:
+        # sections we're interested start lhs with a digit.
+        if len(line) > 3 and line[0].isdigit():
+            section_name = line[2:].strip()
+        if section_name:
+            by_section_name[section_name].append(line)
+
+    if want:
+        for section_name, section_text in by_section_name.items():
+            if re.match(want, section_name, flags=re.IGNORECASE):
+                lib.write_nl_lines(section_text, "-")
+    else:
+        print("Usage: doc <section>")
+        print("all")
+        lib.write_nl_lines(by_section_name, "-")
+
+
+#
 
 
 def calculate_output_file_name(provided_filename):
@@ -145,6 +167,20 @@ def do_gen(src_name, job_name, func_name, output_name):
     return 1
 
 
+def modify_version(level, src):
+    plusplace = src.find("+")
+    if plusplace >= 0:
+        plus = src[plusplace + 1 :]
+        src = src[:plusplace]
+    else:
+        plus = "0"
+    dots = src.split(".")
+    dots.append(plus)
+
+    dots[level] = str(int(dots[level]) + 1)
+    return f"{dots[0]}.{dots[1]}.{dots[2]}+{dots[3]}"
+
+
 def inner_main(options: list[str]):
     # remove comments from source to docopt.
 
@@ -168,10 +204,13 @@ def inner_main(options: list[str]):
             gbl.sprint(DOC.strip("\n").replace("#", " "))
 
         case ["version"]:
-            gbl.sprint(f"Version: p2g {p2g.VERSION}")
+            version = p2g.VERSION
+            if opts["--bump"]:
+                version = modify_version(int(opts["--bump"]), version)
+            gbl.sprint(version)
 
         case ["location"]:
-            gbl.sprint(f"{pathlib.Path(__file__).parent}")
+            gbl.sprint(f"{sys.argv[0]}")
 
         case ["examples"]:
             do_examples(pathlib.Path(opts["<exampledir>"]))
@@ -184,9 +223,10 @@ def inner_main(options: list[str]):
                 opts["--org"],
             )
 
+        case ["doc", "all"]:
+            do_doc(".*")
         case ["doc"]:
-            do_doc()
-
+            do_doc(opts["<heading>"])
         case ["gen"]:
             gbl.config = gbl.config._replace(
                 narrow_output=gbl.config.narrow_output or opts["--narrow"],

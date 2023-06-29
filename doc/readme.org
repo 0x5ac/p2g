@@ -9,12 +9,10 @@
 [[file:https://img.shields.io/badge/License-MIT%20v3-blue.svg]]
 [[file:https://github.com/0x5ac/p2g/actions/workflows/build.yml/badge.svg]]
 
-*** Version 0.2.30.0
-* p2g - Python 2 G-code
+*** Version 0.2.42+7
+
 -----------------------------------
-
-
-** Introduction.
+* Introduction.
 Many styli died to bring us this information.
 
 This project makes it simpl(er) to ensure that
@@ -33,12 +31,12 @@ compilation can be used in the source, classes, dicts, and so on.
 
 It comes with a set of macro variable definitions for a Haas mill with
 NCD.  And a few example settings for my own VF-3SSYT.
+
 -----------------------------------
 #+TOC:  headlines:2
 
-
 -----------------------------------
-** Usage.
+* Usage.
 #+NAME: usage
 #+BEGIN_SRC python  :eval always :exports results :results output  :python poetry run p2g help
 
@@ -104,8 +102,9 @@ Usage:
            --verbose          Too much.
            --logio            Even more.
 #+end_example
+
 -----------------------------------
-** Install:
+* Install:
 
 #+BEGIN_EXAMPLE
 $ pip install p2g
@@ -144,12 +143,8 @@ N1002
   M30
 #+end_example
 
-
-
-
-
 -----------------------------------
-** A taste.
+* A taste.
 
 #+NAME: demo1
 #+BEGIN_SRC python  :eval always :exports both :results output  :python poetry run p2g gen -
@@ -223,7 +218,7 @@ N1001                             (     message[ALARM, f"too far {sch.name}."])
 #+end_example
 
 -----------------------------------
-** Variables
+* Variables
 
  + Give names to macro variables at a known address:
    
@@ -284,7 +279,7 @@ Example:
   M30
 #+end_example
 -----------------------------------
-** Coordinates.
+* Coordinates.
 
 Describe position, with axis by location, in sequence or by name.
 #+NAME: co1
@@ -374,7 +369,7 @@ Describe position, with axis by location, in sequence or by name.
 #+end_example
 
 -----------------------------------
-** Expressions
+* Expressions
 
 Python expressions turn into G-Code as you may expect, save that
 native Python uses radians for trig, and G-Code uses degrees, so
@@ -446,8 +441,9 @@ folding is done in degrees.
   #105= [#113 + #114 + 3.] / COS[#115]
   M30
 #+end_example
+
 -----------------------------------
-** Axes
+* Axes
 
 Any number of axes are supported, default just being xy and z.
 # 
@@ -529,7 +525,7 @@ coordinates to turn up in work offset registers.
 #+end_example
 
 -----------------------------------
-** Goto.
+* Goto.
 
 Goto functions are constructed from parts, and make
 building  blocks when partially applied.
@@ -658,7 +654,7 @@ building  blocks when partially applied.
 #+end_example
 
 -----------------------------------
-** Printing
+* Printing
 
 Turns Python f string prints into G-code DPRNT.  Make sure
 that your print string does not have any characters in it that
@@ -695,9 +691,8 @@ N2002
   M30
 #+end_example
 
-
 -----------------------------------
-** Symbol Tables.
+* Symbol Tables.
 
 Set the global ~p2g.symbol.Table.print~ to get a symbol
 table in the output file.
@@ -742,9 +737,8 @@ table in the output file.
   M30
 #+end_example
 
-
 -----------------------------------
-** Notes.
+* Notes.
 
 The entire thing is brittle; I've only used it to make code
 for my own limited purposes. 
@@ -892,11 +886,8 @@ N1003
   M30
 #+end_example
 
-
-
-
 -----------------------------------
-** HAAS macro var definitions
+* HAAS macro var definitions
 
 Names predefined in p2g.haas:
 
@@ -1055,11 +1046,9 @@ Names predefined in p2g.haas:
 | <code>TOOL_TOLERANCE</code>            | <code>  200</code> | <code>#52401 … #52600</code> |
 | <code>PROBE_TYPE</code>                | <code>  200</code> | <code>#52601 … #52800</code> |
 
-
-
 -----------------------------------
 
-** Why:
+* Why:
 
 
 Waiting for a replacement stylus *and* tool setter to arrive, I
@@ -1068,12 +1057,8 @@ of Hass WIPS Renishaw G-code with just a few lines of Python?
 
 Maybe.
 
-
-#      (org-gfm-export-to-markdown)
-# (org-babel-execute-buffer) 
-# (setq org-confirm-babel-evaluate nil) 
+-----------------------------------
 
 # Local Variables:
-# org-confirm-babel-evaluate: nil
 # org-confirm-babel-evaluate: nil
 # End:

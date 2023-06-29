@@ -3,15 +3,12 @@
 ![img](https://codecov.io/gh/0x5ac/p2g/branch/master/graph/badge.svg?token=FKR0R7P8U1) ![img](https://img.shields.io/badge/License-MIT%20v3-blue.svg) ![img](https://github.com/0x5ac/p2g/actions/workflows/build.yml/badge.svg)
 
 
-### Version 0.2.30.0
-
-
-# p2g - Python 2 G-code
+### Version 0.2.42+7
 
 ---
 
 
-## Introduction.
+# Introduction.
 
 Many styli died to bring us this information.
 
@@ -28,26 +25,25 @@ It comes with a set of macro variable definitions for a Haas mill with NCD. And 
 
 # Table of Contents
 
-1.  [p2g - Python 2 G-code](#orgebba8d8)
-    1.  [Introduction.](#org394a877)
-    2.  [Usage.](#orga0ce803)
-    3.  [Install:](#org12c5dd3)
-    4.  [A taste.](#org4467f0b)
-    5.  [Variables](#orgd404151)
-    6.  [Coordinates.](#orgaa41d19)
-    7.  [Expressions](#orge5996d3)
-    8.  [Axes](#org7e09f50)
-    9.  [Goto.](#orgaebd6f0)
-    10. [Printing](#org3042c62)
-    11. [Symbol Tables.](#org0f5aae8)
-    12. [Notes.](#org3bd9866)
-    13. [HAAS macro var definitions](#org7cc7a99)
-    14. [Why:](#org06e062b)
+1.  [Introduction.](#org53cd326)
+2.  [Usage.](#orgd9b53e8)
+3.  [Install:](#org62392a5)
+4.  [A taste.](#org9a39685)
+5.  [Variables](#org7f87182)
+6.  [Coordinates.](#orgd5e14ca)
+7.  [Expressions](#orgede07bc)
+8.  [Axes](#org09a4c18)
+9.  [Goto.](#org27a175d)
+10. [Printing](#orgb24f552)
+11. [Symbol Tables.](#orgda7bb7b)
+12. [Notes.](#orgc9a5089)
+13. [HAAS macro var definitions](#org9b61f85)
+14. [Why:](#orgdac5bc3)
 
 ---
 
 
-## Usage.
+# Usage.
 
 ```
 Turns a python program into a gcode program.
@@ -113,7 +109,7 @@ Usage:
 ---
 
 
-## Install:
+# Install:
 
 ```
 $ pip install p2g
@@ -160,7 +156,7 @@ N1002
 ---
 
 
-## A taste.
+# A taste.
 
 ```python
 from p2g import *
@@ -232,7 +228,7 @@ N1001                             (     message[ALARM, f"too far {sch.name}."])
 ---
 
 
-## Variables
+# Variables
 
 -   Give names to macro variables at a known address:
     
@@ -295,7 +291,7 @@ def ex2():
 ---
 
 
-## Coordinates.
+# Coordinates.
 
 Describe position, with axis by location, in sequence or by name.
 
@@ -387,7 +383,7 @@ def co1():
 ---
 
 
-## Expressions
+# Expressions
 
 Python expressions turn into G-Code as you may expect, save that native Python uses radians for trig, and G-Code uses degrees, so folding is done in degrees.
 
@@ -460,7 +456,7 @@ def exp11():
 ---
 
 
-## Axes
+# Axes
 
 Any number of axes are supported, default just being xy and z.
 
@@ -540,7 +536,7 @@ def axes():
 ---
 
 
-## Goto.
+# Goto.
 
 Goto functions are constructed from parts, and make building blocks when partially applied.
 
@@ -659,7 +655,7 @@ def goto1():
 ---
 
 
-## Printing
+# Printing
 
 Turns Python f string prints into G-code DPRNT. Make sure that your print string does not have any characters in it that your machine considers to be illegal in a DPRNT string.
 
@@ -696,7 +692,7 @@ N2002
 ---
 
 
-## Symbol Tables.
+# Symbol Tables.
 
 Set the global `p2g.symbol.Table.print` to get a symbol table in the output file.
 
@@ -743,7 +739,7 @@ def stest():
 ---
 
 
-## Notes.
+# Notes.
 
 The entire thing is brittle; I've only used it to make code for my own limited purposes.
 
@@ -886,7 +882,7 @@ N1003
 ---
 
 
-## HAAS macro var definitions
+# HAAS macro var definitions
 
 Names predefined in p2g.haas:
 
@@ -1041,8 +1037,10 @@ Names predefined in p2g.haas:
 ---
 
 
-## Why:
+# Why:
 
 Waiting for a replacement stylus **and** tool setter to arrive, I wondered if were possible to replace the hundreds of inscrutible lines of Hass WIPS Renishaw G-code with just a few lines of Python?
 
 Maybe.
+
+---

@@ -1,3 +1,6 @@
+VERSION=$(shell cat pyproject.toml | grep "^version =" | sed 's:version = "\(.*\)":\1:g')
+
+
 SRC_DIR=./p2g
 DOC_DIR=./doc
 EXAMPLE_DIR=./examples
@@ -5,11 +8,13 @@ TESTS_DIR=./tests
 EMACS?=emacs
 POETRY=poetry 
 PR=$(POETRY) run
-PG=$(POETRY) run
+P2G_SCRIPT=$(POETRY) run p2g
+
 #PG=python -m 
 COVERAGE=$(PR) coverage
 
-PYTEST=$(PR) pytest --cov=$(SRC_DIR) --cov-append
+PYTEST=$(PR) pytest
+
 OX_GFM_DIR=~/.emacs.d/straight/build/ox-gfm
 
 
@@ -57,7 +62,8 @@ COMPILED_DOC=\
 	license.md					\
 	authors.md
 
-ALL_FOR_DIST= $(COMPILED_EXAMPLES)  $(COMPILED_DOC) $(GENERATED_SRC) $(SRC)
+CONTROL_FILES=Makefile pyproject.toml .scrutinizer.yml 
+ALL_FOR_DIST=$(CONTROL_FILES) $(COMPILED_EXAMPLES)  $(COMPILED_DOC) $(GENERATED_SRC) $(SRC)
 
 top: poetry-install $(ALL_FOR_DIST)
 	$(ECHO) Ready for build dist.
@@ -66,11 +72,24 @@ top: poetry-install $(ALL_FOR_DIST)
 
 
 .PHONY:
-poetry-install: .poetry_and_deps_installed
+poetry-install: .poetry_installed .deps_installed
 	$(ECHO) Poetry installed.
 
-.poetry_and_deps_installed: readme.md
+.deps_installed:
 	$(POETRY) install
+	touch $@
+
+.PHONY:
+download_poetry1:
+	- pip install --upgrade tox
+	- pip install --upgrade poetry
+.PHONY:
+download_poetry2:
+	curl -sSL https://install.python-poetry.org | python3 -	 --force
+
+.poetry_installed:
+	if [ ! $$(which poetry) ] ; then make download_poetry1 ; fi
+	if [ ! $$(which poetry) ] ; then make download_poetry2 ; fi	
 	touch $@
 
 
@@ -82,19 +101,19 @@ compiled-examples:
 	$(ECHO) Examples ready.
 
 %.nc:%.py 
-	$(PG) p2g gen $<  $@
+	$(P2G_SCRIPT) gen $<  $@
 
 ######################################################################
 # Doc and machine generated headers.
 
 $(SRC_DIR)/haas.py: $(SRC_DIR)/makestdvars.py 
-	$(PG) p2g stdvars --py=$@ 
+	$(P2G_SCRIPT)  stdvars --py=$@ 
 
 $(DOC_DIR)/haas.txt: p2g/makestdvars.py
-	$(PG) p2g stdvars --txt=$@ 
+	$(P2G_SCRIPT)  stdvars --txt=$@ 
 
 $(DOC_DIR)/haas.org: $(SRC_DIR)/makestdvars.py pyproject.toml
-	$(PG) p2g stdvars --org=$@ 
+	$(P2G_SCRIPT) stdvars --org=$@ 
 
 HAVE_EMACS=$(and  $(shell which $(EMACS)),$(wildcard $(OX_GFM_DIR)/*),1)
 
@@ -131,7 +150,7 @@ endif
 
 ######################################################################
 # release:
-VERSION=$(shell cat pyproject.toml | grep "^version =" | sed 's:version = "\(.*\)":\1:g')
+
 
 
 gitrel-part2:
@@ -146,12 +165,11 @@ gitrel:
 	make bump
 	make gitrel-part2
 
-
-
 .PHONY:
 update-pyproject:
 	# can't be with other lines cause of staleness
 	$(POETRY) version patch
+
 .PHONY:
 update-src:
 	sed -i $(SRC_DIR)/__init__.py -e 'sX^VERSION.*XVERSION = "$(shell $(POETRY) version -s)"Xg'
@@ -230,9 +248,6 @@ ruff:
 clean:
 	git clean -fdx
 	rm -f $(COMPILED_EXAMPLES)
-ifeq ($(HAVE_EMACS),1)
-	rm -f $(COMPILED_DOC) 
-endif
 
 .PHONY:
 cleanup: isort ssort autoflake

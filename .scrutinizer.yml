@@ -1,7 +1,7 @@
 
 build:
   environment:
-    python: 3.10.5
+    python: 3.10.6
   nodes:
     my-tests:
       dependencies:

@@ -1,7 +1,7 @@
 [tool.poetry]
 
 name = "p2g"
-version = "0.2.29"
+version = "0.2.42+7"
 description = "Transpile python into cnc gcode."
 authors = ["sac <sac@0x5ac.com>"]
 readme = "readme.md" 
@@ -35,22 +35,6 @@ p2g = "p2g.main:main"
 [tool.poetry.group.dev.dependencies]
 pytest = {extras = ["all"], version = "^7.3.1"}
 pytest-cov = "^4.0.0"
-coverage = "^7.2.3"
-mypy = "^1.2.0"
-pylint = "^2.17.2"
-pydeps = "^1.12.1"
-flake8-annotations-complexity = "^0.0.7"
-flake8-pyproject = {extras = ["all"], version = "^1.2.3"}
-black = "^23.3.0"
-ssort = "^0.11.6"
-tox = "^4.5.1"
-deptry = "^0.8.0"
-mccabe = "^0.7.0"
-wrapt = "^1.15.0"
-dill = "^0.3.6"
-autoflake = "^2.1.1"
-ruff = "^0.0.272"
-pyright = "^1.1.314"
 
 [tool.deptry]
 ignore_missing = [ "csearch" , "defs", "pytest" ]
@@ -116,6 +100,7 @@ good-names = "_,fn,el,ns,ch,i,n"
 #ignore = ['tests']
 [tool.pytest.ini_options]
 
+python_files = [ 'tests/*.py', 'tools/test*.py']
 filterwarnings = [
     "ignore:Module already imported so cannot be rewritten"
 ]
@@ -123,13 +108,13 @@ filterwarnings = [
 console_output_style="classic"
 log_format="%(asctime)s %(message)s"
 log_date_format="%H%M"
-addopts="-p no:pylama -p no:pytest_pylama --cov=p2g --cov-append --tb=short -m 'not forcefail'"
+addopts="--cov --cov-append --tb=short -m 'not forcefail'"
 
 [tool.coverage.run]
 
 
 [tool.coverage.report]
-include = ["p2g/*.py"]
+include = ["p2g/*.py", "tools/*.py"]
 exclude_lines = ["NotImplemented", "AssertionError", "for debug",  "no cover","@(abc\\.)?abstractmethod" ]
 omit = ["tests/*.py","examples/*.py","p2g/__main__.py"]
 

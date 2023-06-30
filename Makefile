@@ -201,16 +201,13 @@ gitci:
 	make bump-version
 	make prepare-dist
 	git commit -m 'new patch' -a
-
-	
-
-
+	git push github
 .PHONY:
 bump-version:
 	$(HR)
 	$(TITLE) Update version numbers.
-	$(TITLE) From $(THIS_VERSION)
-	$(TITLE) To   $(NEXT_VERSION)
+	$(TITLE) "From $(THIS_VERSION)"
+	$(TITLE) "To   $(NEXT_VERSION)"
 	sed -i $(SRC_DIR)/__init__.py -e 'sX^VERSION.*XVERSION = "$(NEXT_VERSION)"Xg'
 	sed -i $(DOC_DIR)/readme.org -e 'sX^\*\*\* Version.*X*** Version $(NEXT_VERSION)Xg'
 	$(POETRY) version $(NEXT_VERSION)

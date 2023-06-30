@@ -3,7 +3,7 @@
 ![img](https://codecov.io/gh/0x5ac/p2g/branch/master/graph/badge.svg?token=FKR0R7P8U1) ![img](https://img.shields.io/badge/License-MIT%20v3-blue.svg) ![img](https://github.com/0x5ac/p2g/actions/workflows/build.yml/badge.svg)
 
 
-### Version 0.2.42+7
+### Version 0.2.29+11
 
 ---
 
@@ -25,20 +25,20 @@ It comes with a set of macro variable definitions for a Haas mill with NCD. And 
 
 # Table of Contents
 
-1.  [Introduction.](#org53cd326)
-2.  [Usage.](#orgd9b53e8)
-3.  [Install:](#org62392a5)
-4.  [A taste.](#org9a39685)
-5.  [Variables](#org7f87182)
-6.  [Coordinates.](#orgd5e14ca)
-7.  [Expressions](#orgede07bc)
-8.  [Axes](#org09a4c18)
-9.  [Goto.](#org27a175d)
-10. [Printing](#orgb24f552)
-11. [Symbol Tables.](#orgda7bb7b)
-12. [Notes.](#orgc9a5089)
-13. [HAAS macro var definitions](#org9b61f85)
-14. [Why:](#orgdac5bc3)
+1.  [Introduction.](#org373adde)
+2.  [Usage.](#org4acd0e8)
+3.  [Install:](#org127e8ba)
+4.  [A taste.](#org0d01b21)
+5.  [Variables](#org98bd830)
+6.  [Coordinates.](#orga58930d)
+7.  [Expressions](#org285f33c)
+8.  [Axes](#org6652725)
+9.  [Goto.](#org416e180)
+10. [Printing](#orgf823c67)
+11. [Symbol Tables.](#org1a4fafe)
+12. [Notes.](#org13b5a0c)
+13. [HAAS macro var definitions](#orge59cc14)
+14. [Why:](#org3f1e289)
 
 ---
 
@@ -167,31 +167,31 @@ fast_probe = goto.probe.feed(30)
 
 class SearchParams:
     def __init__(self, name, search_depth, iota, delta):
-        self.name = name
-        self.its = 10
-        self.search_depth = search_depth
-        self.iota = iota
-        self.delta = delta
-        self.probe = goto.probe.feed(30)
-        self.go = goto.feed(640)
+	self.name = name
+	self.its = 10
+	self.search_depth = search_depth
+	self.iota = iota
+	self.delta = delta
+	self.probe = goto.probe.feed(30)
+	self.go = goto.feed(640)
 
 def search(cursor, sch):
     # stick from class SearchParams  iterations into macro var
     its = Var(sch.its)
     while its > 0:
-        # goto start point
-        sch.go(cursor)
-        # down until hit - or not.
-        sch.probe(z=sch.search_depth)
-        # if probe is below (+some slack) hit
-        # point, then done.
-        if SKIP_POS.z < sch.search_depth + sch.iota:
-            break
-        # otherwise move to next point
-        cursor.xy += sch.delta
-        its -= 1
+	# goto start point
+	sch.go(cursor)
+	# down until hit - or not.
+	sch.probe(z=sch.search_depth)
+	# if probe is below (+some slack) hit
+	# point, then done.
+	if SKIP_POS.z < sch.search_depth + sch.iota:
+	    break
+	# otherwise move to next point
+	cursor.xy += sch.delta
+	its -= 1
     else:
-        message(ALARM, f"too far {sch.name}.")
+	message(ALARM, f"too far {sch.name}.")
 
 def demo1():
     cursor = Var[3](2, 3, 41)
@@ -416,7 +416,7 @@ def exp11():
     b = tlhc[0] % tlhc[1]
     x = tlhc[0] & tlhc[1]        
     tlhc.xy = ((a - b + 3) / sin(x),
-               (a + b + 3) / cos(x))
+	       (a + b + 3) / cos(x))
 
 
 
@@ -474,7 +474,7 @@ def a5():
    p2g.com ("fill yz and c with some stuff")
    tmp1 = Const(y=3, z=9, c=p2g.asin(.5))
    p2g.com ("Unmentioned axes values are assumed",
-            "to be 0, so adding them makes no code.")
+	    "to be 0, so adding them makes no code.")
    G55.var += tmp1
    p2g.com ("")
    G55.ac *= 2.0
@@ -584,7 +584,7 @@ def goto1():
     p2.xy_then_z(v1)
 
     comment ("p3 is whatever p1 was, with a probe and relative,",
-             "using only the x and y axes")
+	     "using only the x and y axes")
     p3 = p1.relative.probe
     p3.xy_then_z(v1.xy)
 
@@ -751,23 +751,23 @@ from p2g import *
 from p2g.haas import *
 
 class X():
-         def __init__(self, a,b):
-               self.thisone = a
-               self.b = b
-         def adjust(self, tof):
-               self.thisone += tof.x
-               self.b += tof.y
+	 def __init__(self, a,b):
+	       self.thisone = a
+	       self.b = b
+	 def adjust(self, tof):
+	       self.thisone += tof.x
+	       self.b += tof.y
 
 class Y():
-         def __init__(self, a):
-               self.val = a
-         def adjust(self, tof):
-               self.val += tof
-         # an example of overloading.
-         # I'm not recommending replacing
-         # add with multiply, but it would work.
-         def __add__(self, other):
-               return self.val * other + 3
+	 def __init__(self, a):
+	       self.val = a
+	 def adjust(self, tof):
+	       self.val += tof
+	 # an example of overloading.
+	 # I'm not recommending replacing
+	 # add with multiply, but it would work.
+	 def __add__(self, other):
+	       return self.val * other + 3
 
 def cool():
       com ("You can do surprising things.")
@@ -799,18 +799,18 @@ G55 = p2g.Fixed[3](addr=5241)
 
 def beware():
     com(
-        "Names on the left hand side of an assignment need to be",
-        "treated with care.  A simple.",
+	"Names on the left hand side of an assignment need to be",
+	"treated with care.  A simple.",
     )
     G55 = [0, 0, 0]
     com(
-        "Will not do what you want - this will overwrite the definition",
-        "of G55 above - so no code will be generated.",
+	"Will not do what you want - this will overwrite the definition",
+	"of G55 above - so no code will be generated.",
     )
 
     com(
-        "You need to use .var (for everything), explicitly name the axes,"
-        "or use magic slicing."
+	"You need to use .var (for everything), explicitly name the axes,"
+	"or use magic slicing."
     )
 
     G56.var = [1, 1, 1]

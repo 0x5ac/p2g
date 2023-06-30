@@ -1,5 +1,5 @@
 
-top: | install-tools compile test lint prepare-dist
+top: | install-tools  prepare-dist
 	$(HR)
 	$(TITLE) 
 	$(TITLE) 
@@ -74,7 +74,8 @@ COMPILED_DOC=\
 	authors.md
 
 CONTROL_FILES=Makefile pyproject.toml .scrutinizer.yml 
-ALL_SRC_DIST=$(CONTROL_FILES) $(COMPILED_EXAMPLES)  $(COMPILED_DOC) $(GENERATED_SRC) $(SRC)
+ALL_SRC_FOR_DIST=$(CONTROL_FILES) $(COMPILED_EXAMPLES)  $(COMPILED_DOC) $(GENERATED_SRC) $(SRC)
+
 
 .PHONY:
 compile: $(ALL_SRC_FOR_DIST) 
@@ -113,13 +114,7 @@ install-poetry:
 
 
 ######################################################################
-# Examples.
-.PHONY:
-compiled-examples:
-	$(HR)
-	$(TITLE)
-	$(TITLE) Examples ready.
-
+# examples
 %.nc:%.py 
 	$(P2G_SCRIPT) gen $^  $@
 
@@ -149,24 +144,28 @@ ELCOMMON=  --directory $(OX_GFM_DIR)					\
            --eval "(setq org-confirm-babel-evaluate nil)"		\
            --eval "(setq default-directory \"$(realpath $(@D))\")"
 %.md: %.org
+	$(HR)
+	$(TITLE) Build md from org
+	$(TITLE)
 	emacs  $<  $(ELCOMMON) --eval   "(org-gfm-export-to-markdown)"
 	rm -f $*.md.tmp
 
 %.txt: %.org
+	$(HR)
+	$(TITLE) Build txt from org
+	$(TITLE)
 	emacs  $< $(ELCOMMON) --eval       "(org-ascii-export-to-ascii)"
 
 else
 
 %.md: %.org
-	@ echo
-	@ echo "edit makefile - emacs not setup"
-	@ echo
-	touch $@
+	$(HR)
+	$(TITLE) edit makefile - emacs not setup
+	$(MAYLOG)	touch $@
 %.txt: %.org
-	@ echo
-	@ echo "edit makefile - emacs not setup"
-	@ echo
-	touch $@
+	$(HR)
+	$(TITLE) edit makefile - emacs not setup
+	$(MAYLOG) touch $@
 endif
 
 ######################################################################
@@ -196,19 +195,28 @@ gitrel:
 	make bump
 	make gitrel-part2
 
-.PHONY:
-update-pyproject:
-	# can't be with other lines cause of staleness
-	$(POETRY) version patch
-.PHONY:
-update-src:
-	echo $(THIS_VERSION)
-	echo $(NEXT_VERSION)
-#	sed -i $(SRC_DIR)/__init__.py -e 'sX^VERSION.*XVERSION = "$(NEXT_VERSION)"Xg'
-	sed -i $(DOC_DIR)/readme.org -e 'sX^Version.*X*** Version $(NEXT_VERSION)Xg' 
+
+gitci:
+	# need new shells because version changes.
+	make bump-version
+	make prepare-dist
+	git commit -m 'new patch' -a
+
+	
+
 
 .PHONY:
-bump: update-pyproject update-src pyproject.toml
+bump-version:
+	$(HR)
+	$(TITLE) Update version numbers.
+	$(TITLE) From $(THIS_VERSION)
+	$(TITLE) To   $(NEXT_VERSION)
+	sed -i $(SRC_DIR)/__init__.py -e 'sX^VERSION.*XVERSION = "$(NEXT_VERSION)"Xg'
+	sed -i $(DOC_DIR)/readme.org -e 'sX^\*\*\* Version.*X*** Version $(NEXT_VERSION)Xg'
+	$(POETRY) version $(NEXT_VERSION)
+	# need in another shell because version env change.
+	make prepare-dist
+
 
 
 .PHONY:
@@ -216,14 +224,14 @@ build: clean compiled-doc lint
 	$(POETRY) build 
 
 .PHONY:
-publish:dist/p2g-$(VERSION).tar.gz
+publish:dist/p2g-$(THIS_VERSION).tar.gz
 	$(POETRY) publish 
 
 .PHONY:
-prepare-dist: dist/p2g-$(VERSION).tar.gz
+prepare-dist: compile test lint dist/p2g-$(THIS_VERSION).tar.gz
 
 
-dist/p2g-$(VERSION).tar.gz: compile
+dist/p2g-$(THIS_VERSION).tar.gz: 
 	$(HR)
 	$(TITLE) Make dist
 	$(TILE)
@@ -255,7 +263,9 @@ ruff: $(LINTABLE_SRC)
 	 $(PR) ruff check  p2g | cat
 
 .PHONY:
-lint: pyright mypy  flake8 pylint  ruff  deptry  pytype
+#lint: pyright mypy  flake8 pylint  ruff  deptry  pytype
+lint:
+	echo lint
 
 ######################################################################
 # cleanup stuff

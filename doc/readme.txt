@@ -12,8 +12,8 @@
 <file:https://github.com/0x5ac/p2g/actions/workflows/build.yml/badge.svg>
 
 
-0.0.1 Version 0.2.42+7
-----------------------
+0.0.1 Version 0.2.29+11
+-----------------------
 
   ----------------------------------------------------------------------
 
@@ -182,31 +182,31 @@
   | 
   | class SearchParams:
   |     def __init__(self, name, search_depth, iota, delta):
-  |         self.name = name
-  |         self.its = 10
-  |         self.search_depth = search_depth
-  |         self.iota = iota
-  |         self.delta = delta
-  |         self.probe = goto.probe.feed(30)
-  |         self.go = goto.feed(640)
+  | 	self.name = name
+  | 	self.its = 10
+  | 	self.search_depth = search_depth
+  | 	self.iota = iota
+  | 	self.delta = delta
+  | 	self.probe = goto.probe.feed(30)
+  | 	self.go = goto.feed(640)
   | 
   | def search(cursor, sch):
   |     # stick from class SearchParams  iterations into macro var
   |     its = Var(sch.its)
   |     while its > 0:
-  |         # goto start point
-  |         sch.go(cursor)
-  |         # down until hit - or not.
-  |         sch.probe(z=sch.search_depth)
-  |         # if probe is below (+some slack) hit
-  |         # point, then done.
-  |         if SKIP_POS.z < sch.search_depth + sch.iota:
-  |             break
-  |         # otherwise move to next point
-  |         cursor.xy += sch.delta
-  |         its -= 1
+  | 	# goto start point
+  | 	sch.go(cursor)
+  | 	# down until hit - or not.
+  | 	sch.probe(z=sch.search_depth)
+  | 	# if probe is below (+some slack) hit
+  | 	# point, then done.
+  | 	if SKIP_POS.z < sch.search_depth + sch.iota:
+  | 	    break
+  | 	# otherwise move to next point
+  | 	cursor.xy += sch.delta
+  | 	its -= 1
   |     else:
-  |         message(ALARM, f"too far {sch.name}.")
+  | 	message(ALARM, f"too far {sch.name}.")
   | 
   | def demo1():
   |     cursor = Var[3](2, 3, 41)
@@ -436,7 +436,7 @@
   |     b = tlhc[0] % tlhc[1]
   |     x = tlhc[0] & tlhc[1]        
   |     tlhc.xy = ((a - b + 3) / sin(x),
-  |                (a + b + 3) / cos(x))
+  | 	       (a + b + 3) / cos(x))
   | 
   | 
   | 
@@ -497,7 +497,7 @@
   |    p2g.com ("fill yz and c with some stuff")
   |    tmp1 = Const(y=3, z=9, c=p2g.asin(.5))
   |    p2g.com ("Unmentioned axes values are assumed",
-  |             "to be 0, so adding them makes no code.")
+  | 	    "to be 0, so adding them makes no code.")
   |    G55.var += tmp1
   |    p2g.com ("")
   |    G55.ac *= 2.0
@@ -608,7 +608,7 @@
   |     p2.xy_then_z(v1)
   | 
   |     comment ("p3 is whatever p1 was, with a probe and relative,",
-  |              "using only the x and y axes")
+  | 	     "using only the x and y axes")
   |     p3 = p1.relative.probe
   |     p3.xy_then_z(v1.xy)
   | 
@@ -777,23 +777,23 @@
   | from p2g.haas import *
   | 
   | class X():
-  |          def __init__(self, a,b):
-  |                self.thisone = a
-  |                self.b = b
-  |          def adjust(self, tof):
-  |                self.thisone += tof.x
-  |                self.b += tof.y
+  | 	 def __init__(self, a,b):
+  | 	       self.thisone = a
+  | 	       self.b = b
+  | 	 def adjust(self, tof):
+  | 	       self.thisone += tof.x
+  | 	       self.b += tof.y
   | 
   | class Y():
-  |          def __init__(self, a):
-  |                self.val = a
-  |          def adjust(self, tof):
-  |                self.val += tof
-  |          # an example of overloading.
-  |          # I'm not recommending replacing
-  |          # add with multiply, but it would work.
-  |          def __add__(self, other):
-  |                return self.val * other + 3
+  | 	 def __init__(self, a):
+  | 	       self.val = a
+  | 	 def adjust(self, tof):
+  | 	       self.val += tof
+  | 	 # an example of overloading.
+  | 	 # I'm not recommending replacing
+  | 	 # add with multiply, but it would work.
+  | 	 def __add__(self, other):
+  | 	       return self.val * other + 3
   | 
   | def cool():
   |       com ("You can do surprising things.")
@@ -832,18 +832,18 @@
   | 
   | def beware():
   |     com(
-  |         "Names on the left hand side of an assignment need to be",
-  |         "treated with care.  A simple.",
+  | 	"Names on the left hand side of an assignment need to be",
+  | 	"treated with care.  A simple.",
   |     )
   |     G55 = [0, 0, 0]
   |     com(
-  |         "Will not do what you want - this will overwrite the definition",
-  |         "of G55 above - so no code will be generated.",
+  | 	"Will not do what you want - this will overwrite the definition",
+  | 	"of G55 above - so no code will be generated.",
   |     )
   | 
   |     com(
-  |         "You need to use .var (for everything), explicitly name the axes,"
-  |         "or use magic slicing."
+  | 	"You need to use .var (for everything), explicitly name the axes,"
+  | 	"or use magic slicing."
   |     )
   | 
   |     G56.var = [1, 1, 1]

@@ -33,7 +33,7 @@ def test_forcefail():
 
 @must_be(
     "Can only take address of something with location.",
-    "p2g/tests/test_error.py:7:20:21:     f = p2g.address(9)",
+    "tests/test_error.py:7:20:21:     f = p2g.address(9)",
     "                                                     ^",
 )
 def test_cerror_addressof0():
@@ -42,7 +42,7 @@ def test_cerror_addressof0():
 
 @must_be(
     "Can only take address of something with location.",
-    "p2g/tests/test_error.py:8:24:25:     f = p2g.address(9 + x)",
+    "tests/test_error.py:8:24:25:     f = p2g.address(9 + x)",
     "                                                         ^",
 )
 def test_cerror_addressof1():
@@ -52,7 +52,7 @@ def test_cerror_addressof1():
 
 @must_be(
     "list index out of range",
-    "p2g/tests/test_error.py:8:6:7:     a[3][4] = 7",
+    "tests/test_error.py:8:6:7:     a[3][4] = 7",
     "                                     ^",
 )
 def test_cerror_bad_var():
@@ -62,7 +62,7 @@ def test_cerror_bad_var():
 
 @must_be(
     "Not enough values to unpack.",
-    "p2g/tests/test_error.py:8:4:5:     a, b = (1,)",
+    "tests/test_error.py:8:4:5:     a, b = (1,)",
     "                                   ^",
 )
 def test_cerror_test_tupl1():
@@ -72,7 +72,7 @@ def test_cerror_test_tupl1():
 
 @must_be(
     "Feature 'try' not implemented.",
-    "p2g/tests/test_error.py:7:4:12:     try:",
+    "tests/test_error.py:7:4:12:     try:",
     "                                    ^^^^^^^^",
 )
 def test_cerror_no_try():
@@ -84,7 +84,7 @@ def test_cerror_no_try():
 
 @must_be(
     "Bad axis letter in 'fish'.",
-    "p2g/tests/test_error.py:8:4:9:     PROBE.fish = 100",
+    "tests/test_error.py:8:4:9:     PROBE.fish = 100",
     "                                   ^^^^^",
 )
 def test_cerror_some_errors0():
@@ -94,7 +94,7 @@ def test_cerror_some_errors0():
 
 @must_be(
     "Too many values to unpack.",
-    "p2g/tests/test_error.py:8:7:8:     a, b = (1, 2, 3)",
+    "tests/test_error.py:8:7:8:     a, b = (1, 2, 3)",
     "                                      ^",
 )
 def test_cerror_tupl0():
@@ -104,7 +104,7 @@ def test_cerror_tupl0():
 
 @must_be(
     "Name 'undefined' is not defined.",
-    "p2g/tests/test_error.py:8:10:19:     tmp = undefined",
+    "tests/test_error.py:8:10:19:     tmp = undefined",
     "                                           ^^^^^^^^^",
 )
 def test_cerror_undef0():
@@ -114,7 +114,7 @@ def test_cerror_undef0():
 
 @must_be(
     "Feature 'try' not implemented.",
-    "p2g/tests/test_error.py:7:4:12:     try:",
+    "tests/test_error.py:7:4:12:     try:",
     "                                 ^^^^^^^^",
 )
 def test_cerror_no_try():

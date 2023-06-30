@@ -5,7 +5,7 @@ from p2g.ptest import must_be
 
 @must_be(
     "Need feed rate.",
-    "p2g/tests/test_goto.py:7:24:25:     p2g.goto.work(1, 2, 3)",
+    "tests/test_goto.py:7:24:25:     p2g.goto.work(1, 2, 3)",
     "                                                        ^",
 )
 def test_cerror_no_feed():
@@ -119,7 +119,7 @@ def test_goto_rel_and_change():
 
 @must_be(
     "Relative with 9810 move is illegal.",
-    "p2g/tests/test_goto.py:7:52:53:     p2g.goto.r9810.feed(7).relative.z_then_xy(1, 2, 3)",
+    "tests/test_goto.py:7:52:53:     p2g.goto.r9810.feed(7).relative.z_then_xy(1, 2, 3)",
     "                                                                                    ^",
 )
 def test_cerror_9810_1():
@@ -128,7 +128,7 @@ def test_cerror_9810_1():
 
 @must_be(
     "Probe with 9810 move is illegal.",
-    "p2g/tests/test_goto.py:7:49:50:     p2g.goto.r9810.feed(7).probe.z_then_xy(1, 2, 3)",
+    "tests/test_goto.py:7:49:50:     p2g.goto.r9810.feed(7).probe.z_then_xy(1, 2, 3)",
     "                                                                                 ^",
 )
 def test_cerror_9810_2():
@@ -137,7 +137,7 @@ def test_cerror_9810_2():
 
 @must_be(
     "MCODE with 9810 move is illegal.",
-    'p2g/tests/test_goto.py:7:54:55:     p2g.goto.r9810.feed(7).mcode("a").z_then_xy(1, 2, 3)',
+    'tests/test_goto.py:7:54:55:     p2g.goto.r9810.feed(7).mcode("a").z_then_xy(1, 2, 3)',
     "                                                                                      ^",
 )
 def test_cerror_9810_3():

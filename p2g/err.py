@@ -50,7 +50,7 @@ def note_from_node_place(pos, absolute_lines, topfn=None):
     filename = pos.filename
     if gbl.config.tin_test:
         orig = pathlib.Path(filename)
-        filename = "/".join(orig.parts[-3:])
+        filename = "/".join(orig.parts[-2:])
 
     reportable_line = pos.lineno - relfixer + 1
     col_offset = pos.col_offset_first

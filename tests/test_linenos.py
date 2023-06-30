@@ -5,7 +5,7 @@ from p2g.ptest import must_be
 
 @must_be(
     "Conflicting sizes 2 and 1.",
-    "p2g/tests/test_linenos.py:10:19:20:     j = p2g.Var[2](1)",
+    "tests/test_linenos.py:10:19:20:     j = p2g.Var[2](1)",
     "                                                       ^",
 )
 def test_cerror_no0():
@@ -17,7 +17,7 @@ def test_cerror_no0():
 
 @must_be(
     "Conflicting sizes 2 and 1.",
-    "p2g/tests/test_linenos.py:8:19:20:     j = p2g.Var[2](1)",
+    "tests/test_linenos.py:8:19:20:     j = p2g.Var[2](1)",
     "                                                      ^",
 )
 def test_cerror_no1():

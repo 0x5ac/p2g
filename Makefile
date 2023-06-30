@@ -256,7 +256,6 @@ ruff: $(LINTABLE_SRC)
 
 .PHONY:
 lint: pyright mypy  flake8 pylint  ruff  deptry  pytype
-	
 
 ######################################################################
 # cleanup stuff
@@ -300,12 +299,12 @@ pytype: $(LINTABLE_SRC)
 
 # remove poetry and env and try from scratch
 .PHONY:
-TMPDIR=/tmp/pg2
+
+TMPDIR=/tmp/p2g
 ab-initio: kill-env
-	rm -rf $(TMPDIR)
+	rm -rf $(TMPDIR) 
 	git clone hub:repos/vf3/p2g $(TMPDIR)
-	cd $(TMPDIR)
-	make
+	make -C $(TMPDIR)
 
 
 kill-env:

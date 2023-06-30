@@ -33,7 +33,7 @@ def add_some_symbols():
 
 @must_be(
     "Bad axis letter in 'pop'.",
-    "p2g/tests/test_smoke.py:8:4:6:     st.txyz.pop",
+    "tests/test_smoke.py:8:4:6:     st.txyz.pop",
     "                                   ^^",
 )
 def test_cerror_bad_attribute():
@@ -43,7 +43,7 @@ def test_cerror_bad_attribute():
 
 @must_be(
     "Attempt to divide by zero.",
-    "p2g/tests/test_smoke.py:8:20:23:     T.var = T.var / 0.0",
+    "tests/test_smoke.py:8:20:23:     T.var = T.var / 0.0",
     "                                                     ^^^",
 )
 def test_cerror_div_err():

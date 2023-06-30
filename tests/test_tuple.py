@@ -9,7 +9,7 @@ W = p2g.Fixed[4](addr=200)
 
 @must_be(
     "Not enough values to unpack.",
-    "p2g/tests/test_tuple.py:7:7:8:     a, b, c = (1, 2)",
+    "tests/test_tuple.py:7:7:8:     a, b, c = (1, 2)",
     "                                      ^",
 )
 def test_cerror_too_few_xfail():
@@ -18,7 +18,7 @@ def test_cerror_too_few_xfail():
 
 @must_be(
     "Too many values to unpack.",
-    "p2g/tests/test_tuple.py:7:10:11:     a, b, c = (1, 2, 3, 4)",
+    "tests/test_tuple.py:7:10:11:     a, b, c = (1, 2, 3, 4)",
     "                                           ^",
 )
 def test_cerror_too_many():

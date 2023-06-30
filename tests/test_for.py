@@ -20,7 +20,7 @@ def test_for0():
 
 @must_be(
     "Must be simple name as destination for 'for'.",
-    "p2g/tests/test_for.py:8:23:25:     for i.var in range(10):",
+    "tests/test_for.py:8:23:25:     for i.var in range(10):",
     "                                                       ^^",
 )
 def test_cerror_for1():
@@ -74,7 +74,7 @@ def test_for4():
 
 @must_be(
     "Must be simple name as destination for 'for'.",
-    "p2g/tests/test_for.py:10:17:18:     for v.var in x:",
+    "tests/test_for.py:10:17:18:     for v.var in x:",
     "                                                 ^",
 )
 def test_cerror_for5():
@@ -87,7 +87,7 @@ def test_cerror_for5():
 
 @must_be(
     "Illegal iterator.",
-    "p2g/tests/test_for.py:7:20:21:     for x in [1, 2, 3]:",
+    "tests/test_for.py:7:20:21:     for x in [1, 2, 3]:",
     "                                                   ^",
 )
 def test_cerror_for11():
@@ -97,7 +97,7 @@ def test_cerror_for11():
 
 @must_be(
     "Must be simple name as destination for 'for'.",
-    "p2g/tests/test_for.py:7:25:26:     for V[0] in range(1, 9):",
+    "tests/test_for.py:7:25:26:     for V[0] in range(1, 9):",
     "                                                        ^",
 )
 def test_cerror_for():

@@ -84,7 +84,7 @@ def test_break():
 
 @must_be(
     "Feature 'try' not implemented.",
-    "p2g/tests/test_interp.py:7:4:16:     try:",
+    "tests/test_interp.py:7:4:16:     try:",
     "                                     ^^^^^^^^^^^^",
 )
 def test_cerror_tr():
@@ -97,7 +97,7 @@ def test_cerror_tr():
 
 @must_be(
     "Feature 'try' not implemented.",
-    "p2g/tests/test_interp.py:7:4:12:     try:",
+    "tests/test_interp.py:7:4:12:     try:",
     "                                     ^^^^^^^^",
 )
 def test_cerror_try():
@@ -110,7 +110,7 @@ def test_cerror_try():
 
 @must_be(
     "Feature 'with' not implemented.",
-    "p2g/tests/test_interp.py:7:4:16:     with foo():",
+    "tests/test_interp.py:7:4:16:     with foo():",
     "                                     ^^^^^^^^^^^^",
 )
 def test_cerror_with():
@@ -217,7 +217,7 @@ def test_ifs():
 
 @must_be(
     "module pytest has no attribute v2",
-    "p2g/tests/test_interp.py:7:4:34:     from pytest import v2 as dummy",
+    "tests/test_interp.py:7:4:34:     from pytest import v2 as dummy",
     "                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
 )
 def test_cerror_import_from():
@@ -228,7 +228,7 @@ def test_cerror_import_from():
 
 @must_be(
     "module pytest has no attribute v1",
-    "p2g/tests/test_interp.py:9:11:16:     V[0] = dummy.v1",
+    "tests/test_interp.py:9:11:16:     V[0] = dummy.v1",
     "                                             ^^^^^",
 )
 def test_cerror_import():

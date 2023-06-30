@@ -131,7 +131,7 @@ def test_nonlocal1():
 
 @must_be(
     "Name 'inner' is not defined.",
-    "p2g/tests/test_vars.py:10:4:9:     inner()",
+    "tests/test_vars.py:10:4:9:     inner()",
     "                                   ^^^^^",
 )
 def test_cerror_nonlocal2():
@@ -171,7 +171,7 @@ def test_nonlocal3():
 
 @must_be(
     "Name 'nothing' is not defined.",
-    "p2g/tests/test_vars.py:7:8:15:     del nothing",
+    "tests/test_vars.py:7:8:15:     del nothing",
     "                                       ^^^^^^^",
 )
 def test_cerror_novar0():

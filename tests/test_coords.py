@@ -12,7 +12,7 @@ class S:
 
 @must_be(
     "Var can't have an address.",
-    "p2g/tests/test_coords.py:8:25:27:     v = p2g.Var[10](addr=20)",
+    "tests/test_coords.py:8:25:27:     v = p2g.Var[10](addr=20)",
     "                                                           ^^",
 )
 def test_cerror_addr0():
@@ -23,7 +23,7 @@ def test_cerror_addr0():
 
 @must_be(
     "Conflicting sizes 100 and 1.",
-    "p2g/tests/test_coords.py:8:17:18:     p2g.Var[100](2)",
+    "tests/test_coords.py:8:17:18:     p2g.Var[100](2)",
     "                                                   ^",
 )
 def test_cerror_conflicting_sizes():
@@ -33,7 +33,7 @@ def test_cerror_conflicting_sizes():
 
 @must_be(
     "Const can't have an address.",
-    "p2g/tests/test_coords.py:8:28:31:     p2g.Const[2](1, 2, addr=123)",
+    "tests/test_coords.py:8:28:31:     p2g.Const[2](1, 2, addr=123)",
     "                                                              ^^^",
 )
 def test_cerror_const1():
@@ -43,7 +43,7 @@ def test_cerror_const1():
 
 @must_be(
     "Overlapping axes [<2>] {'x': 3}.",
-    "p2g/tests/test_coords.py:8:17:18:     p2g.Var(2, x=3)",
+    "tests/test_coords.py:8:17:18:     p2g.Var(2, x=3)",
     "                                                   ^",
 )
 def test_cerror_overlapping():
@@ -53,7 +53,7 @@ def test_cerror_overlapping():
 
 @must_be(
     "Conflicting sizes 10 and 4.",
-    "p2g/tests/test_coords.py:7:25:26:     p2g.Var[10](1, 2, 3, 4)",
+    "tests/test_coords.py:7:25:26:     p2g.Var[10](1, 2, 3, 4)",
     "                                                           ^",
 )
 def test_cerror_size0():
@@ -62,7 +62,7 @@ def test_cerror_size0():
 
 @must_be(
     "Const can't have an address.",
-    "p2g/tests/test_coords.py:7:22:23:     p2g.Const[2](addr=0)",
+    "tests/test_coords.py:7:22:23:     p2g.Const[2](addr=0)",
     "                                                        ^",
 )
 def test_cerror_zeros0():
@@ -71,7 +71,7 @@ def test_cerror_zeros0():
 
 @must_be(
     "Const can't have an address.",
-    "p2g/tests/test_coords.py:7:22:23:     p2g.Const[2](addr=0)",
+    "tests/test_coords.py:7:22:23:     p2g.Const[2](addr=0)",
     "                                                        ^",
 )
 def test_cerror_zeros1():
@@ -80,7 +80,7 @@ def test_cerror_zeros1():
 
 @must_be(
     "Const can't have an address.",
-    "p2g/tests/test_coords.py:7:31:32:     p2g.Const[0](1, 2, 3, addr=0)",
+    "tests/test_coords.py:7:31:32:     p2g.Const[0](1, 2, 3, addr=0)",
     "                                                                 ^",
 )
 def test_cerror_zeros2():
@@ -89,7 +89,7 @@ def test_cerror_zeros2():
 
 @must_be(
     "Zero sized vector.",
-    "p2g/tests/test_coords.py:7:14:15:     p2g.Const[0]()",
+    "tests/test_coords.py:7:14:15:     p2g.Const[0]()",
     "                                                ^",
 )
 def test_cerror_zeros3():

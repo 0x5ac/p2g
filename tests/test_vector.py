@@ -62,7 +62,7 @@ def test_const_deref_addresses():
 
 @must_be(
     "Bad axis letter in 'pop'.",
-    "p2g/tests/test_vector.py:9:4:6:     st.txyz.pop",
+    "tests/test_vector.py:9:4:6:     st.txyz.pop",
     "                                    ^^",
 )
 def test_cerror_bad_attribute():
@@ -73,7 +73,7 @@ def test_cerror_bad_attribute():
 
 @must_be(
     "Reference to too many axes.",
-    "p2g/tests/test_vector.py:10:4:6:     st.txy.xyz = 0x99",
+    "tests/test_vector.py:10:4:6:     st.txy.xyz = 0x99",
     "                                     ^^",
 )
 def test_cerror_bad_bounds0():
@@ -85,7 +85,7 @@ def test_cerror_bad_bounds0():
 
 @must_be(
     "Reference to too many axes.",
-    "p2g/tests/test_vector.py:9:17:19:     st.txyz.xy = st.txy.z",
+    "tests/test_vector.py:9:17:19:     st.txyz.xy = st.txy.z",
     "                                                   ^^",
 )
 def test_cerror_bad_bounds1():
@@ -116,7 +116,7 @@ def test_nested3():
 
 @must_be(
     "Index out of range, index=20 size=10.",
-    "p2g/tests/test_vector.py:9:6:8:     x[20] = 9",
+    "tests/test_vector.py:9:6:8:     x[20] = 9",
     "                                      ^^",
 )
 def test_cerror_oob():

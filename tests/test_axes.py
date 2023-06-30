@@ -21,7 +21,7 @@ def test_3axis():
 
 @must_be(
     "Bad axis letter in 'xyzabc'.",
-    "p2g/tests/test_axes.py:8:4:7:     xyz.xyzabc = 32",
+    "tests/test_axes.py:8:4:7:     xyz.xyzabc = 32",
     "                                  ^^^",
 )
 def test_3axis1():

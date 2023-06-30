@@ -475,17 +475,21 @@ def py_out(target_filename, defs):
         tmp_filepath.rename(target_filename)
 
 
+def all_outputs(outtxt_name, outdef_name, outpy_name, outorg_name):
+    for names in [HaasNames()]:
+        if outtxt_name:
+            txt_out(outtxt_name, names)
+        if outdef_name:
+            regen_out(outdef_name, names)
+        if outorg_name:
+            org_out(outorg_name, names)
+        if outpy_name:
+            py_out(outpy_name, names)
+
+
 def makestdvars(outtxt_name, outdef_name, outpy_name, outorg_name):
     try:
-        for names in [HaasNames()]:
-            if outtxt_name:
-                txt_out(outtxt_name, names)
-            if outdef_name:
-                regen_out(outdef_name, names)
-            if outorg_name:
-                org_out(outorg_name, names)
-            if outpy_name:
-                py_out(outpy_name, names)
+        all_outputs(outtxt_name, outdef_name, outpy_name, outorg_name)
     except FileNotFoundError as exc:  # no cover
         print(f"FAIL {exc.args[1]} '{exc.filename}'")
         return 1

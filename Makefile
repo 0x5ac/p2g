@@ -14,7 +14,7 @@ EMACS?=emacs
 POETRY=poetry 
 PR=$(POETRY) run
 P2G_SCRIPT=$(POETRY) run p2g
-
+TERM=dumb
 THIS_VERSION=$(shell $(P2G_SCRIPT) version)
 NEXT_VERSION=$(shell $(P2G_SCRIPT) version  --bump 3)
 
@@ -260,8 +260,8 @@ ruff: $(LINTABLE_SRC)
 	 $(PR) ruff check  p2g | cat
 
 .PHONY:
-#lint: pyright mypy  flake8 pylint  ruff  deptry  pytype
-lint:
+lint: pyright mypy  flake8 pylint  ruff  deptry  pytype
+#lint: pyproject.toml
 	echo lint
 
 ######################################################################

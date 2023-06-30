@@ -32,83 +32,6 @@ class MovementOrder(enum.IntEnum):
     Z_THEN_XY = enum.auto()
 
 
-def do_goto_worker(self, fter, args, kwargs):
-    # split out arguments we understand from
-    # ones for coordinates.
-
-    def accumulate_relorabs():
-        match self.relorabs_:
-            case MovementRelOrAbs.ABSOLUTE:
-                yield "G90"
-
-            case MovementRelOrAbs.RELATIVE:
-                yield "G91"
-
-    def accumulate_probe():
-        if self.probe_:
-            yield "G31"
-
-    def accumulate_mcode():
-        if self.mcode_:
-            yield self.mcode_
-
-    def accumulate_feed():
-        if self.feed_ == 0.0:
-            err.compiler("Need feed rate.")
-
-        yield f"F{nd.to_gcode(self.feed_)}"
-
-    def accumulate_parts():
-        match self.space_:
-            case MovementSpace.MACHINE:
-                yield "G01"
-                yield "G53"
-                yield from accumulate_relorabs()
-                yield from accumulate_probe()
-                yield from accumulate_mcode()
-            case MovementSpace.WORK:
-                yield "G01"
-                yield from accumulate_relorabs()
-                yield from accumulate_probe()
-                yield from accumulate_mcode()
-            case MovementSpace.R9810:
-                yield "G65 R9810"
-                if self.relorabs_ & MovementRelOrAbs.RELATIVE:
-                    err.compiler("Relative with 9810 move is illegal.")
-
-                if self.probe_:
-                    err.compiler("Probe with 9810 move is illegal.")
-
-                if self.mcode_:
-                    err.compiler("MCODE with 9810 move is illegal.")
-
-        yield from accumulate_feed()
-
-    def get_coords():
-        values = coords.unpack(args, kwargs)
-        for aname, value in zip(axis.low_names_v(), values):
-            # skip non important coords
-            if fter and aname not in fter:
-                continue
-            # skip non mentioned coords
-            if value.is_none_constant:
-                continue
-            yield aname, value
-
-    def accumulate_coords(cos):
-        for aname, value in cos:
-            yield f"{aname}{value.to_gcode(nd.NodeModifier.EMPTY)}"
-
-    cos = list(get_coords())
-    if not cos:
-        return
-
-    stat.code(
-        accumulate_parts(),
-        accumulate_coords(cos),
-    )
-
-
 @dataclasses.dataclass(eq=True, frozen=True)
 class GotoWorker:
     user_defined = True
@@ -119,6 +42,32 @@ class GotoWorker:
     feed_: float
     probe_: bool
     mcode_: str
+
+    def accumulate_coords(self, cos):
+        for aname, value in cos:
+            yield f"{aname}{value.to_gcode(nd.NodeModifier.EMPTY)}"
+
+    def accumulate_relorabs(self):
+        match self.relorabs_:
+            case MovementRelOrAbs.ABSOLUTE:
+                yield "G90"
+
+            case MovementRelOrAbs.RELATIVE:
+                yield "G91"
+
+    def accumulate_probe(self):
+        if self.probe_:
+            yield "G31"
+
+    def accumulate_mcode(self):
+        if self.mcode_:
+            yield self.mcode_
+
+    def accumulate_feed(self):
+        if self.feed_ == 0.0:
+            err.compiler("Need feed rate.")
+
+        yield f"F{nd.to_gcode(self.feed_)}"
 
     def to_symtab_entry(self, *_) -> str:
         return "".join(
@@ -181,16 +130,66 @@ class GotoWorker:
     def mcode(self, m_code):
         return self.update("mcode_", str(m_code))
 
+    def accumulate_parts(self):
+        match self.space_:
+            case MovementSpace.MACHINE:
+                yield "G01"
+                yield "G53"
+                yield from self.accumulate_relorabs()
+                yield from self.accumulate_probe()
+                yield from self.accumulate_mcode()
+            case MovementSpace.WORK:
+                yield "G01"
+                yield from self.accumulate_relorabs()
+                yield from self.accumulate_probe()
+                yield from self.accumulate_mcode()
+            case MovementSpace.R9810:
+                yield "G65 R9810"
+                if self.relorabs_ & MovementRelOrAbs.RELATIVE:
+                    err.compiler("Relative with 9810 move is illegal.")
+
+                if self.probe_:
+                    err.compiler("Probe with 9810 move is illegal.")
+
+                if self.mcode_:
+                    err.compiler("MCODE with 9810 move is illegal.")
+
+        yield from self.accumulate_feed()
+
+    def do_goto_worker(self, fter, args, kwargs):
+        # split out arguments we understand from
+        # ones for coordinates.
+
+        def get_coords():
+            values = coords.unpack(args, kwargs)
+            for aname, value in zip(axis.low_names_v(), values):
+                # skip non important coords
+                if fter and aname not in fter:
+                    continue
+                # skip non mentioned coords
+                if value.is_none_constant:
+                    continue
+                yield aname, value
+
+        cos = list(get_coords())
+        if not cos:
+            return
+
+        stat.code(
+            self.accumulate_parts(),
+            self.accumulate_coords(cos),
+        )
+
     def __call__(self, *args, **kwargs):
         match self.order_:
             case MovementOrder.XYZ:
-                do_goto_worker(self, "", args, kwargs)
+                self.do_goto_worker("", args, kwargs)
             case MovementOrder.Z_THEN_XY:
-                do_goto_worker(self, "z", args, kwargs)
-                do_goto_worker(self, "xy", args, kwargs)
+                self.do_goto_worker("z", args, kwargs)
+                self.do_goto_worker("xy", args, kwargs)
             case MovementOrder.XY_THEN_Z:
-                do_goto_worker(self, "xy", args, kwargs)
-                do_goto_worker(self, "z", args, kwargs)
+                self.do_goto_worker("xy", args, kwargs)
+                self.do_goto_worker("z", args, kwargs)
 
 
 gbl.HasToSymTab.register(GotoWorker)

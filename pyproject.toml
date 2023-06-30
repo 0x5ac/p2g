@@ -28,6 +28,7 @@ python = "^3.10"
 typeguard = "^3.0.2"
 rich = "^13.3.4"
 docopt = "^0.6.2"
+pylint-mccabe = "^0.1.3"
 
 
 [tool.poetry.scripts]
@@ -88,6 +89,8 @@ build-backend = "poetry.core.masonry.api"
 [tool.pylint]
 init-import = false
 
+
+
 disable = [
 "abstract-method",
 "redefined-builtin",
@@ -103,6 +106,8 @@ disable = [
 "W1203"
 ]
 
+max-complexity=10
+
 good-names = "_,fn,el,ns,ch,i,n"
 #ignore = ['tests']
 [tool.pytest.ini_options]
@@ -117,6 +122,7 @@ log_format="%(asctime)s %(message)s"
 log_date_format="%H%M"
 addopts="--cov --cov-append --tb=short -m 'not forcefail'"
 
+[tool.pylint.design]
 [tool.coverage.run]
 
 
@@ -141,7 +147,7 @@ per-file-ignores = [
 ]
 max-line-length = 100
 count = true
-
+max-complexity=7
 
 [tool.ruff]
 ignore = [ "E501" ]

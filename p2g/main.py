@@ -1,5 +1,4 @@
 import collections
-#! /usr/bin/env python
 import datetime
 import pathlib
 import re
@@ -48,13 +47,13 @@ Usage:
 #              p2g gen showme/vicecenter.py
 #              p2g gen showme/checkprobe.py
 #
-   p2g doc [ all | <heading> ] 
+   p2g doc [ all | <heading> ]
 #         Send all or parts of readme.txt to console.
 #
    p2g help
 #         Show complete command line help.
 #
-   p2g [ --bump=<n> ] version 
+   p2g [ --bump=<n> ] version
 #         Show version.
 #
    p2g location
@@ -120,7 +119,9 @@ def do_doc(want):
         if section_name:
             by_section_name[section_name].append(line)
 
-    if want:
+    if want is not None:
+        want = ".*?" + want + ".*"
+        print(want)
         for section_name, section_text in by_section_name.items():
             if re.match(want, section_name, flags=re.IGNORECASE):
                 lib.write_nl_lines(section_text, "-")
@@ -225,7 +226,7 @@ def inner_main(options: list[str]):
             )
 
         case ["doc", "all"]:
-            do_doc(".*")
+            do_doc("")
         case ["doc"]:
             do_doc(opts["<heading>"])
         case ["gen"]:

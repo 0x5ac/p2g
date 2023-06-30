@@ -1,3 +1,10 @@
+
+top: | install-tools compile test lint prepare-dist
+	$(HR)
+	$(TITLE) 
+	$(TITLE) 
+
+
 PATH=$(HOME)/.local/bin:/usr/bin
 SRC_DIR=./p2g
 DOC_DIR=./doc
@@ -69,11 +76,8 @@ COMPILED_DOC=\
 CONTROL_FILES=Makefile pyproject.toml .scrutinizer.yml 
 ALL_SRC_DIST=$(CONTROL_FILES) $(COMPILED_EXAMPLES)  $(COMPILED_DOC) $(GENERATED_SRC) $(SRC)
 
-top: | install-tools $(ALL_SRC_DIST) test lint
-	$(HR)
-	$(TITLE) Ready for build dist.
-	$(TITLE) 
-
+.PHONY:
+compile: $(ALL_SRC_FOR_DIST) 
 
 ######################################################################
 # Init environment
@@ -128,7 +132,7 @@ $(SRC_DIR)/haas.py: $(SRC_DIR)/makestdvars.py
 $(DOC_DIR)/haas.txt: p2g/makestdvars.py
 	$(P2G_SCRIPT)  stdvars --txt=$@ 
 
-$(DOC_DIR)/haas.org: $(SRC_DIR)/makestdvars.py pyproject.toml
+$(DOC_DIR)/haas.org: $(SRC_DIR)/makestdvars.py 
 	$(P2G_SCRIPT) stdvars --org=$@ 
 
 HAVE_EMACS=$(and  $(shell which $(EMACS)),$(wildcard $(OX_GFM_DIR)/*),1)
@@ -216,20 +220,21 @@ publish:dist/p2g-$(VERSION).tar.gz
 	$(POETRY) publish 
 
 .PHONY:
-dist: dist/p2g-$(VERSION).tar.gz
-	$(TITLE) Dist made.
+prepare-dist: dist/p2g-$(VERSION).tar.gz
 
 
-dist/p2g-$(VERSION).tar.gz: pyproject.toml   $(ALL_SRC_FOR_DIST)
-	@ # want to distribute examples  and docs, so copy
+dist/p2g-$(VERSION).tar.gz: compile
+	$(HR)
+	$(TITLE) Make dist
+	$(TILE)
+	@ # want to distribute docs, so copy
 	@ # somewhere safe.
-	@ rm -rf  $(SRC_DIR)/doc $(SRC_DIR)/examples
+	@ rm -rf  $(SRC_DIR)/doc  $(EXAMPLE_DIR)/doc
 	@ cp -a $(DOC_DIR) $(EXAMPLE_DIR) $(SRC_DIR)
 	$(POETRY) build
 	@ rm -rf  $(SRC_DIR)/doc $(SRC_DIR)/examples
 
  
-
 
 ######################################################################
 # linty stuff

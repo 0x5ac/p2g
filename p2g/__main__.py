@@ -9,5 +9,4 @@ import typeguard
 typeguard.install_import_hook("p2g")
 import p2g.main
 
-breakpoint()
 p2g.main.main()

@@ -54,6 +54,7 @@ SRC=$(SRC_DIR)/axis.py				\
 
 TESTS=$(TESTS_DIR)/*.py
 
+LINTABLE_SRC=$(SRC) $(GENERATED_SRC) $(TESTS)
 COMPILED_EXAMPLES=$(EXAMPLE_DIR)/vicecenter.nc \
                   $(EXAMPLE_DIR)/probecalibrate.nc
 
@@ -66,13 +67,14 @@ COMPILED_DOC=\
 	authors.md
 
 CONTROL_FILES=Makefile pyproject.toml .scrutinizer.yml 
-ALL_FOR_DIST=$(CONTROL_FILES) $(COMPILED_EXAMPLES)  $(COMPILED_DOC) $(GENERATED_SRC) $(SRC)
+ALL_SRC_DIST=$(CONTROL_FILES) $(COMPILED_EXAMPLES)  $(COMPILED_DOC) $(GENERATED_SRC) $(SRC)
 
-top: install-tools $(ALL_FOR_DIST) test
+top: | install-tools $(ALL_SRC_DIST) test lint
 	$(HR)
 	$(TITLE) Ready for build dist.
 	$(TITLE) 
-	
+
+
 ######################################################################
 # Init environment
 
@@ -115,7 +117,7 @@ compiled-examples:
 	$(TITLE) Examples ready.
 
 %.nc:%.py 
-	$(P2G_SCRIPT) gen $<  $@
+	$(P2G_SCRIPT) gen $^  $@
 
 ######################################################################
 # Doc and machine generated headers.
@@ -168,15 +170,16 @@ endif
 #   first check for sanity.
 
 .PHONY:
-test: .tested_ok
+test: .tests_ok
 
-.tested_ok: $(ALL_FOR_DIST)
+.tests_ok: $(ALL_SRC_FOR_DIST)
 	$(HR)
 	$(TITLE) Run pytest and coverage.
 	$(PYTEST)
 	$(COVERAGE) lcov -q
 	$(MAYLOG) touch $@
-
+	$(TITLE) Tests passed.
+	$(HR)
 gitrel-part2:
 	# need two parts otherwise version is wrong.
 	make clean
@@ -194,7 +197,6 @@ update-pyproject:
 	# can't be with other lines cause of staleness
 	$(POETRY) version patch
 .PHONY:
-.ONESHELL: 
 update-src:
 	echo $(THIS_VERSION)
 	echo $(NEXT_VERSION)
@@ -218,7 +220,7 @@ dist: dist/p2g-$(VERSION).tar.gz
 	$(TITLE) Dist made.
 
 
-dist/p2g-$(VERSION).tar.gz: pyproject.toml   $(ALL_FOR_DIST)
+dist/p2g-$(VERSION).tar.gz: pyproject.toml   $(ALL_SRC_FOR_DIST)
 	@ # want to distribute examples  and docs, so copy
 	@ # somewhere safe.
 	@ rm -rf  $(SRC_DIR)/doc $(SRC_DIR)/examples
@@ -232,29 +234,44 @@ dist/p2g-$(VERSION).tar.gz: pyproject.toml   $(ALL_FOR_DIST)
 ######################################################################
 # linty stuff
 .PHONY:
-isort:
-	$(PR) isort $(SRC) $(TESTS)
-.PHONY:
-ssort:
-	 $(PR) ssort $(SRC) $(PRECIOUS_SRC)  $(TESTS)
-.PHONY:
-autoflake:
-	 $(PR) autoflake --ignore-init-module-imports  --remove-all-unused-imports  -i -v $(SRC)   $(TESTS)
-.PHONY:
-pyright:
+pyright: $(LINTABLE_SRC)
 	 $(PR)  pyright p2g 
 .PHONY:
-mypy:
+mypy: $(LINTABLE_SRC)
 	 $(PR) mypy p2g 
 .PHONY:
-flake8:
+flake8: $(LINTABLE_SRC)
 	 $(PR) flake8p p2g  |cat
 .PHONY:
-pylint:
+pylint: $(LINTABLE_SRC)
 	 $(PR) pylint p2g 
 .PHONY:
-ruff:
+ruff: $(LINTABLE_SRC)
 	 $(PR) ruff check  p2g | cat
+
+.PHONY:
+lint: pyright mypy  flake8 pylint  ruff  deptry  pytype
+	
+
+######################################################################
+# cleanup stuff
+
+.PHONY:
+isort:$(LINTABLE_SRC)
+	$(PR) isort $^ 
+.PHONY:
+ssort:$(LINTABLE_SRC)
+	$(PR) ssort  $^
+.PHONY:
+autoflake:$(LINTABLE_SRC)
+	 $(PR) autoflake --ignore-init-module-imports  --remove-all-unused-imports  -i -v $^
+
+
+cleanup: isort ssort autoflake
+
+######################################################################
+
+
 .PHONY:
 clean:
 	if [  $$(which p2g) ] ; then rm -f $$(which p2g); fi
@@ -262,19 +279,16 @@ clean:
 	rm -f $(COMPILED_EXAMPLES)
 
 .PHONY:
-cleanup: isort ssort autoflake
+
 
 .PHONY:
 deptry:
 	$(PR) deptry .
 
 
-.PHONY:
-lint: pyright mypy  flake8 pylint  ruff  deptry  pytype
-
 
 .PHONY:
-pytype:
+pytype: $(LINTABLE_SRC)
 	@# needs python < 3.11 
 	@#	pytype p2g
 

@@ -17,9 +17,6 @@ from .coords import Const
 from .coords import Fixed
 from .coords import Var
 from .goto import goto
-
-# from .ptest import must_be
-
 from .scalar import Scalar
 from .stat import code
 from .stat import codenl
@@ -35,6 +32,10 @@ from .visible import as_address
 from .visible import base_addr
 from .visible import message
 from .visible import set_wcs
+
+
+# from .ptest import must_be
+
 
 __all__ = [
     "NAMES",

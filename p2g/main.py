@@ -1,10 +1,11 @@
+import collections
 #! /usr/bin/env python
 import datetime
 import pathlib
 import re
 import shutil
 import sys
-import collections
+
 import docopt
 
 import p2g

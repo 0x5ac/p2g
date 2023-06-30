@@ -1,13 +1,13 @@
 import io
-
 # from p2g.main import main
 import pathlib
 import sys
 
+import p2g
+
 from p2g.main import main
 from p2g.main import nrecur
 from p2g.main import recur
-import p2g
 
 
 def write_func(tmpdir: pathlib.Path):

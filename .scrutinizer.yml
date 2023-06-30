@@ -1,13 +1,6 @@
 
 build:
-  environment:
-    python: 3.10.6
   nodes:
-    my-tests:
-      dependencies:
-        before:
-          - "pip install --upgrade tox"        
-          - "pip install --upgrade poetry"
     analysis:
       tests:
         override:

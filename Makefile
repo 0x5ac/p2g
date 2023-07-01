@@ -192,7 +192,7 @@ gitrel-part2:
 	git push --tag github
 
 gitrel:
-	make bump
+	make bump-version
 	make gitrel-part2
 
 

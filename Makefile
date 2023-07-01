@@ -185,11 +185,11 @@ test: .tests_ok
 	$(HR)
 gitrel-part2:
 	# need two parts otherwise version is wrong.
-	make clean
 	make
-	git commit -m 'release' -a
-	git tag v$(shell $(POETRY) version -s)
-	git push --tag github
+	git commit -m 'bump' -a
+#	git tag v$(shell $(POETRY) version -s)
+#	git push --tag github
+	git push github
 
 gitrel:
 	make bump-version

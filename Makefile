@@ -26,8 +26,8 @@ PYTEST=$(PR) pytest
 OX_GFM_DIR=~/.emacs.d/straight/build/ox-gfm
 
 
-TITLE=@ echo
-MAYLOG=@
+TITLE=echo
+MAYLOG=
 HR=@echo  "********************************************************"
 ######################################################################
 
@@ -85,7 +85,7 @@ compile: $(ALL_SRC_FOR_DIST)
 
 
 .PHONY:
-install-tools: .poetry_installed .deps_installed
+install-tools: .poetry-installed .deps_installed
 
 
 .deps_installed:
@@ -105,7 +105,7 @@ install-poetry:
 	pip install -q --force-reinstall --user --upgrade tox
 
 
-.poetry_installed:
+.poetry-installed:
 	$(HR)
 	$(MAYLOG) if [ ! $$(which poetry) ] ; then make install-poetry ; fi
 	$(MAYLOG) 	touch $@
@@ -184,7 +184,7 @@ test: .tests_ok
 	$(TITLE) Tests passed.
 	$(HR)
 
-gitrel-push-part2:
+gitrel-push:
 	# need two parts otherwise version is wrong.
 	make
 	git commit -m 'bump' -a
@@ -192,9 +192,9 @@ gitrel-push-part2:
 #	git push --tag github
 	git push github
 
-git-push:
+git-bump-push:
 	make bump-version
-	make gitrel-push-part2
+	make gitrel-push
 
 
 gitci:

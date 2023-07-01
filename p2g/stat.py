@@ -95,29 +95,32 @@ class StatBase(abc.ABC):
             [comtxt],
             fillvalue="",
         ):
-            # If code would leak into comment, put out the comment on
-            # own line.  If in narrow mode (by option,  or default if
-            # in pytest or debug), put on own line too.
+            yield from self.yield_lines(code_txt, com_txt)
 
-            if gbl.config.narrow_output:
-                comment_indent = 0
-            else:
-                comment_indent = COMMENT_INDENT
+    def yield_lines(self, code_txt, com_txt):
+        # If code would leak into comment, put out the comment on
+        # own line.  If in narrow mode (by option,  or default if
+        # in pytest or debug), put on own line too.
 
-            code_comment_gap = comment_indent - len(code_txt)
-            if code_comment_gap < 0:
-                first_line = com_txt
-                second_line = code_txt
+        if gbl.config.narrow_output:
+            comment_indent = 0
+        else:
+            comment_indent = COMMENT_INDENT
+
+        code_comment_gap = comment_indent - len(code_txt)
+        if code_comment_gap < 0:
+            first_line = com_txt
+            second_line = code_txt
+        else:
+            if com_txt:
+                first_line = code_txt + " " * code_comment_gap + com_txt
             else:
-                if com_txt:
-                    first_line = code_txt + " " * code_comment_gap + com_txt
-                else:
-                    first_line = code_txt
-                second_line = ""
-            if first_line:
-                yield first_line
-            if second_line:
-                yield second_line
+                first_line = code_txt
+            second_line = ""
+        if first_line:
+            yield first_line
+        if second_line:
+            yield second_line
 
 
 @dataclasses.dataclass

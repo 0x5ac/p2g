@@ -423,14 +423,13 @@ def nd_install(opfo: nd.Opinfo):
     def make_scalar_unop_tramp(child):
         return make_scalar_unop(opfo, child)
 
-    if opfo.mth:
-        if isinstance(opfo.mth, str):
-            if opfo.nargs == 1:
-                setattr(vector.Vec, opfo.mth, make_multi_unop_tramp)
-                setattr(scalar.Scalar, opfo.mth, make_scalar_unop_tramp)
-            else:
-                setattr(vector.Vec, opfo.mth, make_multi_binop_tramp)
-                setattr(scalar.Scalar, opfo.mth, make_scalar_binop_tramp)
+    if opfo.mth and isinstance(opfo.mth, str):
+        if opfo.nargs == 1:
+            setattr(vector.Vec, opfo.mth, make_multi_unop_tramp)
+            setattr(scalar.Scalar, opfo.mth, make_scalar_unop_tramp)
+        else:
+            setattr(vector.Vec, opfo.mth, make_multi_binop_tramp)
+            setattr(scalar.Scalar, opfo.mth, make_scalar_binop_tramp)
 
 
 def reg(**kwargs):

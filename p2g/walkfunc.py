@@ -211,14 +211,20 @@ class WalkFunc(walkbase.WalkBase):
         self.ns[node.name] = ifunc
 
 
-def digest_top(walker, func_name, srcpath, job_name, args):
-    if args is None:
-        args = []
+def find_desc(walker, func_name, srcpath):
     try:
         fncdef = walker.ns[func_name]
         desc = fncdef(Marker())
     except KeyError:
         err.compiler(f"No such function '{func_name}' in '{srcpath}'.")
+    return desc
+
+
+def digest_top(walker, func_name, srcpath, job_name, args):
+    if args is None:
+        args = []
+
+    desc = find_desc(walker, func_name, srcpath)
 
     def insides():
         if gbl.config.bp_on_error:  # no cover

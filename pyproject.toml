@@ -28,7 +28,7 @@ python = "^3.10"
 typeguard = "^3.0.2"
 rich = "^13.3.4"
 docopt = "^0.6.2"
-pylint = "^2.17.4"
+
 
 
 
@@ -36,6 +36,7 @@ pylint = "^2.17.4"
 p2g = "p2g.main:main"
 
 [tool.poetry.group.dev.dependencies]
+pylint = "^2.17.4"
 pytest = {extras = ["all"], version = "^7.3.1"}
 pytest-cov = "^4.0.0"
 mypy = "^1.4.1"

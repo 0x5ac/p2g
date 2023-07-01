@@ -183,7 +183,8 @@ test: .tests_ok
 	$(MAYLOG) touch $@
 	$(TITLE) Tests passed.
 	$(HR)
-gitrel-part2:
+
+gitrel-push-part2:
 	# need two parts otherwise version is wrong.
 	make
 	git commit -m 'bump' -a
@@ -191,9 +192,9 @@ gitrel-part2:
 #	git push --tag github
 	git push github
 
-gitrel:
+git-push:
 	make bump-version
-	make gitrel-part2
+	make gitrel-push-part2
 
 
 gitci:

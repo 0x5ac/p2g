@@ -260,7 +260,7 @@ ruff: $(LINTABLE_SRC)
 	 $(PR) ruff check  p2g | cat
 
 .PHONY:
-lint: pyright mypy  flake8 pylint  ruff  deptry  pytype
+lint: flake8  pyright mypy  pylint  ruff  deptry  pytype
 #lint: pyproject.toml
 	echo lint
 

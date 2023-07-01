@@ -13,6 +13,31 @@ class Table:
     # store in this way to keep multiple definitions.
     name_to_thing: typing.Dict[str, typing.Set] = collections.defaultdict(set)
     addrs_used: typing.Set[int] = set()
+
+    @classmethod
+    def yield_section_lines(cls, phase, key, new_values):
+        old_rhs = ""
+        for rhsobj in new_values:
+            try:
+                if not cls.print_all and not rhsobj.user_defined:
+                    continue
+                new_rhs = rhsobj.to_symtab_entry(cls.addrs_used)
+                if phase in new_rhs:
+                    if new_rhs != old_rhs:
+                        yield (key, new_rhs)
+                        old_rhs = new_rhs
+            except AttributeError:
+                continue
+
+    # go through table of all known macro names,
+    # find out if used, and print nicely.
+    @classmethod
+    def yield_section(cls, phase, sorted_names):
+        for key in sorted_names:
+            new_values = cls.name_to_thing[key]
+
+            yield from cls.yield_section_lines(phase, key, new_values)
+
     # Called for every store to a name, so remember when a vector is
     # given an association.
 
@@ -35,7 +60,7 @@ class Table:
         cls.addrs_used.add(int(addr))
 
     @classmethod
-    def yield_lines(cls):
+    def yield_table(cls):
         #        breakpoint()
         if not cls.print and not cls.print_all:
             return
@@ -43,29 +68,11 @@ class Table:
         # get object names and sort them.
         sorted_names = sorted(cls.name_to_thing.keys(), key=str.casefold)
 
-        # go through table of all known macro names,
-        # find out if used, and print nicely.
-        def yield_table_part(phase):
-            old_rhs = ""
-            for key in sorted_names:
-                new_values = cls.name_to_thing[key]
-                for rhsobj in new_values:
-                    try:
-                        if not cls.print_all and not rhsobj.user_defined:
-                            continue
-                        new_rhs = rhsobj.to_symtab_entry(cls.addrs_used)
-                        if phase in new_rhs:
-                            if new_rhs != old_rhs:
-                                yield (key, new_rhs)
-                                old_rhs = new_rhs
-                    except AttributeError:
-                        continue
-
-        def yield_all_parts():
+        def yield_all_sections():
             for phase in ["#", ",", "xyz"]:
-                yield from yield_table_part(phase)
+                yield from cls.yield_section(phase, sorted_names)
 
-        lcols, rcols = zip(*yield_all_parts())
+        lcols, rcols = zip(*yield_all_sections())
 
         def max_str_len(lines):
             return len(max(lines, key=len, default=""))

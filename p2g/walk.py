@@ -439,5 +439,5 @@ def compile2g(func_name_arg, srcfile_name, job_name, args=None):
             # mods to varrefs for symbol table
             res = list(cursor.to_full_lines())
 
-            yield from symbol.Table.yield_lines()
+            yield from symbol.Table.yield_table()
             yield from res

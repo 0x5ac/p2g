@@ -5,37 +5,37 @@ from p2g import symbol
 from p2g import walkbase
 
 
-def enumerate_comps(self, iters):
-    def eval_ifs(its):
+class WalkExpr(walkbase.WalkBase):
+    def _eval_ifs(self, its):
         for cond in its.ifs:
             if not self.visit(cond):
                 return False
         return True
 
-    if not iters:
-        yield
-        return
-    for el in self.visit(iters[0].iter):
-        self.visit_store(iters[0].target, el)
-        for _ in enumerate_comps(self, iters[1:]):
-            if eval_ifs(iters[0]):
-                yield
+    def _enumerate_comps(self, iters):
+        if iters:
+            for el in self.visit(iters[0].iter):
+                self.visit_store(iters[0].target, el)
+                for _ in self._enumerate_comps(iters[1:]):
+                    if self._eval_ifs(iters[0]):
+                        yield
 
+        else:
+            yield
 
-class WalkExpr(walkbase.WalkBase):
     def _visit_listcomp(self, node):
         with self.pushpopns(walkbase.FunctionNS()):
-            return [self.visit(node.elt) for _ in enumerate_comps(self, node.generators)]
+            return [self.visit(node.elt) for _ in self._enumerate_comps(node.generators)]
 
     def _visit_setcomp(self, node):
         with self.pushpopns(walkbase.FunctionNS()):
-            return {self.visit(node.elt) for _ in enumerate_comps(self, node.generators)}
+            return {self.visit(node.elt) for _ in self._enumerate_comps(node.generators)}
 
     def _visit_dictcomp(self, node):
         with self.pushpopns(walkbase.FunctionNS()):
             return {
                 self.visit(node.key): self.visit(node.value)
-                for _ in enumerate_comps(self, node.generators)
+                for _ in self._enumerate_comps(node.generators)
             }
 
     def _visit_ifexp(self, node):

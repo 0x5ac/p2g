@@ -9,14 +9,7 @@ build:
       tests:
         override:
           - py-scrutinizer-run
-build:
-  nodes:
-    analysis:
-      tests:
-        override:
-          - py-scrutinizer-run
-          - command: pylint-run p2g
-
+ 
 
 
    

@@ -16,7 +16,7 @@ def main():
     parser.add_argument("--dst", action="store", required=True, help="dst")
 
     args = parser.parse_args()
-    incoming = pathlib.Path(args.src).read_text()
+    incoming = pathlib.Path(args.src).read_text(encoding="utf-8")
 
     def remove_bogus_toc(src):
         ignoring_first_part = True
@@ -30,10 +30,8 @@ def main():
             yield line
 
     def make_links_digestable(src):
-        def fixup(m):
-            low = m.group(0).lower()
-            low = low.replace(" ", "-")
-            return low
+        def fixup(match):
+            return match.group(0).lower().replace(" ", "-")
 
         for line in src:
             yield re.sub("\\(#[^)]*", fixup, line)
@@ -55,7 +53,7 @@ def main():
             return f"(![img]({inside.group(1)}))\n"
 
         for line in src:
-            yield re.sub("\\(<(https:.*svg[^>]*)>\\)\s*", svg_worker, line)
+            yield re.sub("\\(<(https:.*svg[^>]*)>\\)\\s*", svg_worker, line)
 
     out = remove_bogus_anchors(
         fixup_svg_links(
@@ -65,7 +63,7 @@ def main():
         )
     )
 
-    pathlib.Path(args.dst).write_text("\n".join(out))
+    pathlib.Path(args.dst).write_text("\n".join(out), encoding="utf-8")
 
 
 main()

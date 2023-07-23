@@ -1,35 +1,16 @@
-- [Version  0.2.110](#Version)
-- [Introduction](#Introduction)
-- [Usage](#Usage)
-- [Install](#Install)
-- [Examples](#Examples.)
-  - [Simple demo](#Simple-Demo)
-  - [Non trivial demo](#Non-Trival-Demo)
-- [Variables](#Variables)
-- [Coordinates](#Coordinates)
-- [Expressions](#Expressions)
-- [Axes](#Axes)
-- [When](#When)
-- [Goto](#Goto)
-- [Printing](#Printing)
-- [Symbol Tables](#Symbol-Tables)
-- [Notes](#Notes)
-- [HAAS macro var definitions](#haas-macro-var-definitions)
-- [Why](#Why)
 
 ---
 
-(<https://codecov.io/gh/0x5ac/p2g/branch/master/graph/badge.svg?token=FKR0R7P8U1>) (![img](https://img.shields.io/badge/License-MIT%20v3-blue.svg))
+(![img](https://codecov.io/gh/0x5ac/p2g/branch/master/graph/badge.svg?token=FKR0R7P8U1))
+(![img](https://img.shields.io/badge/License-MIT%20v3-blue.svg))
 
 
-<a id="Version"></a>
 
-# Version  0.2.110
+# Version  0.2.111
 
 ---
 
 
-<a id="Introduction"></a>
 
 # Introduction
 
@@ -48,29 +29,28 @@ It comes with a set of macro variable definitions for a Haas mill with NCD. And 
 
 # Table of Contents
 
-1.  [Version  0.2.110](#Version)
-2.  [Introduction](#Introduction)
-3.  [Usage](#Usage)
-4.  [Install](#Install)
-5.  [Examples](#Examples.)
-    1.  [Simple demo](#Simple-Demo)
-    2.  [Non trivial demo](#Non-Trival-Demo)
-6.  [Variables](#Variables)
-7.  [Coordinates](#Coordinates)
-8.  [Expressions](#Expressions)
-9.  [Axes](#Axes)
-10. [When](#When)
-11. [Goto](#Goto)
-12. [Printing](#Printing)
-13. [Symbol Tables](#Symbol-Tables)
-14. [Notes](#Notes)
+1.  [Version  0.2.111](#version)
+2.  [Introduction](#introduction)
+3.  [Usage](#usage)
+4.  [Install](#install)
+5.  [Examples](#examples.)
+    1.  [Simple demo](#simple-demo)
+    2.  [Non trivial demo](#non-trival-demo)
+6.  [Variables](#variables)
+7.  [Coordinates](#coordinates)
+8.  [Expressions](#expressions)
+9.  [Axes](#axes)
+10. [When](#when)
+11. [Goto](#goto)
+12. [Printing](#printing)
+13. [Symbol Tables](#symbol-tables)
+14. [Notes](#notes)
 15. [HAAS macro var definitions](#haas-macro-var-definitions)
-16. [Why](#Why)
+16. [Why](#why)
 
 ---
 
 
-<a id="Usage"></a>
 
 # Usage
 
@@ -134,7 +114,6 @@ Options:
 ---
 
 
-<a id="Install"></a>
 
 # Install
 
@@ -147,7 +126,6 @@ $ pip install p2g
 ---
 
 
-<a id="Examples."></a>
 
 # Examples
 
@@ -160,7 +138,6 @@ $ p2g examples dstdir
 ---
 
 
-<a id="Simple-Demo"></a>
 
 ## Simple demo
 
@@ -200,7 +177,6 @@ N1002
 ---
 
 
-<a id="Non-Trival-Demo"></a>
 
 ## Non trivial demo
 
@@ -273,7 +249,6 @@ N1001
 ---
 
 
-<a id="Variables"></a>
 
 # Variables
 
@@ -337,7 +312,6 @@ O0001 (ex2)
 ---
 
 
-<a id="Coordinates"></a>
 
 # Coordinates
 
@@ -432,7 +406,6 @@ O0001 (co1)
 ---
 
 
-<a id="Expressions"></a>
 
 # Expressions
 
@@ -507,7 +480,6 @@ O0001 (exp11)
 ---
 
 
-<a id="Axes"></a>
 
 # Axes
 
@@ -590,7 +562,6 @@ O0001 (axes)
 ---
 
 
-<a id="When"></a>
 
 # When
 
@@ -651,7 +622,6 @@ def when_demo():
 ---
 
 
-<a id="Goto"></a>
 
 # Goto
 
@@ -759,7 +729,6 @@ O0001 (goto1)
 ---
 
 
-<a id="Printing"></a>
 
 # Printing
 
@@ -800,7 +769,6 @@ N1002
 ---
 
 
-<a id="Symbol-Tables"></a>
 
 # Symbol Tables
 
@@ -854,7 +822,6 @@ O0001 (stest)
 ---
 
 
-<a id="Notes"></a>
 
 # Notes
 
@@ -1014,7 +981,6 @@ N1003
 ---
 
 
-<a id="haas-macro-var-definitions"></a>
 
 # HAAS macro var definitions
 
@@ -1389,7 +1355,6 @@ x
 ---
 
 
-<a id="Why"></a>
 
 # Why
 

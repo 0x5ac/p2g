@@ -9,7 +9,7 @@
 Table of Contents
 _________________
 
-1. Version  0.2.110
+1. Version  0.2.111
 2. Introduction
 3. Usage
 4. Install
@@ -31,11 +31,11 @@ _________________
 
 ------------------------------------------------------------------------
 
-(<file:https://codecov.io/gh/0x5ac/p2g/branch/master/graph/badge.svg?token=FKR0R7P8U1&foo=/plop.svg>]])
+(<file:https://codecov.io/gh/0x5ac/p2g/branch/master/graph/badge.svg?token=FKR0R7P8U1>)
 (<file:https://img.shields.io/badge/License-MIT%20v3-blue.svg>)
 
 
-1 Version  0.2.110
+1 Version  0.2.111
 ==================
 
   ----------------------------------------------------------------------
@@ -67,7 +67,7 @@ _________________
   Table of Contents
   _________________
 
-  1. Version  0.2.110
+  1. Version  0.2.111
   2. Introduction
   3. Usage
   4. Install

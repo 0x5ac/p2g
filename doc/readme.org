@@ -9,7 +9,7 @@
 
 
 
-* Version  0.2.110
+* Version  0.2.111
 :PROPERTIES:
 :CUSTOM_ID:  Version
 :END:
@@ -75,7 +75,7 @@ Arguments:
                {countdown} in file name creates a decrementing prefix
                for the output file which makes looking for the .nc in
                a crowded directory less painful - it's at the top.
-               (It's the number of seconds until midnight, so clear
+               (It's the number of minutes until midnight, so clear
                the directory once a day.)
   
   <topic>     [ topics | all | <topic>]

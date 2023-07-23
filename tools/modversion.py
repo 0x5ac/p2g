@@ -4,55 +4,51 @@ import pathlib
 import re
 import subprocess
 import sys
-
+import typing
 
 # yet another grab version from project and update tool.
+# takes from the known truth and puts it everywhere else.
 
 
-# returns what the patch  number would be once we've run
-# this and checked in.
-def calc_next_git_patch():
-    patches = subprocess.run(
-        ["git", "rev-list", "--all", "--count"],
-        capture_output=True,
-        text=True,
-        check=True,
-    ).stdout
-
-    #    now = datetime.date.today()
-    #    res =    f"-{now.strftime('%y%m%d')}.{patches.strip()}"
-    res = f"{patches.strip()}"
-
-    return str(int(res) - 1)
+def dig_out_semver(txt) -> typing.Optional[str]:
+    semver_found = re.match(
+        f'^(\\d*\\.\\d*\\.\\d*[$"]?.*)', txt, re.DOTALL | re.IGNORECASE
+    )
+    if semver_found:
+        return semver_found.group(1)
+    return None
 
 
 # look for things which look like version numbers, break them
 # apart and return <prev_text> <version number> <date-code> <post_text>
-def find_version_strings(path):
+def find_before_version_after(path):
     init_lines = path.read_text()
+
+    semverish = "([0-9]+\\.[0-9]+\\.[-+0-9a-z\\.]+)"
+
+    # special case if first line looks like version
+    version_found = re.match(f"^(){semverish}(.*)", init_lines, re.DOTALL | re.IGNORECASE)
 
     # matches my doc, the toml and the stuff in init.
 
-    version_prefix_found = re.match(
-        "(.*?Version[^0-9]*)(.*)",
-        init_lines,
-        re.DOTALL | re.IGNORECASE,
-    )
+    if not version_found:
+        version_found = re.match(
+            f"(.*?Version[^0-9]*){semverish}(.*)",
+            init_lines,
+            re.DOTALL | re.IGNORECASE,
+        )
 
-    if not version_prefix_found:
+    if not version_found:
         print(f"No existing version found in {path}.")
         sys.exit(1)
-    prefix = version_prefix_found.group(1)
-    old_semver_and_rest = version_prefix_found.group(2)
-    semver_found = re.match(
-        "(\\d+\\.\\d+\\.)([-+.A-Za-z0-9]+)(.*)", old_semver_and_rest, re.DOTALL
-    )
-    if not semver_found:
-        return prefix, "", "", old_semver_and_rest
-    major_minor = semver_found.group(1)
-    patch = semver_found.group(2)
-    rest = semver_found.group(3)
-    return prefix, major_minor, patch, rest
+
+    semver = dig_out_semver(version_found.group(2))
+
+    if not semver:
+        print(f"Can't parse version in '{path}' '{version_found.group(2)}'.")
+        sys.exit(1)
+
+    return version_found.group(1), semver, version_found.group(3)
 
 
 def main():
@@ -60,27 +56,19 @@ def main():
         prog="version",
         description="yet another way for single point pyproject.toml etc version mods.",
     )
-
     parser.add_argument("files", type=str, nargs="+", help="files to check")
-
     parser.add_argument(
-        "--inplace",
+        "--list",
         action="store_true",
         required=False,
-        help="modify source",
-    )
-    parser.add_argument(
-        "--report",
-        action="store_true",
-        required=False,
-        help="show versions in source",
+        help="show current versions in source",
     )
 
     parser.add_argument(
-        "--show",
-        action="store_true",
+        "--truth",
+        action="store",
         required=False,
-        help="show current version",
+        help="source file for truth",
     )
 
     parser.add_argument(
@@ -89,45 +77,28 @@ def main():
         required=False,
         help="force patch version",
     )
-    parser.add_argument(
-        "--git",
-        action="store_true",
-        required=False,
-        help="patch number from git count.",
-    )
     args = parser.parse_args()
 
-    next_semver = None
+    new_truth = None
+    if args.truth:
+        path = pathlib.Path(args.truth)
+        _, new_truth, _ = find_before_version_after(path)
 
-    maxlen = 0
-    for filename in args.files:
-        path = pathlib.Path(filename)
-        before_text, cur_version, cur_patch, after_text = find_version_strings(path)
+    if args.force:
+        new_truth = args.force
 
-        maxlen = max(len(filename), maxlen)
-        if next_semver is None:
-            if args.force:
-                cur_patch = args.force
-            if args.git:
-                cur_patch = calc_next_git_patch()
-
-            next_semver = cur_version + cur_patch
-
-        if args.inplace:
-            path.write_text(before_text + next_semver + after_text, encoding="utf-8")
-
-    if args.report:
+    if new_truth:
         for filename in args.files:
             path = pathlib.Path(filename)
-            before_text, cur_version, cur_patch, after_text = find_version_strings(path)
-            print(
-                f"{filename.rjust(maxlen)} {cur_version.rjust(6)} {cur_patch.ljust(5)}  "
-            )
-        print()
-        print(f"Requested semver {next_semver}")
+            before_text, semver, after_text = find_before_version_after(path)
+            path.write_text(before_text + new_truth + after_text, encoding="utf-8")
 
-    if args.show:
-        print(next_semver)
+    if args.list:
+        maxlen = max(len(filename) for filename in args.files)
+        for filename in args.files:
+            path = pathlib.Path(filename)
+            before_text, semver, after_text = find_before_version_after(path)
+            print(f"{filename.rjust(maxlen)} {semver.rjust(6)}")
 
     sys.exit(0)
 

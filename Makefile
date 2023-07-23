@@ -14,11 +14,9 @@ TEST_DIR=./tests
 EMACS?=emacs
 POETRY=poetry
 PR:=$(POETRY) run
-P2G_SCRIPT:=$(POETRY) run p2g
-VERSION_SCRIPT:=tools/modversion.py
-MAKE_STDVARS:=tools/makestdvars.py
-RUN_VERSION_SCRIPT:= $(PR) python $(VERSION_SCRIPT)
-RUN_MAKESTDVARS:=$(PR) python $(MAKE_STDVARS)
+RUN_P2G:=$(PR) p2g
+RUN_MODVERSION:= $(PR) python tools/modversion.py
+RUN_MAKESTDVARS:=$(PR) python tools/makestdvars.py
 COVERAGE:=$(PR) coverage
 PYTEST:=$(PR) pytest
 OX_GFM_DIR=~/.emacs.d/straight/build/ox-gfm
@@ -65,7 +63,7 @@ TEST_SRC:=$(TEST_DIR)/conftest.py \
 VERSIONED_FILES:=$(P2G_SRC_DIR)/__init__.py pyproject.toml $(DOC_DIR)/readme.org
 
 
-THIS_VERSION:=$(shell $(RUN_VERSION_SCRIPT) $(VERSIONED_FILES) --git --show )
+THIS_VERSION:=$(shell $(RUN_MODVERSION) $(VERSIONED_FILES) --git --show )
 VSTAMP:=.stamp-$(THIS_VERSION)
 
 .PHONY:
@@ -103,8 +101,8 @@ ALL_SRC_FOR_DIST=$(CONTROL_FILES) $(COMPILED_EXAMPLES)  $(GENERATED_DOC) $(GENER
 check-version: $(VSTAMP)
 
 $(VSTAMP):
-	$(RUN_VERSION_SCRIPT) --inplace --git $(VERSIONED_FILES)
-	$(RUN_VERSION_SCRIPT) --report $(VERSIONED_FILES)
+	$(RUN_MODVERSION) --inplace --git $(VERSIONED_FILES)
+	$(RUN_MODVERSION) --report $(VERSIONED_FILES)
 	touch $@
 
 ######################################################################
@@ -150,7 +148,7 @@ install-poetry:
 examples: $(COMPILED_EXAMPLES)  
 
 %.nc:%.py  $(P2G_SRC) $(VSTAMP) examples/*.py
-	$(P2G_SCRIPT) $<  $@
+	$(RUN_P2G) $<  $@
 
 ######################################################################
 # Doc and machine generated headers.
@@ -274,14 +272,14 @@ bump-version: .bump-version
 
 
 
-#	python	$(VERSION_SCRIPT) --report $(VERSIONED_FILES) --bump
+#	python	$(MODVERSION) --report $(VERSIONED_FILES) --bump
 .bump-version:
 	$(HR)
 	$(TITLE) Update version numbers.
 	$(TITLE) "From $(THIS_VERSION)"
 
 	echo "NEW $(THIS_VERSION)"> .version_bumped
-	python	$(VERSION_SCRIPT) --report $(VERSIONED_FILES) --bump
+	python	$(MODVERSION) --report $(VERSIONED_FILES) --bump
 
 	# need in another shell because version env change.
 	git checkout main
@@ -407,7 +405,7 @@ cleanup: isort ssort  black
 
 .PHONY:
 force-version:
-	$(RUN_VERSION_SCRIPT) $(VERSIONED_FILES) --git --report --inplace
+	$(RUN_MODVERSION) $(VERSIONED_FILES) --git --report --inplace
 # .PHONY:
 clean:
 	if [  $$(which p2g) ] ; then rm -f $$(which p2g); fi

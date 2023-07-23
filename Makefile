@@ -69,8 +69,8 @@ THIS_VERSION:=$(shell $(RUN_VERSION_SCRIPT) $(VERSIONED_FILES) --git --show )
 VSTAMP:=.stamp-$(THIS_VERSION)
 
 .PHONY:
-announce: $(VSTAMP)
-	echo "running for version " $(THIS_VERSION) $(VSTAMP)
+announce:
+	echo "running for version " $(THIS_VERSION)
 
 fish:
 	echo $(THIS_VERSION)
@@ -115,8 +115,9 @@ generate: $(COMPILED_EXAMPLES)  $(GENERATED_SRC) $(GENERATED_DOC)
 
 
 .PHONY:
-install-tools: .stamp-poetry .stamp-deps .stamp-git
-
+install-tools: .stamp-poetry .stamp-deps 
+	$(HR)
+	$(TITLE) All dependencies installed now.
 
 .stamp-deps:
 	$(HR)
@@ -131,20 +132,16 @@ install-tools: .stamp-poetry .stamp-deps .stamp-git
 .PHONY:
 install-poetry:
 	$(HR)
-	$(TITLE)
-	$(TITLE) Install poetry using pip.
+	$(TITLE) Install poetry
 	curl -sSL https://install.python-poetry.org | python3
-# -	python -m pip install --upgrade pip
-# 	python -m pip install -q --force-reinstall --user --upgrade poetry
-# 	python -m pip install -q --force-reinstall --user --upgrade tox
 
-
-.stamp-poetry: readme.md
+.stamp-poetry: 
 	$(HR)
 	$(MAYLOG) if [ ! $$(which poetry) ] ; then make install-poetry ; fi
 	$(MAYLOG) 	touch $@
 	$(TITLE)
 	$(TITLE) Poetry installed in $$(which poetry)
+	touch $@
 
 
 ######################################################################
@@ -231,10 +228,9 @@ sanity:
 
 
 .PHONY:
-test: .tests_ok
+test: .stamp-tests
 
-.tests_ok: install-tools $(ALL_SRC_FOR_DIST)
-
+.stamp-tests: install-tools $(ALL_SRC_FOR_DIST)
 	$(HR)
 	$(TITLE) Run pytest and coverage.
 	PYTHONPATH=. COLUMNS=80 $(PYTEST) 
@@ -294,15 +290,15 @@ bump-version: .bump-version
 	git push local 
         # git push upstream MAJOR.{MINOR+1}.0.dev0
 
-1=hub:repos/vf3/p2gxshe 
+# 1=hub:repos/vf3/p2gxshe 
 
-R2=github:0x5ac/p2g
-.stamp-git:
-	if [ "$(shell hostname -d)" = "steveopolis.com" ] ; then	\
-	   grep -q $(R1) .git/config || git remote add local $(R1); \
-	   grep -q $(R2) .git/config || git remote add remote $(R2); \
-	fi							 
-	touch $@
+# R2=github:0x5ac/p2g
+# .stamp-git:
+# 	if [ "$(shell hostname -d)" = "steveopolis.com" ] ; then	\
+# 	   grep -q $(R1) .git/config || git remote add local $(R1); \
+# 	   grep -q $(R2) .git/config || git remote add remote $(R2); \
+# 	fi							 
+# 	touch $@
 
 
 .PHONY:

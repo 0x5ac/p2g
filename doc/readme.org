@@ -7,7 +7,7 @@
 [[file:https://img.shields.io/badge/License-MIT%20v3-blue.svg]]
 [[file:https://github.com/0x5ac/p2g/actions/workflows/build.yml/badge.svg]]
 
-* Version  0.2.105
+* Version  0.2.108
 :PROPERTIES:
 :CUSTOM_ID:  Version
 :END:

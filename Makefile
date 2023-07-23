@@ -249,12 +249,18 @@ gitrel-push-part2:
 	# need two parts otherwise version is wrong.
 	make
 	git commit -m 'bump' -a
-	git tag v$(NEXT_VERSION)
+
 	git push origin HEAD 
 	git push github
 
 foop:
 	echo $(THIS_VERSION)
+
+tohub:
+	git commit --allow-empty -m v$(THIS_VERSION)
+	git tag  v$(THIS_VERSION)
+	git push
+	git push --tags
 git-push:
 	make bump-version
 	make gitrel-push-part2

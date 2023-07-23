@@ -514,7 +514,7 @@ goldify-%: tests/%.py
 
 ci:
 	git commit -m 'wip' -a
-	git push local dev
+	git push local
 
 
 # localclean:

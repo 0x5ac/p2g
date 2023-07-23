@@ -9,7 +9,7 @@
 Table of Contents
 _________________
 
-..... 1. Version  0.2.103
+..... 1. Version  0.2.104
 1. Introduction.
 2. Usage.
 3. Install:
@@ -35,7 +35,7 @@ _________________
 <file:https://github.com/0x5ac/p2g/actions/workflows/build.yml/badge.svg>
 
 
-0.0.1 Version  0.2.103
+0.0.1 Version  0.2.104
 ----------------------
 
   ----------------------------------------------------------------------

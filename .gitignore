@@ -9,6 +9,7 @@ p2g/tests/golden/*got
 *coverage*
 .poetry_and_deps_installed
 .stamp*
+*.decorator
 
 
 

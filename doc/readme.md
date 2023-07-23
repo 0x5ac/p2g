@@ -1,20 +1,37 @@
+- [Version  0.2.110](#Version)
+- [Introduction](#Introduction)
+- [Usage](#Usage)
+- [Install](#Install)
+- [Examples](#Examples.)
+  - [Simple demo](#Simple-Demo)
+  - [Non trivial demo](#Non-Trival-Demo)
+- [Variables](#Variables)
+- [Coordinates](#Coordinates)
+- [Expressions](#Expressions)
+- [Axes](#Axes)
+- [When](#When)
+- [Goto](#Goto)
+- [Printing](#Printing)
+- [Symbol Tables](#Symbol-Tables)
+- [Notes](#Notes)
+- [HAAS macro var definitions](#haas-macro-var-definitions)
+- [Why](#Why)
+
 ---
 
-![img](https://codecov.io/gh/0x5ac/p2g/branch/master/graph/badge.svg?token=FKR0R7P8U1)
-![img](https://img.shields.io/badge/License-MIT%20v3-blue.svg)
-
+(<https://codecov.io/gh/0x5ac/p2g/branch/master/graph/badge.svg?token=FKR0R7P8U1>) (![img](https://img.shields.io/badge/License-MIT%20v3-blue.svg))
 
 
 <a id="Version"></a>
 
-# Version  0.2.109
+# Version  0.2.110
 
 ---
 
 
 <a id="Introduction"></a>
 
-# Introduction.
+# Introduction
 
 Many styli died to bring us this information.
 
@@ -31,23 +48,23 @@ It comes with a set of macro variable definitions for a Haas mill with NCD. And 
 
 # Table of Contents
 
-1.  [Version  0.2.109](#Version)
-2.  [Introduction.](#Introduction)
-3.  [Usage.](#Usage)
-4.  [Install:](#Install)
-5.  [Examples.](#Examples.)
-    1.  [Simple demo.](#SimpleDemo)
-    2.  [Non trivial demo:](#NonTrivalDemo)
+1.  [Version  0.2.110](#Version)
+2.  [Introduction](#Introduction)
+3.  [Usage](#Usage)
+4.  [Install](#Install)
+5.  [Examples](#Examples.)
+    1.  [Simple demo](#Simple-Demo)
+    2.  [Non trivial demo](#Non-Trival-Demo)
 6.  [Variables](#Variables)
-7.  [Coordinates.](#Coordinates)
+7.  [Coordinates](#Coordinates)
 8.  [Expressions](#Expressions)
 9.  [Axes](#Axes)
 10. [When](#When)
 11. [Goto](#Goto)
 12. [Printing](#Printing)
-13. [Symbol Tables.](#SymbolTables)
+13. [Symbol Tables](#Symbol-Tables)
 14. [Notes](#Notes)
-15. [HAAS macro var definitions](#Haas)
+15. [HAAS macro var definitions](#haas-macro-var-definitions)
 16. [Why](#Why)
 
 ---
@@ -55,7 +72,7 @@ It comes with a set of macro variable definitions for a Haas mill with NCD. And 
 
 <a id="Usage"></a>
 
-# Usage.
+# Usage
 
 ```python
 
@@ -119,7 +136,7 @@ Options:
 
 <a id="Install"></a>
 
-# Install:
+# Install
 
 ```
 $ pip install p2g
@@ -132,7 +149,7 @@ $ pip install p2g
 
 <a id="Examples."></a>
 
-# Examples.
+# Examples
 
 for a show:
 
@@ -143,9 +160,9 @@ $ p2g examples dstdir
 ---
 
 
-<a id="SimpleDemo"></a>
+<a id="Simple-Demo"></a>
 
-## Simple demo.
+## Simple demo
 
 ```
 $ echo "
@@ -183,9 +200,9 @@ N1002
 ---
 
 
-<a id="NonTrivalDemo"></a>
+<a id="Non-Trival-Demo"></a>
 
-## Non trivial demo:
+## Non trivial demo
 
 ```python
 from p2g import *
@@ -322,7 +339,7 @@ O0001 (ex2)
 
 <a id="Coordinates"></a>
 
-# Coordinates.
+# Coordinates
 
 Describe position, with axis by location, in sequence or by name.
 
@@ -783,9 +800,9 @@ N1002
 ---
 
 
-<a id="SymbolTables"></a>
+<a id="Symbol-Tables"></a>
 
-# Symbol Tables.
+# Symbol Tables
 
 Set the global `p2g.symbol.Table.print` to get a symbol table in the output file.
 
@@ -997,7 +1014,7 @@ N1003
 ---
 
 
-<a id="Haas"></a>
+<a id="haas-macro-var-definitions"></a>
 
 # HAAS macro var definitions
 

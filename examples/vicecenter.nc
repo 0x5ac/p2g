@@ -1,4 +1,4 @@
-O0001 (vicecenter: 0.2.109)
+O0001 (vicecenter: 0.2.110)
 ( Symbol Table )
 
  ( MABS_ABOVE_VICE      : -27.500,-13.000,-17.500 )

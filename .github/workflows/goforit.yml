@@ -1,24 +1,35 @@
-name: CI
-on: pull_request
+name: test and coverage
+
+on:
+  push:
+    branches:
+      - master
+# Cancel running jobs for the same workflow and branch.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  ci:
+  test:
+    name: on ubuntu
+    runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
       matrix:
-        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10"]
-        poetry-version: ["1.0", "1.1.15"]
-        os: [ubuntu-18.04, macos-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
+        python-version: ["3.10", "3.11"]
+        os: [ubuntu-latest]
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - uses: actions/checkout@v2
+      - name: Setup Python ${{ matrix.python-version }} 
+        uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Run image
-        uses: abatilo/actions-poetry@v2
-        with:
-          poetry-version: ${{ matrix.poetry-version }}
-      - name: View poetry --help
-        run: poetry --help
-        
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+      - name: Build everything, run tests.
+        run: |
+          make 
+
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+

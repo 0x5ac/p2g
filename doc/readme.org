@@ -3,18 +3,19 @@
 #+AUTHOR: sac@0x5ac.com
 
 -----------------------------------
-[[
-file:https://codecov.io/gh/0x5ac/p2g/branch/master/graph/badge.svg?token=FKR0R7P8U1]]
-[[file:https://img.shields.io/badge/License-MIT%20v3-blue.svg]]
+
+(file:https://codecov.io/gh/0x5ac/p2g/branch/master/graph/badge.svg?token=FKR0R7P8U1)
+([[file:https://img.shields.io/badge/License-MIT%20v3-blue.svg]])
 
 
-* Version  0.2.109
+
+* Version  0.2.110
 :PROPERTIES:
 :CUSTOM_ID:  Version
 :END:
 
 -----------------------------------
-* Introduction.
+* Introduction
 :PROPERTIES:
 :CUSTOM_ID: Introduction
 :END:
@@ -41,7 +42,7 @@ NCD.  And a few example settings for my own VF-3SSYT.
 #+TOC:  headlines:2
 
 -----------------------------------
-* Usage.
+* Usage
 :PROPERTIES:
 :CUSTOM_ID: Usage
 :END:
@@ -106,7 +107,7 @@ Options:
 #+end_example
 
 -----------------------------------
-* Install:
+* Install
 :PROPERTIES:
 :CUSTOM_ID: Install
 :END:
@@ -118,7 +119,7 @@ $ pip install p2g
 -----------------------------------
 
 -----------------------------------
-* Examples.
+* Examples
 :PROPERTIES:
 :CUSTOM_ID: Examples.
 :END:
@@ -129,9 +130,9 @@ $ p2g examples dstdir
 #+END_EXAMPLE
 
 -----------------------------------
-** Simple demo.
+** Simple demo
 :PROPERTIES:
-:CUSTOM_ID:  SimpleDemo
+:CUSTOM_ID:  Simple-Demo
 :END:
 #+BEGIN_EXAMPLE
 $ echo "
@@ -164,9 +165,9 @@ N1002
 %
 #+end_example
 -----------------------------------
-** Non trivial demo:
+** Non trivial demo
 :PROPERTIES:
-:CUSTOM_ID:  NonTrivalDemo
+:CUSTOM_ID:  Non-Trival-Demo
 :END:
 
 #+NAME: demo1
@@ -299,7 +300,7 @@ O0001 (ex2)
 %                                 ( 0.2.301                       )
 #+end_example
 -----------------------------------
-* Coordinates.
+* Coordinates
 :PROPERTIES:
 :CUSTOM_ID: Coordinates
 :END:
@@ -783,9 +784,9 @@ N1002
 #+end_example
 
 -----------------------------------
-* Symbol Tables.
+* Symbol Tables
 :PROPERTIES:
-:CUSTOM_ID:    SymbolTables
+:CUSTOM_ID:    Symbol-Tables
 :END:
 
 Set the global ~p2g.symbol.Table.print~ to get a symbol
@@ -1002,7 +1003,7 @@ N1003
 -----------------------------------
 * HAAS macro var definitions
 :PROPERTIES:
-:CUSTOM_ID: Haas
+:CUSTOM_ID: haas-macro-var-definitions
 :END:
 
 Names predefined in p2g.haas:

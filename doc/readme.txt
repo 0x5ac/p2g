@@ -9,40 +9,40 @@
 Table of Contents
 _________________
 
-1. Version  0.2.109
-2. Introduction.
-3. Usage.
-4. Install:
-5. Examples.
-.. 1. Simple demo.
-.. 2. Non trivial demo:
+1. Version  0.2.110
+2. Introduction
+3. Usage
+4. Install
+5. Examples
+.. 1. Simple demo
+.. 2. Non trivial demo
 6. Variables
-7. Coordinates.
+7. Coordinates
 8. Expressions
 9. Axes
 10. When
 11. Goto
 12. Printing
-13. Symbol Tables.
+13. Symbol Tables
 14. Notes
 15. HAAS macro var definitions
 16. Why
 
 
 ------------------------------------------------------------------------
-<file:https://codecov.io/gh/0x5ac/p2g/branch/master/graph/badge.svg?token=FKR0R7P8U1>
-<file:https://img.shields.io/badge/License-MIT%20v3-blue.svg>
-<file:https://github.com/0x5ac/p2g/actions/workflows/build.yml/badge.svg>
+
+(<file:https://codecov.io/gh/0x5ac/p2g/branch/master/graph/badge.svg?token=FKR0R7P8U1&foo=/plop.svg>]])
+(<file:https://img.shields.io/badge/License-MIT%20v3-blue.svg>)
 
 
-1 Version  0.2.109
+1 Version  0.2.110
 ==================
 
   ----------------------------------------------------------------------
 
 
-2 Introduction.
-===============
+2 Introduction
+==============
 
   Many styli died to bring us this information.
 
@@ -67,21 +67,21 @@ _________________
   Table of Contents
   _________________
 
-  1. Version  0.2.109
-  2. Introduction.
-  3. Usage.
-  4. Install:
-  5. Examples.
-  .. 1. Simple demo.
-  .. 2. Non trivial demo:
+  1. Version  0.2.110
+  2. Introduction
+  3. Usage
+  4. Install
+  5. Examples
+  .. 1. Simple demo
+  .. 2. Non trivial demo
   6. Variables
-  7. Coordinates.
+  7. Coordinates
   8. Expressions
   9. Axes
   10. When
   11. Goto
   12. Printing
-  13. Symbol Tables.
+  13. Symbol Tables
   14. Notes
   15. HAAS macro var definitions
   16. Why
@@ -89,8 +89,8 @@ _________________
   ----------------------------------------------------------------------
 
 
-3 Usage.
-========
+3 Usage
+=======
 
   ,----
 
@@ -151,8 +151,8 @@ _________________
   ----------------------------------------------------------------------
 
 
-4 Install:
-==========
+4 Install
+=========
 
   ,----
   | $ pip install p2g
@@ -163,8 +163,8 @@ _________________
   ----------------------------------------------------------------------
 
 
-5 Examples.
-===========
+5 Examples
+==========
 
   for a show:
   ,----
@@ -174,8 +174,8 @@ _________________
   ----------------------------------------------------------------------
 
 
-5.1 Simple demo.
-~~~~~~~~~~~~~~~~
+5.1 Simple demo
+~~~~~~~~~~~~~~~
 
   ,----
   | $ echo "
@@ -208,8 +208,8 @@ _________________
   ----------------------------------------------------------------------
 
 
-5.2 Non trivial demo:
-~~~~~~~~~~~~~~~~~~~~~
+5.2 Non trivial demo
+~~~~~~~~~~~~~~~~~~~~
 
   ,----
   | from p2g import *
@@ -340,8 +340,8 @@ _________________
   ----------------------------------------------------------------------
 
 
-7 Coordinates.
-==============
+7 Coordinates
+=============
 
   Describe position, with axis by location, in sequence or by name.
   ,----
@@ -805,8 +805,8 @@ _________________
   ----------------------------------------------------------------------
 
 
-13 Symbol Tables.
-=================
+13 Symbol Tables
+================
 
   Set the global `p2g.symbol.Table.print' to get a symbol table in the
   output file.

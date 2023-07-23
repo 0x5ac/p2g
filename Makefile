@@ -198,7 +198,7 @@ doc/readme.md: .stamp-readme.org $(VSTAMP)
 	$(TITLE)
 	- emacs $(ELCOMMON) -f org-gfm-export-as-markdown $(WRITE_RESULT)
 	# fix the initial table of contents.
-	- grep -q -- "---"  $@ &&  sed -i '/^---/,$$!d' $@
+#	- grep -q -- "---"  $@ &&  sed -i '/^---/,$$!d' $@
 	rm -f readme.md.tmp 
 	touch $@
 

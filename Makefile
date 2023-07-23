@@ -17,8 +17,8 @@ PR:=$(POETRY) run
 P2G_SCRIPT:=$(POETRY) run p2g
 VERSION_SCRIPT:=tools/modversion.py
 MAKE_STDVARS:=tools/makestdvars.py
-RUN_VERSION_SCRIPT:= $(PR) $(VERSION_SCRIPT)
-RUN_MAKESTDVARS:=$(PR) $(MAKE_STDVARS)
+RUN_VERSION_SCRIPT:= $(PR) python $(VERSION_SCRIPT)
+RUN_MAKESTDVARS:=$(PR) python $(MAKE_STDVARS)
 COVERAGE:=$(PR) coverage
 PYTEST:=$(PR) pytest
 OX_GFM_DIR=~/.emacs.d/straight/build/ox-gfm
@@ -196,7 +196,7 @@ doc/readme.md: .stamp-readme.org $(VSTAMP)
 	$(TITLE)
 	- $(EMACS) $(ELCOMMON) -f org-gfm-export-as-markdown $(WRITE_RESULT)
 	# fix the initial table of contents.
-	python	tools/repairmd.py --src $@ --dst $@
+	$(PR) python	tools/repairmd.py --src $@ --dst $@
 	rm -f readme.md.tmp 
 	touch $@
 

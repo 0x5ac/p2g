@@ -122,8 +122,9 @@ install-tools: .stamp-poetry .stamp-deps .stamp-git
 	$(HR)
 	$(TITLE)
 	$(TITLE)  Install dependencies.
-	$(POETRY)  install;
-	$(POETRY)  update
+	$(POETRY) install
+	$(POETRY) update
+	$(POETRY) export > requirements.txt
 	$(MAYLOG) touch $@
 
 

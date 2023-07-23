@@ -9,7 +9,7 @@
 Table of Contents
 _________________
 
-1. Version  0.2.111
+1. Version  0.2.112
 2. Introduction
 3. Usage
 4. Install
@@ -35,7 +35,7 @@ _________________
 (<file:https://img.shields.io/badge/License-MIT%20v3-blue.svg>)
 
 
-1 Version  0.2.111
+1 Version  0.2.112
 ==================
 
   ----------------------------------------------------------------------
@@ -67,7 +67,7 @@ _________________
   Table of Contents
   _________________
 
-  1. Version  0.2.111
+  1. Version  0.2.112
   2. Introduction
   3. Usage
   4. Install
@@ -117,7 +117,7 @@ _________________
   |                {countdown} in file name creates a decrementing prefix
   |                for the output file which makes looking for the .nc in
   |                a crowded directory less painful - it's at the top.
-  |                (It's the number of seconds until midnight, so clear
+  |                (It's the number of minutes until midnight, so clear
   |                the directory once a day.)
   |   
   |   <topic>     [ topics | all | <topic>]

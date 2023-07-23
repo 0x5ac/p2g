@@ -1,0 +1,8 @@
+docopt==0.6.2 ; python_version >= "3.10" and python_version < "4.0" \
+    --hash=sha256:49b3a825280bd66b3aa83585ef59c4a8c82f2c8a522dbe754a8bc8d08c85c491
+typeguard==3.0.2 ; python_version >= "3.10" and python_version < "4.0" \
+    --hash=sha256:bbe993854385284ab42fd5bd3bee6f6556577ce8b50696d6cb956d704f286c8e \
+    --hash=sha256:fee5297fdb28f8e9efcb8142b5ee219e02375509cd77ea9d270b5af826358d5a
+typing-extensions==4.7.1 ; python_version >= "3.10" and python_version < "3.11" \
+    --hash=sha256:440d5dd3af93b060174bf433bccd69b0babc3b15b1a8dca43789fd7f61514b36 \
+    --hash=sha256:b75ddc264f0ba5615db7ba217daeb99701ad295353c45f9e95963337ceeeffb2

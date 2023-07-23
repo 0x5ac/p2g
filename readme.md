@@ -6,7 +6,7 @@
 
 
 
-# Version  0.2.111
+# Version  0.2.112
 
 ---
 
@@ -29,7 +29,7 @@ It comes with a set of macro variable definitions for a Haas mill with NCD. And 
 
 # Table of Contents
 
-1.  [Version  0.2.111](#version)
+1.  [Version  0.2.112](#version)
 2.  [Introduction](#introduction)
 3.  [Usage](#usage)
 4.  [Install](#install)
@@ -80,7 +80,7 @@ Arguments:
                {countdown} in file name creates a decrementing prefix
                for the output file which makes looking for the .nc in
                a crowded directory less painful - it's at the top.
-               (It's the number of seconds until midnight, so clear
+               (It's the number of minutes until midnight, so clear
                the directory once a day.)
   
   <topic>     [ topics | all | <topic>]

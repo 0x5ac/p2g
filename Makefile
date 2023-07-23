@@ -185,7 +185,7 @@ ELCOMMON=						\
 	--eval "(setq org-confirm-babel-evaluate nil)"		
 
 .stamp-readme.org: doc/readme.org  doc/haas.org $(VSTAMP)
-	- emacs   $(ELCOMMON) $(DO_EVAL) $(WRITE_RESULT)
+	- $(EMACS)   $(ELCOMMON) $(DO_EVAL) $(WRITE_RESULT)
 	touch $@
 
 VERSIONED_FILES: $(VSTAMP)
@@ -194,14 +194,14 @@ doc/readme.md: .stamp-readme.org $(VSTAMP)
 	$(HR)
 	$(TITLE) Build md from org
 	$(TITLE)
-	- emacs $(ELCOMMON) -f org-gfm-export-as-markdown $(WRITE_RESULT)
+	- $(EMACS) $(ELCOMMON) -f org-gfm-export-as-markdown $(WRITE_RESULT)
 	# fix the initial table of contents.
 	python	tools/repairmd.py --src $@ --dst $@
 	rm -f readme.md.tmp 
 	touch $@
 
 doc/%.md:doc/%.org
-	- emacs $(ELCOMMON) -f org-gfm-export-as-markdown $(WRITE_RESULT)
+	- $(emacs) $(ELCOMMON) -f org-gfm-export-as-markdown $(WRITE_RESULT)
 
 # .PRECIOUS: .stamp-%.txt
 # doc/%.txt: .stamp-%.txt
@@ -211,7 +211,7 @@ doc/%.txt: doc/%.org $(VSTAMP)
 	$(HR)
 	$(TITLE) Build txt from org
 	$(TITLE)
-	-  emacs  $(ELCOMMON) -f org-ascii-export-as-ascii $(WRITE_RESULT)
+	-  $(EMACS)  $(ELCOMMON) -f org-ascii-export-as-ascii $(WRITE_RESULT)
 	touch $@
 
 %.md:doc/%.md

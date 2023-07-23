@@ -21,7 +21,7 @@ RUN_VERSION_SCRIPT:= python $(VERSION_SCRIPT)
 RUN_MAKESTDVARS:= python $(MAKE_STDVARS)
 COVERAGE:=$(PR) coverage
 PYTEST:=$(PR) pytest
-
+OX_GFM_DIR=~/.emacs.d/straight/build/ox-gfm
 
 
 TITLE=@ echo
@@ -132,9 +132,10 @@ install-poetry:
 	$(HR)
 	$(TITLE)
 	$(TITLE) Install poetry using pip.
-	python -m pip install --upgrade pip
-	python -m pip install -q --force-reinstall --user --upgrade poetry
-	python -m pip install -q --force-reinstall --user --upgrade tox
+	curl -sSL https://install.python-poetry.org | python3
+# -	python -m pip install --upgrade pip
+# 	python -m pip install -q --force-reinstall --user --upgrade poetry
+# 	python -m pip install -q --force-reinstall --user --upgrade tox
 
 
 .stamp-poetry: readme.md
@@ -177,11 +178,13 @@ WRITE_RESULT= --eval '(write-region (point-min) (point-max) "$(@F)")'
 # witout this evals won't eval, so speed things up.
 DO_EVAL'=--eval "(require 'ob-python)"	'
 
-ELCOMMON=								\
-	-q --batch								\
-        --chdir doc $(<F)  \
-	--eval "(org-mode)"						\
-	--eval "(setq org-confirm-babel-evaluate nil)"			\
+ELCOMMON=						\
+        --directory $(OX_GFM_DIR)			\
+	-q --batch					\
+        --chdir doc $(<F)				\
+	--eval "(org-mode)"				\
+        --eval "(require 'ox-gfm)"			\
+	--eval "(setq org-confirm-babel-evaluate nil)"		
 
 .stamp-readme.org: doc/readme.org  doc/haas.org $(VSTAMP)
 	- emacs   $(ELCOMMON) $(DO_EVAL) $(WRITE_RESULT)
@@ -193,11 +196,14 @@ doc/readme.md: .stamp-readme.org $(VSTAMP)
 	$(HR)
 	$(TITLE) Build md from org
 	$(TITLE)
-	- emacs $(ELCOMMON) -f org-md-export-as-markdown $(WRITE_RESULT)
+	- emacs $(ELCOMMON) -f org-gfm-export-as-markdown $(WRITE_RESULT)
 	# fix the initial table of contents.
 	- grep -q -- "---"  $@ &&  sed -i '/^---/,$$!d' $@
 	rm -f readme.md.tmp 
 	touch $@
+
+doc/%.md:doc/%.org
+	- emacs $(ELCOMMON) -f org-gfm-export-as-markdown $(WRITE_RESULT)
 
 # .PRECIOUS: .stamp-%.txt
 # doc/%.txt: .stamp-%.txt
@@ -281,7 +287,8 @@ bump-version: .bump-version
 	git push local 
         # git push upstream MAJOR.{MINOR+1}.0.dev0
 
-R1=hub:repos/vf3/p2g
+1=hub:repos/vf3/p2gxshe 
+
 R2=github:0x5ac/p2g
 .stamp-git:
 	if [ "$(shell hostname -d)" = "steveopolis.com" ] ; then	\

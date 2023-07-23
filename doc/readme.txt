@@ -9,24 +9,24 @@
 Table of Contents
 _________________
 
-..... 1. Version  0.2.104
-1. Introduction.
-2. Usage.
-3. Install:
-4. Examples.
+1. Version  0.2.105
+2. Introduction.
+3. Usage.
+4. Install:
+5. Examples.
 .. 1. Simple demo.
 .. 2. Non trivial demo:
-5. Variables
-6. Coordinates.
-7. Expressions
-8. Axes
-9. When
-10. Goto
-11. Printing
-12. Symbol Tables.
-13. Notes
-14. HAAS macro var definitions
-15. Why
+6. Variables
+7. Coordinates.
+8. Expressions
+9. Axes
+10. When
+11. Goto
+12. Printing
+13. Symbol Tables.
+14. Notes
+15. HAAS macro var definitions
+16. Why
 
 
 ------------------------------------------------------------------------
@@ -35,13 +35,13 @@ _________________
 <file:https://github.com/0x5ac/p2g/actions/workflows/build.yml/badge.svg>
 
 
-0.0.1 Version  0.2.104
-----------------------
+1 Version  0.2.105
+==================
 
   ----------------------------------------------------------------------
 
 
-1 Introduction.
+2 Introduction.
 ===============
 
   Many styli died to bring us this information.
@@ -67,28 +67,29 @@ _________________
   Table of Contents
   _________________
 
-  1. Introduction.
-  2. Usage.
-  3. Install:
-  4. Examples.
+  1. Version  0.2.105
+  2. Introduction.
+  3. Usage.
+  4. Install:
+  5. Examples.
   .. 1. Simple demo.
   .. 2. Non trivial demo:
-  5. Variables
-  6. Coordinates.
-  7. Expressions
-  8. Axes
-  9. When
-  10. Goto
-  11. Printing
-  12. Symbol Tables.
-  13. Notes
-  14. HAAS macro var definitions
-  15. Why
+  6. Variables
+  7. Coordinates.
+  8. Expressions
+  9. Axes
+  10. When
+  11. Goto
+  12. Printing
+  13. Symbol Tables.
+  14. Notes
+  15. HAAS macro var definitions
+  16. Why
 
   ----------------------------------------------------------------------
 
 
-2 Usage.
+3 Usage.
 ========
 
   ,----
@@ -150,7 +151,7 @@ _________________
   ----------------------------------------------------------------------
 
 
-3 Install:
+4 Install:
 ==========
 
   ,----
@@ -162,7 +163,7 @@ _________________
   ----------------------------------------------------------------------
 
 
-4 Examples.
+5 Examples.
 ===========
 
   for a show:
@@ -173,7 +174,7 @@ _________________
   ----------------------------------------------------------------------
 
 
-4.1 Simple demo.
+5.1 Simple demo.
 ~~~~~~~~~~~~~~~~
 
   ,----
@@ -207,7 +208,7 @@ _________________
   ----------------------------------------------------------------------
 
 
-4.2 Non trivial demo:
+5.2 Non trivial demo:
 ~~~~~~~~~~~~~~~~~~~~~
 
   ,----
@@ -277,7 +278,7 @@ _________________
   ----------------------------------------------------------------------
 
 
-5 Variables
+6 Variables
 ===========
 
   + Give names to macro variables at a known address:
@@ -339,7 +340,7 @@ _________________
   ----------------------------------------------------------------------
 
 
-6 Coordinates.
+7 Coordinates.
 ==============
 
   Describe position, with axis by location, in sequence or by name.
@@ -431,7 +432,7 @@ _________________
   ----------------------------------------------------------------------
 
 
-7 Expressions
+8 Expressions
 =============
 
   Python expressions turn into G-Code as you may expect, save that
@@ -506,7 +507,7 @@ _________________
   ----------------------------------------------------------------------
 
 
-8 Axes
+9 Axes
 ======
 
   Any number of axes are supported, default just being xy and z.
@@ -591,8 +592,8 @@ _________________
   ----------------------------------------------------------------------
 
 
-9 When
-======
+10 When
+=======
 
   'when' works as in python, save there are no exceptions; useful for
   turning on probing and magically getting it turned off,.  Or setting
@@ -656,7 +657,7 @@ _________________
   ----------------------------------------------------------------------
 
 
-10 Goto
+11 Goto
 =======
 
   Goto functions are constructed from parts, and make building blocks
@@ -763,7 +764,7 @@ _________________
   ----------------------------------------------------------------------
 
 
-11 Printing
+12 Printing
 ===========
 
   Turns Python f string prints into G-code DPRNT.  Make sure that your
@@ -804,7 +805,7 @@ _________________
   ----------------------------------------------------------------------
 
 
-12 Symbol Tables.
+13 Symbol Tables.
 =================
 
   Set the global `p2g.symbol.Table.print' to get a symbol table in the
@@ -856,7 +857,7 @@ _________________
   ----------------------------------------------------------------------
 
 
-13 Notes
+14 Notes
 ========
 
   The entire thing is brittle; I've only used it to make code for my own
@@ -1019,7 +1020,7 @@ _________________
   ----------------------------------------------------------------------
 
 
-14 HAAS macro var definitions
+15 HAAS macro var definitions
 =============================
 
   Names predefined in p2g.haas:
@@ -1394,7 +1395,7 @@ _________________
   ----------------------------------------------------------------------
 
 
-15 Why
+16 Why
 ======
 
   Waiting for a replacement stylus *and* tool setter to arrive, I

@@ -1,35 +1,18 @@
+import contextlib
+import functools
+import pathlib
+import sys
 import typing
 
 
-class Config:
-    opt_relative_lines: bool
-    opt_relative_paths: bool
-    debug: bool
-    opt_narrow_output: bool
-    in_pytest: bool
-    bp_on_error: bool
-    recursive: bool
-
-    def __init__(self):
-        self.bp_on_error = False
-        self.opt_relative_lines = False
-        self.opt_relative_paths = False
-        self.opt_narrow_output = False
-        self.debug = False
-        self.in_pytest = True
-        self.recursive = False
-
-    @property
-    def relative_lines(self):
-        return self.opt_relative_lines or self.in_pytest
-
-    @property
-    def relative_paths(self):
-        return self.opt_relative_paths or self.in_pytest
-
-    @property
-    def narrow_output(self):
-        return self.opt_narrow_output or self.in_pytest
+class Config(typing.NamedTuple):
+    narrow_output: bool = False
+    bp_on_error: bool = False
+    verbose: int = 0
+    no_version: bool = False
+    emit_rtl: bool = False
+    tin_test: bool = False
+    force_no_tintest: bool = False  # noqa
 
 
 config = Config()
@@ -38,7 +21,6 @@ config = Config()
 class PerTranslation:
     ebss: int
     varrefs: typing.Dict
-    last_node: typing.Any
 
     def __init__(self):
         self.reset()
@@ -52,9 +34,120 @@ class PerTranslation:
         self.varrefs = {}
         self.ebss = 100
 
-        self.last_node = None
-
-    #        self.next_label = 1000
-
 
 iface = PerTranslation()
+
+
+def log(*args):
+    if config.verbose > 1:
+        print(*args)
+
+
+def v1print(*args):
+    if config.verbose > 0:
+        print(*args)
+
+
+def v2print(*args):
+    if config.verbose > 1:
+        print(*args)
+
+
+def sprint(*args):
+    print(*args)
+
+
+# print to redirected stderr
+def eprint(*args):
+    print(*args, file=sys.stderr)
+
+
+@functools.cache
+def logread(handle):
+    res = handle.read()
+    if config.verbose > 2:
+        print(res)  # no cover
+    return res
+
+
+def splitnl(line):
+    return line.split("\n")
+
+
+######################################################################
+# i/o redirection
+@contextlib.contextmanager
+def openr(name):
+    if str(name) == "-":
+        yield sys.stdin, None
+    else:
+        try:
+            with open(name, "r", encoding="utf-8") as rfile:
+                yield rfile, None
+        except FileNotFoundError as err:
+            yield None, err
+
+
+def g2l(generator):
+    def g2l_(*args, **kwargs):
+        return list(generator(*args, **kwargs))
+
+    return g2l_
+
+
+def sentinel():
+    # pylint: disable=too-few-public-methods
+    class Sentinel:
+        pass
+
+    return Sentinel
+
+
+# open accouting for '-' files.
+# sourcing empty file when in test.
+@contextlib.contextmanager
+def openw(name):
+    if str(name) == "-":
+        yield sys.stdout
+    else:
+        with open(name, "w", encoding="utf-8") as wfile:
+            yield wfile
+
+
+def write_nl_lines(thing, outfile_path):
+    with openw(outfile_path) as outf:
+        for line in thing:
+            print(line, file=outf)
+
+
+def same(lhs, rhs):
+    if type(lhs) is not type(rhs):
+        return False
+    return lhs.same(rhs)
+
+
+# unwind a list of lists etc can turn generators of lists of strings
+# into space joined string.
+def unwind1(args):
+    if isinstance(args, str):
+        yield args
+    else:
+        for el in args:
+            yield from unwind1(el)
+
+
+def unwind(args):
+    return " ".join(unwind1(args))
+
+
+# find the file if in dist or just checkout out.
+def find_ours(filename):
+    for topdir in [".", ".."]:
+        for subdir in ["tests", "doc", "examples"]:
+            look_here = pathlib.Path(__file__).parent / topdir / subdir / filename
+            if look_here.exists():
+                return look_here.resolve()
+    raise FileNotFoundError  # no cover
+
+
+on_exit: typing.List[typing.Callable] = []

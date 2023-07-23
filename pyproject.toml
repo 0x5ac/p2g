@@ -1,14 +1,11 @@
 [tool.poetry]
-
-
-
+version = "0.2.376"
 name = "p2g"
-version = "0.1.97"
 description = "Transpile python into cnc gcode."
 authors = ["sac <sac@0x5ac.com>"]
-readme = "README.rst"
+readme = "readme.md" 
 license = "MIT"
-keywords = ["cnc", "gcode", "mill", "haas"]
+keywords = ["cnc", "gcode", "mill", "haas", "g-code", "probe", "vf"]
 classifiers = [
 "Development Status :: 3 - Alpha",
 "Intended Audience :: Manufacturing",
@@ -18,154 +15,156 @@ classifiers = [
 ]
 repository = 'https://github.com/0x5ac/p2g'
 homepage = 'https://github.com/0x5ac/p2g'
-
-
 packages = [
-    { include = "p2g", format = "sdist"},
+    { include = "p2g",    format = "sdist"},
 
 ]
-
-
-[tool.poetry.dependencies]
-
-python = "^3.10"
-docopt = "^0.6.2"
-pytest =  "^7.3.1"
-typeguard = "^3.0.2"
-rich = "^13.3.4"
-loguru = "^0.7.0"
+include = [ "p2g/doc/*"]
+exclude = [ ".*stamp*" ] 
 [tool.poetry.scripts]
 p2g = "p2g.main:main"
 
-[tool.poetry.group.dev.dependencies]
-pytest = {extras = ["all"], version = "^7.3.1"}
-pytest-cov = "^4.0.0"
-coverage = "^7.2.3"
+[tool.poetry.dependencies]
+python = ">= 3.10, < 4.0"
+typeguard = "^3.0.2"
+docopt = "^0.6.2"
 
-mypy = "^1.2.0"
-pylint = "^2.17.2"
-pydeps = "^1.12.1"
-flake8-annotations-complexity = "^0.0.7"
-flake8-pyproject = {extras = ["all"], version = "^1.2.3"}
-black = "^23.3.0"
+
+
+[tool.poetry.group.dev.dependencies]
+rich = "^13.3.4"
+vulture = "^2.7"
+pylint = "^2.17.4"
+pytest = {version = "^7.3.1"}
+mypy = "^1.4.1"
+deptry = "^0.12.0"
 ssort = "^0.11.6"
-tox = "^4.5.1"
-deptry = "^0.8.0"
-mccabe = "^0.7.0"
+pyright = "^1.1.316"
+flake8-pyproject = "^1.2.3"
+ruff = "^0.0.275"
+update = "^0.0.1"
+autopep8 = "^2.0.2"
+tox = "^4.6.4"
+pytest-cov = "^4.1.0"
 wrapt = "^1.15.0"
 dill = "^0.3.6"
-autoflake = "^2.1.1"
+
+[tool.deptry]
+exclude = ['(examples|tests)/*']
 
 [tool.pyright]
-disable = "N802"
-ignore = ["N802"]
-include = ["p2g/*.py"]
+include = ["p2g","tools"]
+
 [tool.isort]
 force_alphabetical_sort_within_sections = true
-#force_single_line = true
 combine_as_imports = true
 lines_between_types = 1
-known_localfolder = "p2g"
 lines_after_imports = 2
 float_to_top = true
 force_single_line = true
-src_paths = ["p2g"]
-
-
+src_paths = ["p2g","tests","examples","tools"]
 
 [tool.black]
 line-length=90
 
+[tool.autopep8]
+max_line_length= 90
+aggresive=10
+in-place=true
+#recursive=true
 
-[tool.pylama]
-linters = "mccabe,mypy,pycodestyle,pydocstyle,isort"
-max_line_length = 100
-ignore = "W0611,E501,D212,C0116,W0611,D100,D104,D101,C0115,C0114,D103,D105,D107,D102,N802,E800,B601,G004,E203,D209,D205,D400,E402"
-ignore-errors="E203"
-exclude= [ "p2g/tests", "p2g/doc" ]
-[tool.mypy]
+[tool.mypy] 
 ignore_missing_imports = true
 check_untyped_defs = true
-exclude= [ "p2g/tests" , "p2g/doc", "p2g/examples"]
+explicit_package_bases = true
+mypy_path=["."]
+files=["."]
 
 [tool.pydocstyle]
-ignore  = "D103,D101,D107,D100,D102,D105, D104"
-
-
+#ignore  = "D103,D101,D107,D100,D102,D105, D104"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-
+[tool.vulture]
+exclude =[ 'examples']
+ignore_names = ['_visit*','[A-Z]*' ]
+paths = ['p2g','tools']
 
 [tool.pylint]
 init-import = false
-
 disable = [
+"unnecessary-dunder-call",
+"import-outside-toplevel",
 "abstract-method",
-"redefined-builtin",
 "missing-module-docstring",
 "missing-function-docstring",
-"line-too-long",
-"missing-class-docstring",
-"C0116",
-"R0903",
-"wrong-import-position",
-"logging-fstring-interpolation",
-"forgotten-debug-statement",
-"W1203"
-]
+"missing-class-docstring"]
 
-good-names = "_,fn,el,ns,ch,i,n"
-ignore = ['p2g/tests']
+good-names = "_,fn,el,ns"
+
 [tool.pytest.ini_options]
-
-testpaths="p2g/tests"
-filterwarnings = [
-    "ignore:Module already imported so cannot be rewritten"
-]
-
+python_files = [ 'tests/*.py' ]
 console_output_style="classic"
-log_format="%(asctime)s %(message)s"
-log_date_format="%H%M"
-addopts="-p no:pylama -p no:pytest_pylama --cov=p2g --cov-append --tb=short -m 'not forcefail'"
+addopts=["--cov" , "--no-header", "-vv" ] 
 
-[tool.coverage.run]
-# though it looks like python,
-# this code is examined but not actually not run.
-#omit = ["p2g/examples/*", "p2g/tests/*"]
-#include = ["p2g/*.py"]
-omit=["./*.py", "p2g/debug.py", "p2g/builtin.py", "p2g/examples/*.py", "p2g/tests/*.py"]
 [tool.coverage.report]
-#show_missing = true
-#skip_covered = true
-exclude_lines = ["raise AssertionError", "pragma: no cover", "pass","soon", ".*placeholder.*", "for debug", "hard to test right", "no cover; crashes pytest", "no cover"]
 
+exclude_lines = [       "NotImplemented",
+                        "AssertionError",
+                        "for debug",
+                        "no cover",
+                        "@(abc\\.)?abstractmethod" ]
 
-
+omit = ["tests/*.py",
+        "examples/*.py"] 
 [tool.flake8]
-ignore = ['E231', 'E241', "T201", "SCS109", "B601", "IF100","SCS108", "S101","W503",
-'G004','E203', 'R504']
-exclude= ['p2g/tests', 'p2g/examples', 'p2g/doc']
-per-file-ignores = [
-    '__init__.py:F401',
-    '__main__.py:E402',     #  module level import not at top of file
-    'builtin.py:A001',    
-    'op.py:E203,E501',
+ignore="E203"
+exclude = [
+"tests/*",
+".tox/*"
 
-# function names with mixed case in exports.
-    'visible.py:N802'
 ]
-max-line-length = 100
-count = true
 
+max-line-length = 90
 
 [tool.ruff]
-ignore = [ "E501" ]
-ignore-init-module-imports = true
-exclude= [ "p2g/tests" , "p2g/doc", "p2g/examples"] 
+line-length = 90
 
 ################################################################################
 
+[tool.tox]
+legacy_tox_ini = """
+    [tox]
 
+    min_version = 4.0
+    skip_missing_interpreters =  true
+    env_list =
+        py310
+        py311
+        py312        
+
+
+    [testenv]
+    allowlist_externals = make            
+    deps = pytest
+            pytest-cov
+            rich
+    commands = make test
+
+    [testenv:lint]
+
+    deps = pyright
+            mypy
+            pytype
+            pylint
+            vulture
+            ruff
+            flake8
+            rich
+    commands = make lint
+
+
+
+"""

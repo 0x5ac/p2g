@@ -1,10 +1,5 @@
-# magic for things like
-#  a) g.goto.fast ([1,2])
-#  b) foo = g.probe.slow
-#  c)foo(z=12)
-
-
-import dataclasses
+import copy
+import enum
 import typing
 
 from p2g import axis
@@ -23,63 +18,57 @@ def flatten(args):
     return res
 
 
-def unpack(args, kwargs) -> vector.RValueVec:
+def unpack(args, kwargs) -> vector.TupleV:
     resmap: typing.Dict[int, scalar.Scalar] = {}
     if args:
-        args = map(vector.wrap_maybe_vec, args)
+        args = map(vector.wrap, args)
         args = flatten(args)
-
         for idx, value in enumerate(args):
             resmap[idx] = value
-
     # can have x=1,y=1 or xy=(somthing)
     for axis_string, values in kwargs.items():
-        values = vector.wrap_maybe_vec(values)
+        values = vector.wrap(values)
         axis_indexes = axis.name_to_indexes_list(axis_string)
         for axis_idx, value in zip(axis_indexes, values.forever()):
             if axis_idx in resmap:
-                err.compiler(f"Overlapping axes {args} {kwargs}")
+                err.compiler(f"Overlapping axes {args} {kwargs}.")
             resmap[axis_idx] = value
-
     # fill any holes.
     coord_size = 0
     if resmap:
         coord_size = max(resmap) + 1
-
     # rules:
     # everything in the input gets packed into
     # the output in the right order.
     # if something is a nan in the input, and
     # we've got gap_default, then the nan is
     # turned into that.
-
     min_size = 0
-    return vector.RValueVec(
+    return vector.TupleV(
         [resmap.get(x) for x in range(max(min_size, coord_size))], from_user=True
     )
 
 
+class CoNum(enum.IntEnum):
+    CONST = enum.auto()
+    FIXED = enum.auto()
+    VAR = enum.auto()
+
+
 # build things like AABuilder(1,2,3, _addr=123) and AABuilder[8](_addr=123)
-@dataclasses.dataclass
-class _TypeBuilder:
-    btype: str
+class CoType:
     size: typing.Optional[int]
+    cot: CoNum
+    # for typing, default works too.
+    x: "CoType"
 
-    def __init__(self, btype="c", *, size=None):
-        self.btype = btype
-        self.size = size
-
-    def check_addr_sanity(self, addr):
-        if addr is None:
-            return
-        if self.btype == "c":
-            err.compiler("Const can't have an address.")
-        elif self.btype == "a":
-            err.compiler("Var can't have an address.")
+    def __init__(self, cot: CoNum):
+        self.cot = cot
+        self.size = None
 
     def check_size_sanity(self, size, initialized_size):
         if initialized_size > 0 and initialized_size != size:
-            err.compiler(f"Conflicting sizes {self.size} and {initialized_size}")
+            err.compiler(f"Conflicting sizes {self.size} and {initialized_size}.")
         if size == 0 and initialized_size == 0:
             err.compiler("Zero sized vector.")
 
@@ -90,38 +79,35 @@ class _TypeBuilder:
         self.check_size_sanity(size, initialized_size)
         return size
 
-    def __call__(
-        self,
-        *args,
-        addr=None,
-        **kwargs,
-    ):
-        self.check_addr_sanity(addr)
+    def __call__(self, *args, addr: typing.Optional[int] = None, **kwargs):
         values = unpack(args, kwargs)
-
         initialized_size = values.nelements()
-
         size = self.workout_size(initialized_size)
-
-        if self.btype == "c":
-            return values
-        if addr is None:
-            addr = gbl.iface.next_bss(size)
+        match self.cot:
+            case CoNum.CONST:
+                if addr is not None:
+                    err.compiler("Const can't have an address.")
+                return values
+            case CoNum.FIXED:
+                if addr is None:
+                    err.compiler("Fixed needs an address.")
+            case CoNum.VAR:
+                if addr is not None:
+                    err.compiler("Var can't have an address.")
+                addr = gbl.iface.next_bss(size)
         res = vector.MemVec(addr, size)
-        if values.nelements():
+        if initialized_size:
             for lhs, rhs in zip(res.everything(), values.forever()):
                 stat.append_set(lhs, rhs)
-
         return res
 
     # sets vector size.
     def __getitem__(self, el):
-        return _TypeBuilder(
-            size=el,
-            btype=self.btype,
-        )
+        cop = copy.copy(self)
+        cop.size = el
+        return cop
 
 
-Var = _TypeBuilder("a")
-Fixed = _TypeBuilder("f")
-Const = _TypeBuilder("c")
+Var = CoType(CoNum.VAR)
+Fixed = CoType(CoNum.FIXED)
+Const = CoType(CoNum.CONST)

@@ -1,19 +1,10 @@
-import typing
-
 from p2g import nd
-from p2g import opinfo
-
-
-Ctype = typing.Union[float, int, str]
 
 
 class Scalar(nd.EBase):
-    opfo: opinfo.Opinfo
+    opfo: nd.Opinfo
     is_none_constant = False
     is_constant = False
-    is_string_constant = False
-    is_numeric_constant = False
-    is_scalar = True
 
     def __init__(self, opfo):
         self.opfo = opfo
@@ -21,9 +12,6 @@ class Scalar(nd.EBase):
     @property
     def prec(self):
         return self.opfo.prec
-
-    def get_address(self):
-        return None
 
     def forever(self):
         while True:
@@ -37,10 +25,10 @@ class Scalar(nd.EBase):
 
     # placeholder to east typechecking,
     # overwitten by op install machines.
-    def __add__(self, _other):
+    def __add__(self, _other):  # no cover
         pass
 
-    def __lt__(self, _other):
+    def __lt__(self, _other):  # no cover
         pass
 
     def __int__(self) -> int:
@@ -53,12 +41,19 @@ class ConstantBase(Scalar):
 
 class Constant(ConstantBase):
     _value: int | float
-    is_numeric_constant = True
+
+    def rtl_arg_info_(self):
+        return ["constant"]
+
+    def rtl_get_arg_(self, _idx):
+        return self._value
 
     def __init__(self, value: int | float):
-        super().__init__(opinfo.const_opinfo)
+        super().__init__(nd.const_nd)
         self._value = value
 
+    # def get_address(self):
+    #     err.compiler("Can't take address of constant.")
     @property
     def value(self):
         return self._value
@@ -78,7 +73,6 @@ class Constant(ConstantBase):
     def __bool__(self):
         if self._value:
             return True
-
         return False
 
     def __int__(self) -> int:
@@ -95,43 +89,35 @@ class ConstantNone(ConstantBase):
     is_none_constant = True
 
     def __init__(self):
-        super().__init__(opinfo.const_opinfo)
+        super().__init__(nd.const_nd)
+
+    def to_gcode(self, _modifier) -> str:
+        return "<none>"
 
 
 class ConstantStr(ConstantBase):
     value: str
-    is_string_constant = True
 
     def __init__(self, value: str):
-        super().__init__(opinfo.const_opinfo)
+        super().__init__(nd.const_nd)
         self.value = value
 
     def to_gcode(self, modifier=nd.NodeModifier.EMPTY) -> str:
         # as an integer literal or as a string.
-
         if modifier & nd.NodeModifier.ARGUMENT:
             return f"{ord(self.value)}."
         return f"'{self.value}'"
 
 
-def wrap_optional_scalar(thing) -> typing.Optional[Scalar]:
+def wrap_scalar(thing) -> Scalar:
     if isinstance(thing, str):
         return ConstantStr(thing)
-
+    if thing is None:
+        return ConstantNone()
     if isinstance(thing, (int, float, bool)):
         return Constant(thing)
     if isinstance(thing, Scalar):
         return thing
-    return None
-
-
-def wrap_scalar(thing) -> Scalar:
-    if thing is None:
-        return ConstantNone()
-    res = wrap_optional_scalar(thing)
-    if res is not None:
-        return res
-
     return thing.to_scalar()
 
 
@@ -139,7 +125,6 @@ def wrap_scalar(thing) -> Scalar:
 def urange(start, stop, step=1):
     stop = int(stop)
     step = int(step)
-
     tmp = list(range(int(start), stop, step))
     for el in tmp:
         yield el

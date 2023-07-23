@@ -3,7 +3,6 @@ from p2g import scalar
 
 
 NAMES = "xyz"
-
 # special case constant for vectors of naxes size.
 
 
@@ -16,7 +15,7 @@ class Axes(scalar.Constant):
         return len(NAMES)
 
     @_value.setter
-    def _value(self, inset):
+    def _value(self, _inset):
         pass
 
 
@@ -36,4 +35,4 @@ def name_to_indexes_list(name: str) -> list[int]:
     try:
         return [axis_name_to_index(ch) for ch in name]
     except ValueError:
-        return err.compiler(f"Bad axis letter in '{name}'")
+        return err.compiler(f"Bad axis letter in '{name}'.")

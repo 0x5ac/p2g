@@ -1,222 +1,201 @@
-#! /usr/bin/env python
+import collections
 import datetime
 import pathlib
+import re
 import shutil
 import sys
+import typing
 
 import docopt
 
-from loguru import logger
-
-from p2g import debug
 from p2g import err
 from p2g import gbl
-from p2g import lib
-from p2g import makestdvars
-from p2g import version
-from p2g import walk
+from p2g import VERSION
+from p2g import walkfunc
 
-
-DOC = """
-Turns a python program into a gcode program.
+DOC = """Example of program with many options using docopt.
 
 Usage:
-   p2g [options] gen <srcfile>
-   p2g [options] ngen <srcfile>
-   p2g [options] test [<srcfile>]
-   p2g [options] examples
-   p2g [options] version
-   p2g [options] stdvars [--txt=<txtfile>] [--dev=<devfile>] [--py=<pyfile>] [--org=<orgfile>]
+  p2g.py [options]  <srcfile> [<dstfile>]
+  p2g.py --help [<topic>]
+  p2g.py --version
+  p2g.py --location
+  p2g.py --examples <dstdir>
 
-Try:
-   p2g gen -o ../nc/O05AC.nc vf3/vicecenter.py
-       Read vicecenter.py starting at the last function in file.
-       Turn into gcode in ../nc/O05AC.nc
 
-   p2g ngen -o ../nc/O05AC.nc vf3/vicecenter.py
-       Same as the 'gen' command, save the output is formatted
-       to fit in the narrow space in the CNC machine's program
-       display.
+#   Example:
+#       p2g tram-rotary.py ~/_nc_/O{countdown}tr.nc
+#        Makes an output of the form ~/_nc_/O1234tr.nc
+#
+#       p2g --func=thisone -
+#        Read from stdin, look for the 'thisone' function and write to
+#        to stdout.
+#
 
-   p2g gen --func=main vf3/probecheck.py > vf3/probecheck.nc
-        Run through probecheck.py(main) and make vf3/probecheck.nc
-
-   p2g test
-        Run internal test.
-
-   p2g examples
-        Copies the examples into the current directory and then runs
-        p2g  gen vicecenter.py
-        p2g  gen checkprobe.py
-
-   p2g stdvars
-       Regenerate machine specific definitions.
+Arguments:
+  <srcfile>   Source python file. [default: stdin]
+  <dstfile>   Destination G-Code file. [default: stdout]
+               {countdown} in file name creates a decrementing prefix
+               for the output file which makes looking for the .nc in
+               a crowded directory less painful - it's at the top.
+               (It's the number of seconds until midnight, so clear
+               the directory once a day.)
+  <topic>     [ topics | all | <topic>]
+        # <topic>  Print from readme starting at topic.
+        # topics:  List all topics.
+        # all      Print all readme.
 
 Options:
-    -o <file> --out=<file>   Output file, [default: <stdout>]
-    --outdir <dir>           Output directory, [default: .]
-    -h --help                This.
-    -v --verbose             Make verbose
-    --relative-paths         Errors contain paths relative to current directory.
-    --relative-lines         Errors contain linenumbers relative to start of function.
-    --job=<pattern>             Job name, [default: O0001]
-    --function=<name>        Function to compile, [default: <last function in file>]
-    --debug                  Enter debugging code. [default: False]
-    --recursive              Notify when called by self. [default: False]
-    --logfile=<logfile>      Turn on logger.and send to <logfile> [default: <stdout>]
-    --loglevel=<loglevel>    Set logger.level [default: ERROR]
-    --break                  Breakpoint on error.
-
-    output pattern may include <time> which will create a decrementing
-    prefix for the output file which makes looking for the .nc in a
-    crowded directory simpler.
-
-    eg  --out="~/_nc_/<time>O001-foo.nc" foo.py
-    makes an output of the form ~/_nc_/001234O001-foo.nc
-
-    Output directory is used as a prefix for out, as well as output
-    for examples.
+     --job=<jobname>      Olabel for output code.
+     --function=<fname>   Function to be compiled,
+                           default is last one in source file.
+     --narrow             Emit comments on their own line,
+                           makes text fit more easily into
+                           a narrow program window.
+     --version            Print version.
+     --location           Print path of running executable.
+     --examples=<dstdir>  Create <dstdir>, populate with
+                              examples and compile.
+#
+#         Examples:
+#           p2g --examples showme
+#             Copies the examples into ./showme and then runs
+#              p2g showme/vicecenter.py showme/vicecenter.nc
+#              p2g showme/checkprobe.py showme/checkprobe.nc
+#
+#For maintenance:
+     --emit-rtl           Write internal format to output file.
+     --break              pdb.set_trace() on error.
+     --no-version         Don't put version number in outputs.
+     --verbose=<level>    Set verbosity level [default: 0]
 """
 
 
-def do_examples(opts):
-    here_dir = pathlib.Path(__file__).parent
-    example_dir = here_dir / "examples"
-    examples = example_dir.glob("[a-z]*.py")
+def do_examples(outdir):
 
-    outdir = opts["--outdir"]
+    find_examples = gbl.find_ours("vicecenter.py")
+    dst_dir = outdir.resolve()
+    example_dir = find_examples.parent
+    example_files = example_dir.glob("[a-z]*.py")
     outdir.mkdir(exist_ok=True, parents=True)
-
-    srcnames = []
-    for src in examples:
-        dst_name = outdir / src.parts[-1]
-        print(f"Copying {src} {dst_name}")
+    for src in example_files:
+        dst_name = outdir / src.name
+        gbl.sprint(f"Copying {src} {dst_name}")
         shutil.copy(src, dst_name)
-        srcnames.append(dst_name)
     for job in ["vicecenter", "probecalibrate"]:
-        top_name = outdir / (job + ".py")
-        out_name = outdir / (job + ".nc")
+        rootname = dst_dir / job
         sysargs = [
-            "--out",
-            str(out_name),
-            "gen",
-            str(top_name),
+            str(rootname.with_suffix(".py")),
+            str(rootname.with_suffix(".nc")),
         ]
-
-        print(f"Running {' '.join(sysargs)}")
+        gbl.sprint(f"Running p2g {sysargs[0]} {sysargs[1]}")
         main(sysargs)
 
 
-def setup_logger(opt):
-    loglevel = opt["--loglevel"]
+# chop readme.txt into bits given back by
+# choice of section.
+def do_doc(want):
+    doc = gbl.find_ours("readme.txt").read_text()
+    doc = doc.replace("</code>", "]").replace("<code>", "[")
+    lines = doc.split("\n")
+    by_section = collections.defaultdict(list)
+    # a section header comes the text, not TOC, looks like:
+    # the form <number>  <title>
+    want = want.lower()
+    section_name = ""
+    for line in lines:
+        got = re.match("\\d+ (.*)", line)
+        if got:
+            section_name = got.group(1).lower()
+        by_section[section_name].append(line)
+    if want == "topics":
+        for section in by_section:
+            print(f" {section}")
+        return
+    doneone = False
+    for section, lines in by_section.items():
+        if want == "all" or want in section:
+            doneone = True
+            for line in lines:
+                print(line)
+    if not doneone:
+        print(f"{want} not found, topics:")
+        for section in by_section:
+            print(f" {section}")
 
-    if gbl.config.debug:
-        loglevel = "DEBUG"
 
-    logfile = opt["--logfile"]
-    if logfile == "<stdout>":
-        logfile = sys.stdout
+def calculate_output_file_name(provided_filename):
+    # if provided_filename is empty then output is stdout.
+    if provided_filename is None:
+        return "-"
 
-    logger.remove()
-    logger.add(
-        logfile,
-        level=loglevel,
-        format="{message}",
-    )
-    logger.info(f"Logging on {opt['--loglevel']} {logfile}")
-
-
-def output_file_name(opts):
     now = datetime.datetime.now()
-    prev_midnight = now.replace(hour=0, minute=0, second=0, microsecond=0)
-    next_midnight = 24 * 60
-    mins_togo = next_midnight - (now - prev_midnight).seconds // 60
-
-    out_name = "-"
-
-    if opts["--out"] != "<stdout>":
-        out_name = opts["--outdir"] / pathlib.Path(opts["--out"])
-
-    out_name = str(out_name).replace("<time>", f"{mins_togo:05d}")
-    return out_name
+    prev_midnight_secs = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    mins_since = (now - prev_midnight_secs).seconds // 60
+    mins_togo = 24 * 60 - mins_since
+    return provided_filename.replace("{countdown}", f"{mins_togo:04d}")
 
 
-def do_gen(opts):
-    gbl.config.in_pytest = False
-
-    src_name = opts["<srcfile>"]
+def do_gen(src_name, job_name, func_name, output_name):
+    if func_name is None:
+        func_name = "<last>"
+    job_name = job_name if job_name else "O0001"
+    output_name = calculate_output_file_name(output_name)
     src_path = pathlib.Path(src_name)
-    job_name = src_path.stem
-
-    if opts["--job"] != "<srcfilename>":
-        job_name = opts["--job"]
-
-    func_name = opts["--function"]
-
-    output_name = opts["--out"]
-
-    logger.info(f"src: {src_path}")
-    logger.info(f"fnc: {func_name}")
-    logger.info(f"job: {job_name}")
-    logger.info(f"output: {output_name}")
+    gbl.v1print(f"src: {src_path}")
+    gbl.v1print(f"fnc: {func_name}")
+    gbl.v1print(f"job: {job_name}")
+    gbl.v1print(f"out: {output_name}")
     try:
-        res = walk.compile2g(func_name, src_path, job_name=job_name, in_pytest=False)
-        lib.write_nl_lines(res, output_name)
+        res = walkfunc.compile2g(func_name, src_path, job_name=job_name)
+        gbl.write_nl_lines(res, output_name)
         return 0
     except err.CompilerError as exn:
         exn.report_error(absolute_lines=True)
-
-    except FileNotFoundError as exn:
-        print(exn, file=sys.stderr)
-
-    # when inside self return with no error
-    # even if there was one, message is in stderr.
-    if opts["--recursive"]:
-        return 0
     return 1
 
 
-def main(argv=None):
-    opts = docopt.docopt(DOC, argv)
+def main(options: typing.Optional[list[str]] = None):
 
-    gbl.config.debug = opts["--debug"]
-    opts["--outdir"] = pathlib.Path(opts["--outdir"])
-    setup_logger(opts)
-    logger.info(argv)
+    # remove comments from source to docopt.
 
-    opts["--out"] = output_file_name(opts)
-    if opts["--break"]:  # no cover
-        gbl.config.bp_on_error = True
+    parseable_opts = re.sub("#.*\n", "", DOC)
+    opts = docopt.docopt(parseable_opts, help=False, argv=options)
+    gbl.config = gbl.config._replace(
+        bp_on_error=opts["--break"],
+        verbose=(int(opts["--verbose"])),
+        narrow_output=gbl.config.narrow_output or opts["--narrow"],
+        no_version=gbl.config.no_version or opts["--no-version"],
+        emit_rtl=gbl.config.emit_rtl or opts["--emit-rtl"],
+    )
+    res = 0
 
-    gbl.config.opt_relative_paths = opts["--relative-paths"]
-    gbl.config.opt_relative_lines = opts["--relative-lines"]
+    if opts["--version"]:
+        gbl.sprint(VERSION)
+        return 0
+    if opts["--location"]:
+        gbl.sprint(f"{sys.argv[0]}")
+        return 0
+    if opts["--help"]:
+        match opts["<topic>"]:
+            case None:
+                gbl.sprint(DOC.strip("\n").replace("#", ""))
+            case "topics":
+                do_doc("topics")
+            case "all":
+                do_doc("all")
+            case _:
+                do_doc(opts["<topic>"])
 
-    if opts["version"]:
-        with lib.openw(opts["--out"]) as out:
-            print(f"Version: p2g {version.__version__}", file=out)
+    elif opts["--examples"]:
+        do_examples(pathlib.Path(opts["--examples"]))
 
-    if opts["--recursive"]:
-        if isinstance(argv, list):
-            argv.insert(0, "p2g")
-            sys.argv = argv
-        gbl.config.recursive = True
-
-    if opts["examples"]:
-        do_examples(opts)
-    elif opts["stdvars"]:
-        makestdvars.makestdvars(
-            opts["--txt"],
-            opts["--dev"],
-            opts["--py"],
-            opts["--org"],
+    else:
+        res = do_gen(
+            src_name=opts["<srcfile>"],
+            job_name=opts["--job"],
+            func_name=opts["--function"],
+            output_name=opts["<dstfile>"],
         )
-    elif opts["gen"]:
-        gbl.config.opt_narrow_output = False
-        return do_gen(opts)
-    elif opts["ngen"]:
-        gbl.config.opt_narrow_output = True
-        return do_gen(opts)
 
-    elif opts["test"]:  # for debug
-        debug.run_test(opts["<srcfile>"])
-    return 0
+    return res

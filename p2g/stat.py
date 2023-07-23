@@ -3,19 +3,24 @@ import dataclasses
 import itertools
 import typing
 
-from loguru import logger
-
 from p2g import err
 from p2g import gbl
-from p2g import lib
 from p2g import nd
 
 
-COMMENT_INDENT = 34
-
-
+WIDE_COMMENT_INDENT = 34
+# infront of code which isn't optional block.
+OPT_PREFIX = ""
 # infront of code which isn't a label
 NORMAL_PREFIX = "  "
+
+# args to make comments
+
+
+class CType:  # pylint: disable=too-few-public-methods
+    NO_COMMENT = "no_comment"
+    SRC_COMMENT = "src_comment"
+    FAIL_COMMENT = "FAIL"
 
 
 @dataclasses.dataclass
@@ -31,25 +36,22 @@ class Label:
         return f"{self.idx}"
 
     def as_gcode_definition(self):
-        return f"L{self.idx}"
+        return f"N{self.idx}"
 
 
 # auto comment is a comment which comes from
 # the source, rather than being typed.
 # we take liberties to increase information density.
-
-
 # remove bad chars from a comment.
 def clean_comment_chars(txt: str):
     res = ""
-    for ch in txt:
-        match ch:
+    for el in txt:
+        match el:
             case "(":
-                ch = "["
+                el = "["
             case ")":
-                ch = "]"
-
-        res += ch
+                el = "]"
+        res += el
     return res
 
 
@@ -57,127 +59,151 @@ def compress_and_clean(line: str):
     guts = clean_comment_chars(line)
     for too_talky in ["p2g.", "var."]:
         guts = guts.replace(too_talky, "")
-
     if guts.startswith("    "):
         guts = guts[4:]
-
     return "( " + guts.ljust(30) + ")"
 
 
-def workout_comtxt(pos, comtxt, blockstate):
-    if comtxt == "<no comment>":
-        return ""
-
-    if not comtxt:
-        comtxt = err.src_code_from_node_place(pos)
-    comtxt = compress_and_clean(comtxt)
-    if comtxt == blockstate.prev_comtxt:
-        comtxt = ""
-    else:
-        blockstate.prev_comtxt = comtxt
-    return comtxt
-
-
-@dataclasses.dataclass
 class StatBase(abc.ABC):
-    _comtxt: str
+    _comment: str
 
-    # empty comment means use src if possible.
-    # <no comment> means no comment
-    def __init__(self, comtxt=""):
+    @abc.abstractmethod
+    def rtl_arg_info_(self):
+        return []
+
+    @abc.abstractmethod
+    def rtl_get_arg_(self, _idx):
+        raise IndexError
+
+    def __init__(self, *, comment_txt=CType.FAIL_COMMENT):
+        self.prefix = OPT_PREFIX
         self.pos = err.state.last_pos
-        self._comtxt = comtxt
+        assert comment_txt is not None
+        assert comment_txt != CType.FAIL_COMMENT
+        # if specifically asked for no comment, then we're done.
+        if comment_txt == CType.NO_COMMENT:
+            self._comment = ""
+            return
+        # no comment supplied, then use source line.
+        if comment_txt == CType.SRC_COMMENT:
+            comment_txt = err.src_code_from_node_place(self.pos)
+        comment_txt = compress_and_clean(comment_txt)
+        self._comment = comment_txt
+
+    def talkabout(self, orig):
+        return f"{orig} {self._comment}"
 
     def to_line_lhs(self) -> list[str]:
         raise AssertionError
 
-    @lib.g2l
-    def to_full_lines(self, blockstate):
-        comtxt = workout_comtxt(self.pos, self._comtxt, blockstate)
+    @gbl.g2l
+    def stat_to_rtl(self):
 
+        yield from nd.to_rtl(self)
+
+    @gbl.g2l
+    def to_full_lines(self, nest):
+        comtxt = self._comment
+        if comtxt == nest.prev_comtxt:
+            comtxt = ""
+        else:
+            nest.prev_comtxt = comtxt
         for code_txt, com_txt in itertools.zip_longest(
             self.to_line_lhs(),
             [comtxt],
             fillvalue="",
         ):
-            # If code would leak into comment, put out the comment on
-            # own line.  If in narrow mode (by option,  or default if
-            # in pytest or debug), put on own line too.
+            yield from self.yield_lines(code_txt, com_txt)
 
-            if gbl.config.narrow_output:
-                comment_indent = 0
-            else:
-                comment_indent = COMMENT_INDENT
-
-            code_comment_gap = comment_indent - len(code_txt)
-            if code_comment_gap < 0:
-                first_line = com_txt
-                second_line = code_txt
-            else:
-                if com_txt:
-                    first_line = code_txt + " " * code_comment_gap + com_txt
-                else:
-                    first_line = code_txt
-                second_line = ""
-            if first_line:
-                yield first_line
-            if second_line:
-                yield second_line
+    def yield_lines(self, code_txt, com_txt):
+        # narrow output - emit comment and then code on different
+        # lines, then done.  If code is too wide for comment to start
+        # in the right place, also done.
+        code_comment_gap = WIDE_COMMENT_INDENT - len(code_txt)
+        if not gbl.config.narrow_output and code_comment_gap >= 0 and com_txt:
+            code_txt = code_txt + " " * code_comment_gap + com_txt
+            com_txt = ""
+        if com_txt:
+            yield com_txt
+        if code_txt:
+            yield self.prefix + code_txt
 
 
 @dataclasses.dataclass
 class Nest:
     first_label: int
     next_label: int
-
-    prev: "Nest"
+    prev_comtxt: str
     slist: list[StatBase]
-    cur: "Nest" = typing.cast("Nest", None)
+    cur: typing.Optional["Nest"] = None
 
-    def __init__(self, in_pytest=False):
-        self.prev = Nest.cur
-        if not in_pytest and Nest.cur:
-            self.first_label = self.prev.first_label + 1000
-        else:
-            self.first_label = 1000
-        Nest.cur = self
+    def nest_to_rtl(self):
+
+        for stat in self.slist:
+
+            yield "".join(stat.stat_to_rtl())
+
+    def __init__(self):
+        self.prev_comtxt = ""
+        self.first_label = 1000
         self.next_label = self.first_label
         self.slist = []
 
-    def get_label(self):
-        res = self.next_label
-        self.next_label += 1
+    @classmethod
+    def get_label(cls):
+        assert cls.cur is not None
+        res = cls.cur.next_label
+        cls.cur.next_label += 1
         return Label(res)
 
     @classmethod
     def add_stat(cls, stat):
+        gbl.v2print(f"Adding {stat}")
+        if Nest.cur is None:
+            return
         Nest.cur.slist.append(stat)
 
-    @lib.g2l
+    @gbl.g2l
     def to_full_lines(self):
-        class BS:
-            prev_comtxt = ""
-
-        blockstate = BS()
         for line in self.slist:
-            yield from line.to_full_lines(blockstate)
+            yield from line.to_full_lines(self)
 
-    def __enter__(self):
-        return self
+    @classmethod
+    def __enter__(cls):
+        assert cls.cur is None
+        cls.cur = Nest()
+        return cls.cur
 
-    def __exit__(self, *_exn):
-        Nest.cur = self.prev
+    @classmethod
+    def __exit__(cls, *_exn):
+        cls.cur = None
 
 
 class CommentLines(StatBase):
+    def rtl_arg_info_(self):
+        return []
+
+    def rtl_get_arg_(self, _idx):
+        raise AssertionError
+
     def __init__(self, lines):
-        super().__init__()
+        super().__init__(comment_txt=CType.NO_COMMENT)
         self.lines = lines
 
     def to_full_lines(self, _):
         lines = list(map(str, self.lines))
-        lines = lib.pad_to_same_width(lines)
 
+        def max_str_len(lines):
+            return len(max(lines, key=len, default=""))
+
+        def pad_to_same_width(lines):
+            wid = max_str_len(lines)
+            res = []
+            for line in lines:
+                res.append(line.ljust(wid))
+            return res
+
+        lines = pad_to_same_width(lines)
         for line in lines:
             if line.strip():
                 yield "( " + clean_comment_chars(line) + " )"
@@ -185,9 +211,7 @@ class CommentLines(StatBase):
                 yield ""
 
 
-def add_stat(stat):
-    logger.info(f"Adding {stat}")
-    Nest.add_stat(stat)
+add_stat = Nest.add_stat
 
 
 def comment(*lines):
@@ -204,11 +228,17 @@ class Goto(StatBase):
     target: Label
 
     def __init__(self, target: Label):
-        super().__init__()
+        super().__init__(comment_txt=CType.SRC_COMMENT)
         self.target = target
 
     def to_line_lhs(self):
-        yield f"  GOTO {self.target.as_gcode_ref()}"
+        yield f"{NORMAL_PREFIX}GOTO {self.target.as_gcode_ref()}"
+
+    def rtl_arg_info_(self):
+        return ["labelref"]
+
+    def rtl_get_arg_(self, _idx):
+        return self.target
 
 
 @dataclasses.dataclass
@@ -216,36 +246,85 @@ class If(StatBase):
     exp: typing.Any
     on_t: Label
 
-    def __init__(self, exp, on_t: Label):
-        super().__init__()
+    def rtl_arg_info_(self):
+        return ["exp", "labelref"]
 
+    def rtl_get_arg_(self, idx):
+        if idx == 0:
+            return self.exp
+        return self.on_t
+
+    def __init__(self, exp, on_t: Label):
+        super().__init__(comment_txt=CType.SRC_COMMENT)
         self.exp = exp
         self.on_t = on_t
 
     def to_line_lhs(self):
         lhs = f"IF [{nd.to_gcode(self.exp)}] "
         rhs = f"GOTO {self.on_t.as_gcode_ref()}"
-        yield NORMAL_PREFIX + lhs + rhs
+        yield f"{NORMAL_PREFIX}{lhs}{rhs}"
 
 
 @dataclasses.dataclass
+class IfSet(StatBase):
+    cond: typing.Any
+    ass: "Set"
+
+    def rtl_arg_info_(self):
+        return ["exp", "dst", "src"]
+
+    def rtl_get_arg_(self, idx):
+        if idx == 0:
+            return self.cond
+
+        if idx == 1:
+            return self.ass.args[0]
+        return self.ass.args[1]
+
+    def __init__(self, cond, ass, comment_txt=CType.SRC_COMMENT):
+        super().__init__(comment_txt=comment_txt)
+        self.cond = cond
+        self.ass = ass
+
+    def to_line_lhs(self):
+        yield f"{NORMAL_PREFIX}IF [{nd.to_gcode(self.cond)}] {self.ass}"
+
+
 class Code(StatBase):
     txt: str
 
-    def __init__(self, txt, ctxt):
-        super().__init__(ctxt)
-        self.txt = txt
+    def rtl_arg_info_(self):
+        return ["?string"]
+
+    def rtl_get_arg_(self, _idx):
+        return self.txt
+
+    def __init__(self, txtargs, comment_txt=CType.SRC_COMMENT):
+        super().__init__(comment_txt=comment_txt)
+        self.txt = gbl.unwind(txtargs)
 
     def to_line_lhs(self):
-        yield NORMAL_PREFIX + self.txt
+        if self.txt and (self.txt[0] in "O%LN"):
+            yield self.txt
+        else:
+            yield f"{NORMAL_PREFIX}{self.txt}"
+
+    def __repr__(self):
+        return self.talkabout(f"Code: {self.txt}")
 
 
 @dataclasses.dataclass
 class Dprint(StatBase):
     txt: str
 
+    def rtl_get_arg_(self, _idx):
+        raise AssertionError
+
+    def rtl_arg_info_(self):
+        return []
+
     def __init__(self, txt):
-        super().__init__("<no comment>")
+        super().__init__(comment_txt=CType.NO_COMMENT)
         self.txt = txt
 
     def to_line_lhs(self):
@@ -253,51 +332,95 @@ class Dprint(StatBase):
 
 
 class Set(StatBase):
-    lhs: nd.EBase
-    rhs: nd.EBase
+    args: list[nd.EBase]
+    msg_txt: str
 
-    def __init__(self, lhs: nd.EBase, rhs: nd.EBase, comtxt: str = ""):
-        super().__init__(comtxt)
+    def __init__(
+        self,
+        lhs: nd.EBase,
+        rhs: nd.EBase,
+        *,
+        msg_txt: str = "",
+        comment_txt=CType.SRC_COMMENT,
+    ):
+        super().__init__(comment_txt=comment_txt)
         assert isinstance(lhs, nd.EBase)
-        self.lhs = lhs
-        self.rhs = rhs
+        self.args = [lhs, rhs]
+        self.msg_txt = msg_txt
 
-    @lib.g2l
+    @gbl.g2l
     def to_line_lhs(self):
-        lhs = self.lhs.to_gcode(nd.NodeModifier.EMPTY)
-        rhs = self.rhs.to_gcode(nd.NodeModifier.ARGUMENT)
-        yield f"{NORMAL_PREFIX}{lhs}= {rhs}"
+        yield f"{NORMAL_PREFIX}{self}"
+
+    def rtl_arg_info_(self):
+        return ["dst", "src"]
+
+    def rtl_get_arg_(self, idx):
+        return self.args[idx]
+
+    def __repr__(self):
+        lhs = nd.to_gcode(self.args[0])
+        rhs = nd.to_gcode(self.args[1], modifier=nd.NodeModifier.ARGUMENT)
+        msg_txt = " ( " + clean_comment_chars(self.msg_txt) + " )" if self.msg_txt else ""
+        return f"{lhs}= {rhs}{msg_txt}"
 
 
-def append_set(dst, src, comtxt=""):
-    if not lib.same(dst, src):
-        add_stat(Set(dst, src, comtxt))
+def append_set(dst, src, comment_txt=CType.SRC_COMMENT):
+    if not gbl.same(dst, src):
+        add_stat(Set(dst, src, comment_txt=comment_txt))
 
 
-def code(txt, comtxt: str = ""):
-    if isinstance(txt, str):
-        add_stat(Code(txt, comtxt))
-        return
+def code(*txtargs, comment_txt=CType.SRC_COMMENT):
+    add_stat(Code(txtargs, comment_txt))
 
-    for line in txt:
-        code(str(line), comtxt)
-        comtxt = ""
+
+def codenl(txtlst, comment_txt=CType.SRC_COMMENT):
+    if isinstance(txtlst, str):
+        add_stat(Code(txtlst, comment_txt))
+    else:
+        for txt in txtlst:
+            codenl(txt, comment_txt)
+            comment_txt = CType.NO_COMMENT
+
+
+# contents evaluate when needed, not when
+# created.
+class Lazy(StatBase):
+    todo: typing.Generator[str, None, None]
+
+    def rtl_arg_info_(self):
+        return []
+
+    def rtl_get_arg_(self, _idx):
+        raise AssertionError
+
+    def __init__(self, todo: typing.Generator[str, None, None]):
+        super().__init__(comment_txt=CType.NO_COMMENT)
+        self.todo = todo
+
+    @gbl.g2l
+    def to_full_lines(self, _):
+        if self.todo:
+            yield from self.todo
 
 
 @dataclasses.dataclass
 class LabelDef(StatBase):
     labeldef: Label
 
+    def rtl_arg_info_(self):
+        return ["labeldef"]
+
+    def rtl_get_arg_(self, _idx):
+
+        return self.labeldef
+
     def __init__(self, labeldef: Label):
         self.labeldef = labeldef
-        super().__init__()
+        super().__init__(comment_txt=CType.NO_COMMENT)
 
     def to_line_lhs(self):
         yield f"{self.labeldef.as_gcode_definition()}"
-
-
-def next_label():
-    return Nest.cur.get_label()
 
 
 def dprint(fstr):
@@ -305,6 +428,4 @@ def dprint(fstr):
     add_stat(Dprint(fstr))
 
 
-# when run from tests, sometimes we get generated
-# statements by surprise.
-top = Nest()
+next_label = Nest.get_label

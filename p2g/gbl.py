@@ -4,6 +4,9 @@ import pathlib
 import sys
 import typing
 
+BLOCK_DELETE = False
+SYMBOL_TABLE = False
+
 
 class Config(typing.NamedTuple):
     narrow_output: bool = False

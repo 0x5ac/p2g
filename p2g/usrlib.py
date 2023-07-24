@@ -10,17 +10,17 @@ def load_tool(tool):
 
 
 class Optional:
-    prev: str
+    prev: bool
 
     def __init__(self):
-        self.prev = p2g.BLOCK_DELETE
-        p2g.BLOCK_DELETE = True
+        self.prev = gbl.BLOCK_DELETE
+        gbl.BLOCK_DELETE = True
 
     def __enter__(self):
         pass
 
     def __exit__(self, *_):
-        p2g.BLOCK_DELETE = self.prev
+        gbl.BLOCK_DELETE = self.prev
 
 
 class WCS:

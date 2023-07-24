@@ -215,6 +215,15 @@ doc/haas.org: $(TOOL_DIR)/makestdvars.py
 
 # emacs may not be installed, so after running with -, touch the output.
 # so next make stage will run using existing output files.
+%.md:%.in
+	$(HR)
+	$(TITLE) Build md from org
+	$(TITLE)
+	- $(EMACS) $(ELCOMMON) -f org-gfm-export-as-markdown $(WRITE_RESULT)
+	# fix the initial table of contents.
+	$(PR) python	tools/repairmd.py --src $@ --dst $@
+	rm -f readme.md.tmp 
+
 
 
 WRITE_RESULT= --eval '(write-region (point-min) (point-max) "$(@F)")'
@@ -229,18 +238,9 @@ ELCOMMON=						\
         --eval "(require 'ox-gfm)"			\
 	--eval "(setq org-confirm-babel-evaluate nil)"		
 
-doc/%.org:doc/%.in:
+doc/%.org:doc/%.in
 	- $(EMACS) $(ELCOMMON) $(DO_EVAL) $(WRITE_RESULT)
 	touch $@
-
-%.md:%.in:
-	$(HR)
-	$(TITLE) Build md from org
-	$(TITLE)
-	- $(EMACS) $(ELCOMMON) -f org-gfm-export-as-markdown $(WRITE_RESULT)
-	# fix the initial table of contents.
-	$(PR) python	tools/repairmd.py --src $@ --dst $@
-	rm -f readme.md.tmp 
 
 
 #doc/%.md:doc/%.org

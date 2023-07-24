@@ -49,7 +49,7 @@ def find_top(wcs):
     defs.goto_down(sch.above)
 
     # fast find move down to min search distance
-    defs.fast_work_probe(z=sch.above.z + sch.initial_search_depth)
+    defs.fast_work_probe(z=sch.above.z + sch.zslack)
 
     p2g.com("make wcs become ~0,0,0 at tdc")
     wcs.xyz = +haas.SKIP_POS
@@ -96,7 +96,7 @@ def fast_find(edge_name):
     defs.goto_up(sch.amin.xy * di.dxdy * 0.5, z=sch.skim)
     while its > 0:
         defs.goto_rel(delta.xy)
-        defs.fast_work_probe.all(z=sch.search_depth)
+        defs.fast_work_probe(z=sch.search_depth)
         if haas.SKIP_POS.z < sch.found_if_below:
             break
         defs.goto(z=sch.skim)
@@ -118,7 +118,7 @@ def backoff_and_slow_probe(edge_name, error):
     )
     defs.goto(z=sch.search_depth)
     defs.goto_rel(sch.backoff.xy * di.dxdy)
-    defs.slow_rel_probe(-sch.indent.xy * di.dxdy)
+    defs.slow_rel_probe(xy=-sch.indent.xy * di.dxdy)
     # no need to adjust by probe_r, since errors will
     # cancel out.
     error[di.cur_axis] += haas.SKIP_POS[di.cur_axis]

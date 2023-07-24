@@ -30,9 +30,26 @@ FAST_PROBE_FEED = 40.0
 must_skip_probe = p2g.goto.probe.mcode(haas.MUST_SKIP)
 may_skip_probe = p2g.goto.probe
 
-slow_rel_probe = must_skip_probe.relative.feed(SLOW_PROBE_FEED).all
-fast_rel_probe = must_skip_probe.relative.relative.all.feed(FAST_PROBE_FEED)
-fast_work_probe = may_skip_probe.work.feed(FAST_PROBE_FEED).all
+_slow_rel_probe = must_skip_probe.delay(10).relative.feed(SLOW_PROBE_FEED).all
+_fast_rel_probe = must_skip_probe.relative.relative.all.feed(FAST_PROBE_FEED)
+_fast_work_probe = may_skip_probe.work.feed(FAST_PROBE_FEED).all
+
+
+def slow_rel_probe(**cos):
+    _slow_rel_probe(**cos)
+    p2g.no_lookahead()
+
+
+def fast_rel_probe(**cos):
+    _fast_rel_probe(**cos)
+    p2g.no_lookahead()
+
+
+def fast_work_probe(**cos):
+    _fast_work_probe(**cos)
+    p2g.no_lookahead()
+
+
 goto_work = p2g.goto.work.feed(FAST_FEED).all
 goto_G53 = p2g.goto.machine.feed(FAST_FEED)
 

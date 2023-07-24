@@ -43,13 +43,13 @@ class SearchConstraint:
         indent: Optional[p2g.Vec] = None,
         backoff: Optional[p2g.Vec] = None,
         search_depth=None,
-        initial_search_depth=None,
+        zslack=None,
         found_if_below=None,
     ):
         super().__init__()
 
-        if initial_search_depth is None:
-            initial_search_depth = p2g.Const(-1.0)
+        if zslack is None:
+            zslack = p2g.Const(-1.0)
 
         if search_depth is None:
             search_depth = p2g.Const(-0.1)
@@ -75,7 +75,7 @@ class SearchConstraint:
         self.skim = skim
         self.backoff = backoff
         self.search_depth = search_depth
-        self.initial_search_depth = initial_search_depth
+        self.zslack = zslack
         self.found_if_below = found_if_below
         self.edge_search_depth = -0.1
 

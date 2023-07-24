@@ -42,6 +42,7 @@ class GotoWorker:
     _feed: float
     _probe: bool
     _mcode: str
+    _delay: int
 
     def accumulate_coords(self, cos):
         for aname, value in cos:
@@ -93,12 +94,12 @@ class GotoWorker:
         return self._update_space(MovementSpace.MACHINE)
 
     @property  # noqa
-    def z_first(self):
-        return self._update_order(MovementOrder.Z_FIRST)
-
-    @property  # noqa
     def z_last(self):
         return self._update_order(MovementOrder.Z_LAST)
+
+    @property  # noqa
+    def z_first(self):
+        return self._update_order(MovementOrder.Z_FIRST)
 
     @property  # noqa
     def all(self):
@@ -117,6 +118,9 @@ class GotoWorker:
 
     def mcode(self, m_code):  # noqa
         return self.update("_mcode", str(m_code))
+
+    def delay(self, delay):  # noqa
+        return self.update("_delay", delay)
 
     def accumulate_parts1(self):
         match self._space:
@@ -167,6 +171,8 @@ class GotoWorker:
             self.accumulate_parts1(),
             self.accumulate_coords(cos),
         )
+        if self._delay:
+            stat.code(f"G103 P{self._delay}")
 
     def __call__(self, *args, **kwargs):
         match self._order:
@@ -192,6 +198,7 @@ goto = GotoWorker(
     _space=MovementSpace.UNDEFINED,
     _order=MovementOrder.UNDEFINED,
     _feed=0,
+    _delay=0,
     _probe=False,
     _mcode="",
 )

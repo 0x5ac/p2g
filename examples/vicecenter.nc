@@ -1,34 +1,34 @@
 O0001 (vicecenter: 0.2.222+2)
 ( Symbol Table )
 
- ( MABS_ABOVE_VICE      : -27.500,-13.000,-17.500 )
- ( above                : -27.500,-13.000,-17.500 )
- ( amax                 :  16.000,  9.000,  3.000 )
- ( amin                 :   8.000,  4.000,  1.000 )
- ( backoff              :   0.100,  0.100,  0.100 )
- ( delta                :   1.000,  1.000         )
- ( delta                :   1.000,<none>          )
- ( delta                :  -1.000,<none>          )
- ( delta                : <none>,  1.000          )
- ( delta                : <none>, -1.000          )
- ( indent               :   1.600,  0.900,  0.300 )
- ( initial_search_depth :  -1.000                 )
- ( search_depth         :  -0.100                 )
- ( skim                 :   0.150                 )
- ( start_search         :   4.000,<none>          )
- ( start_search         :  -4.000,<none>          )
- ( start_search         : <none>,  2.000          )
- ( start_search         : <none>, -2.000          )
- ( stop_search          :   8.000,<none>          )
- ( stop_search          :  -8.000,<none>          )
- ( stop_search          : <none>,  4.500          )
- ( stop_search          : <none>, -4.500          )
+ ( MABS_ABOVE_VICE : -27.500,-13.000,-17.500 )
+ ( above           : -27.500,-13.000,-17.500 )
+ ( amax            :  16.000,  9.000,  3.000 )
+ ( amin            :   8.000,  4.000,  1.000 )
+ ( backoff         :   0.100,  0.100,  0.100 )
+ ( delta           :   1.000,  1.000         )
+ ( delta           :   1.000,<none>          )
+ ( delta           :  -1.000,<none>          )
+ ( delta           : <none>,  1.000          )
+ ( delta           : <none>, -1.000          )
+ ( indent          :   1.600,  0.900,  0.300 )
+ ( search_depth    :  -0.100                 )
+ ( skim            :   0.150                 )
+ ( start_search    :   4.000,<none>          )
+ ( start_search    :  -4.000,<none>          )
+ ( start_search    : <none>,  2.000          )
+ ( start_search    : <none>, -2.000          )
+ ( stop_search     :   8.000,<none>          )
+ ( stop_search     :  -8.000,<none>          )
+ ( stop_search     : <none>,  4.500          )
+ ( stop_search     : <none>, -4.500          )
+ ( zslack          :  -1.000                 )
 
- ( G55                  : #5241.x #5242.y #5243.z )
- ( SKIP_POS             : #5061.x #5062.y #5063.z )
- ( error                :  #101.x  #102.y         )
- ( its                  :  #103.x                 )
- ( wcs                  : #5241.x #5242.y #5243.z )
+ ( G55             : #5241.x #5242.y #5243.z )
+ ( SKIP_POS        : #5061.x #5062.y #5063.z )
+ ( error           :  #101.x  #102.y         )
+ ( its             :  #103.x                 )
+ ( wcs             : #5241.x #5242.y #5243.z )
 
 
 ( Find center of plate in vice, )
@@ -59,7 +59,8 @@ O0001 (vicecenter: 0.2.222+2)
 ( just above workpiece surface. )
   G90 G01 G55 F200. x-27.5 y-13.  ( defs.goto_down[sch.above]     )
   G90 G01 G55 F200. z-17.5
-  G90 G31 G55 F40. z-18.5         ( defs.fast_work_probe[z=sch.above.z + sch.initial_search_depth])
+  G90 G31 G55 F40. z-18.5         ( defs.fast_work_probe[z=sch.above.z + sch.zslack])
+  M97 P123                        ( No lookahead                  )
 ( make wcs become ~0,0,0 at tdc )
   #5241= #5061                    ( wcs.xyz = +haas.SKIP_POS      )
   #5242= #5062
@@ -87,7 +88,8 @@ O0001 (vicecenter: 0.2.222+2)
 N1000
   IF [#103 LE 0.] GOTO 1002       ( while its > 0:                )
   G91 G01 G55 F200. x-1.          (     defs.goto_rel[delta.xy]   )
-  G90 G31 G55 F40. z-0.1          (     defs.fast_work_probe.all[z=sch.search_depth])
+  G90 G31 G55 F40. z-0.1          (     defs.fast_work_probe[z=sch.search_depth])
+  M97 P123                        ( No lookahead                  )
   IF [#5063 LT -0.08] GOTO 1001   (     if haas.SKIP_POS.z < sch.found_if_below:)
   G90 G01 G55 F200. z0.15         (     defs.goto[z=sch.skim]     )
   #103= #103 - 1.                 (     its -= 1                  )
@@ -103,7 +105,9 @@ N1001
 (  edge.                          )
   G90 G01 G55 F200. z-0.1         ( defs.goto[z=sch.search_depth] )
   G91 G01 G55 F200. x-0.1         ( defs.goto_rel[sch.backoff.xy * di.dxdy])
-  G91 G31 G55 M79 F10. x1.6       ( defs.slow_rel_probe[-sch.indent.xy * di.dxdy])
+  G91 G31 G55 M79 F10. x1.6       ( defs.slow_rel_probe[xy=-sch.indent.xy * di.dxdy])
+  G103 P10
+  M97 P123                        ( No lookahead                  )
   #101= #101 + #5061              ( error[di.cur_axis] += haas.SKIP_POS[di.cur_axis])
 
 ( Above surface and in:                     )
@@ -133,7 +137,8 @@ N1001
 N1003
   IF [#103 LE 0.] GOTO 1005       ( while its > 0:                )
   G91 G01 G55 F200. y-1.          (     defs.goto_rel[delta.xy]   )
-  G90 G31 G55 F40. z-0.1          (     defs.fast_work_probe.all[z=sch.search_depth])
+  G90 G31 G55 F40. z-0.1          (     defs.fast_work_probe[z=sch.search_depth])
+  M97 P123                        ( No lookahead                  )
   IF [#5063 LT -0.08] GOTO 1004   (     if haas.SKIP_POS.z < sch.found_if_below:)
   G90 G01 G55 F200. z0.15         (     defs.goto[z=sch.skim]     )
   #103= #103 - 1.                 (     its -= 1                  )
@@ -149,7 +154,9 @@ N1004
 (  edge.                        )
   G90 G01 G55 F200. z-0.1         ( defs.goto[z=sch.search_depth] )
   G91 G01 G55 F200. y-0.1         ( defs.goto_rel[sch.backoff.xy * di.dxdy])
-  G91 G31 G55 M79 F10. y0.9       ( defs.slow_rel_probe[-sch.indent.xy * di.dxdy])
+  G91 G31 G55 M79 F10. y0.9       ( defs.slow_rel_probe[xy=-sch.indent.xy * di.dxdy])
+  G103 P10
+  M97 P123                        ( No lookahead                  )
   #102= #102 + #5062              ( error[di.cur_axis] += haas.SKIP_POS[di.cur_axis])
 
 ( Above surface and in:                     )
@@ -179,7 +186,8 @@ N1004
 N1006
   IF [#103 LE 0.] GOTO 1008       ( while its > 0:                )
   G91 G01 G55 F200. y1.           (     defs.goto_rel[delta.xy]   )
-  G90 G31 G55 F40. z-0.1          (     defs.fast_work_probe.all[z=sch.search_depth])
+  G90 G31 G55 F40. z-0.1          (     defs.fast_work_probe[z=sch.search_depth])
+  M97 P123                        ( No lookahead                  )
   IF [#5063 LT -0.08] GOTO 1007   (     if haas.SKIP_POS.z < sch.found_if_below:)
   G90 G01 G55 F200. z0.15         (     defs.goto[z=sch.skim]     )
   #103= #103 - 1.                 (     its -= 1                  )
@@ -195,7 +203,9 @@ N1007
 (  edge.                         )
   G90 G01 G55 F200. z-0.1         ( defs.goto[z=sch.search_depth] )
   G91 G01 G55 F200. y0.1          ( defs.goto_rel[sch.backoff.xy * di.dxdy])
-  G91 G31 G55 M79 F10. y-0.9      ( defs.slow_rel_probe[-sch.indent.xy * di.dxdy])
+  G91 G31 G55 M79 F10. y-0.9      ( defs.slow_rel_probe[xy=-sch.indent.xy * di.dxdy])
+  G103 P10
+  M97 P123                        ( No lookahead                  )
   #102= #102 + #5062              ( error[di.cur_axis] += haas.SKIP_POS[di.cur_axis])
 
 ( Above surface and in:                    )
@@ -226,7 +236,8 @@ N1007
 N1009
   IF [#103 LE 0.] GOTO 1011       ( while its > 0:                )
   G91 G01 G55 F200. x1.           (     defs.goto_rel[delta.xy]   )
-  G90 G31 G55 F40. z-0.1          (     defs.fast_work_probe.all[z=sch.search_depth])
+  G90 G31 G55 F40. z-0.1          (     defs.fast_work_probe[z=sch.search_depth])
+  M97 P123                        ( No lookahead                  )
   IF [#5063 LT -0.08] GOTO 1010   (     if haas.SKIP_POS.z < sch.found_if_below:)
   G90 G01 G55 F200. z0.15         (     defs.goto[z=sch.skim]     )
   #103= #103 - 1.                 (     its -= 1                  )
@@ -242,7 +253,9 @@ N1010
 (  edge.                         )
   G90 G01 G55 F200. z-0.1         ( defs.goto[z=sch.search_depth] )
   G91 G01 G55 F200. x0.1          ( defs.goto_rel[sch.backoff.xy * di.dxdy])
-  G91 G31 G55 M79 F10. x-1.6      ( defs.slow_rel_probe[-sch.indent.xy * di.dxdy])
+  G91 G31 G55 M79 F10. x-1.6      ( defs.slow_rel_probe[xy=-sch.indent.xy * di.dxdy])
+  G103 P10
+  M97 P123                        ( No lookahead                  )
   #101= #101 + #5061              ( error[di.cur_axis] += haas.SKIP_POS[di.cur_axis])
 
 ( Above surface and in:                      )
@@ -272,6 +285,8 @@ N1010
 
 (  final slow probe to find the surface z )
   G91 G31 G55 M79 F10. z-0.1      ( defs.slow_rel_probe[z=sch.search_depth])
+  G103 P10
+  M97 P123                        ( No lookahead                  )
   #5243= #5243 + #5063            ( wcs.z += haas.SKIP_POS.z      )
   G90 G01 G55 F200. z1.           ( defs.goto[z=1]                )
 
@@ -284,7 +299,8 @@ N1010
 ( just above workpiece surface. )
   G90 G01 G55 F200. x-27.5 y-13.  ( defs.goto_down[sch.above]     )
   G90 G01 G55 F200. z-17.5
-  G90 G31 G55 F40. z-18.5         ( defs.fast_work_probe[z=sch.above.z + sch.initial_search_depth])
+  G90 G31 G55 F40. z-18.5         ( defs.fast_work_probe[z=sch.above.z + sch.zslack])
+  M97 P123                        ( No lookahead                  )
 ( make wcs become ~0,0,0 at tdc )
   #5241= #5061                    ( wcs.xyz = +haas.SKIP_POS      )
   #5242= #5062
@@ -312,7 +328,8 @@ N1010
 N1012
   IF [#103 LE 0.] GOTO 1014       ( while its > 0:                )
   G91 G01 G55 F200. x-1.          (     defs.goto_rel[delta.xy]   )
-  G90 G31 G55 F40. z-0.1          (     defs.fast_work_probe.all[z=sch.search_depth])
+  G90 G31 G55 F40. z-0.1          (     defs.fast_work_probe[z=sch.search_depth])
+  M97 P123                        ( No lookahead                  )
   IF [#5063 LT -0.08] GOTO 1013   (     if haas.SKIP_POS.z < sch.found_if_below:)
   G90 G01 G55 F200. z0.15         (     defs.goto[z=sch.skim]     )
   #103= #103 - 1.                 (     its -= 1                  )
@@ -328,7 +345,9 @@ N1013
 (  edge.                          )
   G90 G01 G55 F200. z-0.1         ( defs.goto[z=sch.search_depth] )
   G91 G01 G55 F200. x-0.1         ( defs.goto_rel[sch.backoff.xy * di.dxdy])
-  G91 G31 G55 M79 F10. x1.6       ( defs.slow_rel_probe[-sch.indent.xy * di.dxdy])
+  G91 G31 G55 M79 F10. x1.6       ( defs.slow_rel_probe[xy=-sch.indent.xy * di.dxdy])
+  G103 P10
+  M97 P123                        ( No lookahead                  )
   #101= #101 + #5061              ( error[di.cur_axis] += haas.SKIP_POS[di.cur_axis])
 
 ( Above surface and in:                     )
@@ -358,7 +377,8 @@ N1013
 N1015
   IF [#103 LE 0.] GOTO 1017       ( while its > 0:                )
   G91 G01 G55 F200. y-1.          (     defs.goto_rel[delta.xy]   )
-  G90 G31 G55 F40. z-0.1          (     defs.fast_work_probe.all[z=sch.search_depth])
+  G90 G31 G55 F40. z-0.1          (     defs.fast_work_probe[z=sch.search_depth])
+  M97 P123                        ( No lookahead                  )
   IF [#5063 LT -0.08] GOTO 1016   (     if haas.SKIP_POS.z < sch.found_if_below:)
   G90 G01 G55 F200. z0.15         (     defs.goto[z=sch.skim]     )
   #103= #103 - 1.                 (     its -= 1                  )
@@ -374,7 +394,9 @@ N1016
 (  edge.                        )
   G90 G01 G55 F200. z-0.1         ( defs.goto[z=sch.search_depth] )
   G91 G01 G55 F200. y-0.1         ( defs.goto_rel[sch.backoff.xy * di.dxdy])
-  G91 G31 G55 M79 F10. y0.9       ( defs.slow_rel_probe[-sch.indent.xy * di.dxdy])
+  G91 G31 G55 M79 F10. y0.9       ( defs.slow_rel_probe[xy=-sch.indent.xy * di.dxdy])
+  G103 P10
+  M97 P123                        ( No lookahead                  )
   #102= #102 + #5062              ( error[di.cur_axis] += haas.SKIP_POS[di.cur_axis])
 
 ( Above surface and in:                     )
@@ -404,7 +426,8 @@ N1016
 N1018
   IF [#103 LE 0.] GOTO 1020       ( while its > 0:                )
   G91 G01 G55 F200. y1.           (     defs.goto_rel[delta.xy]   )
-  G90 G31 G55 F40. z-0.1          (     defs.fast_work_probe.all[z=sch.search_depth])
+  G90 G31 G55 F40. z-0.1          (     defs.fast_work_probe[z=sch.search_depth])
+  M97 P123                        ( No lookahead                  )
   IF [#5063 LT -0.08] GOTO 1019   (     if haas.SKIP_POS.z < sch.found_if_below:)
   G90 G01 G55 F200. z0.15         (     defs.goto[z=sch.skim]     )
   #103= #103 - 1.                 (     its -= 1                  )
@@ -420,7 +443,9 @@ N1019
 (  edge.                         )
   G90 G01 G55 F200. z-0.1         ( defs.goto[z=sch.search_depth] )
   G91 G01 G55 F200. y0.1          ( defs.goto_rel[sch.backoff.xy * di.dxdy])
-  G91 G31 G55 M79 F10. y-0.9      ( defs.slow_rel_probe[-sch.indent.xy * di.dxdy])
+  G91 G31 G55 M79 F10. y-0.9      ( defs.slow_rel_probe[xy=-sch.indent.xy * di.dxdy])
+  G103 P10
+  M97 P123                        ( No lookahead                  )
   #102= #102 + #5062              ( error[di.cur_axis] += haas.SKIP_POS[di.cur_axis])
 
 ( Above surface and in:                    )
@@ -451,7 +476,8 @@ N1019
 N1021
   IF [#103 LE 0.] GOTO 1023       ( while its > 0:                )
   G91 G01 G55 F200. x1.           (     defs.goto_rel[delta.xy]   )
-  G90 G31 G55 F40. z-0.1          (     defs.fast_work_probe.all[z=sch.search_depth])
+  G90 G31 G55 F40. z-0.1          (     defs.fast_work_probe[z=sch.search_depth])
+  M97 P123                        ( No lookahead                  )
   IF [#5063 LT -0.08] GOTO 1022   (     if haas.SKIP_POS.z < sch.found_if_below:)
   G90 G01 G55 F200. z0.15         (     defs.goto[z=sch.skim]     )
   #103= #103 - 1.                 (     its -= 1                  )
@@ -467,7 +493,9 @@ N1022
 (  edge.                         )
   G90 G01 G55 F200. z-0.1         ( defs.goto[z=sch.search_depth] )
   G91 G01 G55 F200. x0.1          ( defs.goto_rel[sch.backoff.xy * di.dxdy])
-  G91 G31 G55 M79 F10. x-1.6      ( defs.slow_rel_probe[-sch.indent.xy * di.dxdy])
+  G91 G31 G55 M79 F10. x-1.6      ( defs.slow_rel_probe[xy=-sch.indent.xy * di.dxdy])
+  G103 P10
+  M97 P123                        ( No lookahead                  )
   #101= #101 + #5061              ( error[di.cur_axis] += haas.SKIP_POS[di.cur_axis])
 
 ( Above surface and in:                      )
@@ -497,6 +525,8 @@ N1022
 
 (  final slow probe to find the surface z )
   G91 G31 G55 M79 F10. z-0.1      ( defs.slow_rel_probe[z=sch.search_depth])
+  G103 P10
+  M97 P123                        ( No lookahead                  )
   #5243= #5243 + #5063            ( wcs.z += haas.SKIP_POS.z      )
   G90 G01 G55 F200. z1.           ( defs.goto[z=1]                )
 
@@ -505,4 +535,13 @@ N1022
   G65 P9833                       ( Probe off.                    )
   G[# 100]                        ( Restore wcs                   )
   M30
+
+( No lookahead )
+N123
+  G103 P1
+  G04 P1
+  G04 P1
+  G04 P1
+  G04 P1
+  M99
 %

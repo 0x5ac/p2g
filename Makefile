@@ -1,42 +1,150 @@
+PATH=$(HOME)/.local/bin:/usr/bin
+export TERM:=dumb
+export NO_COLOR:=true
+
+
+EMACS:=emacs
+POETRY:=poetry
+PR:=$(POETRY) run
+RUN_P2G:=$(PR) p2g
+RUN_MODVERSION:=$(PR) python tools/modversion.py
+RUN_MAKESTDVARS:=$(PR) python tools/makestdvars.py
+COVERAGE:=$(PR) coverage
+PYTEST:=$(PR) pytest
+OX_GFM_DIR=~/.emacs.d/straight/build/ox-gfm
+
+
 check:
 	rm -f .deps; ../fabricate/fabricate.py make install-tools ; cat .deps
 
 
-top: | announce version-update install-tools generate test lint release
-	$(HR)
-	$(TITLE) 
-	$(TITLE) 
 
 VERSION_FILE=VERSION
 THIS_VERSION=$(shell cat $(VERSION_FILE))
 
 # all things which depend version depend on the stamp.
-VERSION_STAMP=.stamp-version-$(THIS_VERSION)
-
+VERSION_STAMP:=.stamp-version-$(THIS_VERSION)
+POETRY_STAMP:=.stamp-poetry
 # trick because .org is self modifying
 README_STAMP=.stamp-readme-$(THIS_VERSION)
+
+
+# files used, should only appear once.
+
+
+P2G_GEN_SRC:= p2g/haas.py
+P2G_SRC:=					\
+	p2g/__init__.py				\
+	p2g/__main__.py				\
+	p2g/axis.py				\
+	p2g/coords.py				\
+	p2g/err.py				\
+	p2g/gbl.py				\
+	p2g/goto.py				\
+	p2g/usrlib.py				\
+	p2g/main.py				\
+	p2g/nd.py				\
+	p2g/op.py				\
+	p2g/scalar.py				\
+	p2g/stat.py				\
+	p2g/symbol.py				\
+	p2g/vector.py				\
+	p2g/walkbase.py				\
+	p2g/walkexpr.py				\
+	p2g/walkfunc.py				\
+	p2g/walkstat.py				\
+	$(P2G_GEN_SRC)
+
+TOOL_DIR:=tools
+TOOL_SRC:=\
+	tools/modversion.py  \
+	tools/makestdvars.py
+
+TEST_DIR=tests
+FUNC_TEST_FILES:=					\
+	tests/conftest.py				\
+	tests/test_assert.py				\
+	tests/test_axes.py				\
+	tests/test_badpytest.py				\
+	tests/test_basic.py				\
+	tests/test_builtins.py				\
+	tests/test_comment.py				\
+	tests/test_coords.py				\
+	tests/test_edge.py				\
+	tests/test_error.py				\
+	tests/test_examples.py				\
+	tests/test_expr.py				\
+	tests/test_for.py				\
+	tests/test_func.py				\
+	tests/test_goto.py				\
+	tests/test_interp.py				\
+	tests/test_lib.py				\
+	tests/test_linenos.py				\
+	tests/test_main.py				\
+	tests/test_makestdvars.py			\
+	tests/test_meta.py				\
+	tests/test_nt1.py				\
+	tests/test_op.py				\
+	tests/test_rtl.py				\
+	tests/test_smoke.py				\
+	tests/test_starimport.py			\
+	tests/test_str.py				\
+	tests/test_symtab.py				\
+	tests/test_tuple.py				\
+	tests/test_vars.py				\
+	tests/test_vector.py				\
+
+TEST_SRC:=					\
+	$(FUNC_TEST_FILES)			\
+        tests/conftest.py
+
+
+GENERATED_DOC:= \
+	doc/haas.org			\
+	doc/haas.txt			\
+	doc/readme.txt			\
+	doc/readme.md			\
+	doc/readme.org			\
+	readme.md				\
+	license.md				\
+	authors.md 
+
+
+DOC:=   doc/haas.in			\
+	$(GENERATED_DOC)	  
+
+COMPILED_EXAMPLES:=examples/vicecenter.nc \
+                   examples/probecalibrate.nc
+
+EXAMPLE_SRC:= \
+	examples/csearch.py			\
+	examples/defs.py			\
+	examples/probecalibrate.py		\
+	examples/vicecenter.py 
+
+RELEASE_FILE=dist/p2g-$(THIS_VERSION).tar.gz
+
+
+top: | announce $(VERSION_STAMP) install-tools generate test lint release
+	$(HR)
+	$(TITLE) 
+	$(TITLE) 
+
+######################################################################
+
+LINTABLE_SRC=$(P2G_SRC) $(TEST_SRC) $(TOOL_SRC)
+
+
+CONTROL_FILES=Makefile pyproject.toml .scrutinizer.yml
+
+
+mps:
+	echo $(TEST_SRC)
 
 .PHONY:
 announce:
 	@	echo "running for version " $(THIS_VERSION)
 
-PATH=$(HOME)/.local/bin:/usr/bin
-export TERM:=dumb
-export NO_COLOR:=true
-P2G_SRC_DIR:=./p2g
-TOOL_DIR:=./tools
-DOC_DIR:=./doc
-EXAMPLE_DIR=./examples
-TEST_DIR=./tests
-EMACS?=emacs
-POETRY=poetry
-PR:=$(POETRY) run
-RUN_P2G:=$(PR) p2g
-RUN_MODVERSION:= $(PR) python tools/modversion.py
-RUN_MAKESTDVARS:=$(PR) python tools/makestdvars.py
-COVERAGE:=$(PR) coverage
-PYTEST:=$(PR) pytest
-OX_GFM_DIR=~/.emacs.d/straight/build/ox-gfm
 
 
 
@@ -45,94 +153,29 @@ MAYLOG=@
 HR=@echo  "********************************************************"
 ######################################################################
 
-GENERATED_SRC=$(P2G_SRC_DIR)/haas.py
-
-TOOL_SRC=$(TOOL_DIR)/modversion.py     $(TOOL_DIR)/makestdvars.py		
+VERSIONED_FILES=$(P2G_SRC_DIR)/__init__.py pyproject.toml doc/readme.org
 
 
-P2G_SRC= \
-    $(P2G_SRC_DIR)/__init__.py			\
-    $(P2G_SRC_DIR)/__main__.py			\
-    $(P2G_SRC_DIR)/axis.py			\
-    $(P2G_SRC_DIR)/coords.py			\
-    $(P2G_SRC_DIR)/err.py			\
-    $(P2G_SRC_DIR)/gbl.py			\
-    $(P2G_SRC_DIR)/goto.py			\
-    $(P2G_SRC_DIR)/usrlib.py			\
-    $(P2G_SRC_DIR)/main.py			\
-    $(P2G_SRC_DIR)/nd.py			\
-    $(P2G_SRC_DIR)/op.py			\
-    $(P2G_SRC_DIR)/scalar.py			\
-    $(P2G_SRC_DIR)/stat.py			\
-    $(P2G_SRC_DIR)/symbol.py			\
-    $(P2G_SRC_DIR)/vector.py			\
-    $(P2G_SRC_DIR)/walkbase.py			\
-    $(P2G_SRC_DIR)/walkexpr.py			\
-    $(P2G_SRC_DIR)/walkfunc.py			\
-    $(P2G_SRC_DIR)/walkstat.py                  \
-    $(GENERATED_SRC)
-
-TEST_NAMES=$(notdir $(basename $(wildcard $(TEST_DIR)/test*.py))) 
-
-TEST_SRC=$(TEST_DIR)/conftest.py \
-         $(addprefix $(TEST_DIR)/,$(addsuffix .py,$(TEST_NAMES)))
-
-
-VERSIONED_FILES=$(P2G_SRC_DIR)/__init__.py pyproject.toml $(DOC_DIR)/readme.org
-
-
-
-
-
-
-RELEASE_FILE=dist/p2g-$(THIS_VERSION).tar.gz
-
-LINTABLE_SRC=$(P2G_SRC) $(GENERATED_SRC) $(TEST_SRC) $(TOOL_SRC)
-
-COMPILED_EXAMPLES=$(EXAMPLE_DIR)/vicecenter.nc \
-                  $(EXAMPLE_DIR)/probecalibrate.nc
-
-GENERATED_DOC=\
-	$(DOC_DIR)/haas.org				\
-	$(DOC_DIR)/haas.txt				\
-	$(DOC_DIR)/readme.txt				\
-	$(DOC_DIR)/readme.md				\
-	$(DOC_DIR)/readme.org				\
-	readme.md \
-	license.md					\
-	authors.md \
-	.stamp-readme$(THIS_VERSION).org  # used to rebuild readme.org which updates self as side effect	
-
-CONTROL_FILES=Makefile pyproject.toml .scrutinizer.yml 
 
 ALL_SRC_FOR_DIST=$(CONTROL_FILES) $(COMPILED_EXAMPLES)  $(GENERATED_DOC) $(GENERATED_SRC) $(P2G_SRC) $(TEST_SRC)
 
 
 ######################################################################
-# Generate intermediates
+# convenience rules, for maintenance only
+#
+.PHONY:
+examples: $(COMPILED_EXAMPLES)
+doc:  $(GENERATED_DOC)
+version-update: $(VERSION_STAMP)
+poetry: $(POETRY_STAMP)
 
-generate: $(COMPILED_EXAMPLES)  $(GENERATED_SRC) $(GENERATED_DOC)
+######################################################################
 ######################################################################
 # Init environment
 
-version-update: .stamp-version$(THIS_VERSION) 
-
 $(VERSION_STAMP): VERSION
 	$(RUN_MODVERSION) --truth VERSION --list $(VERSIONED_FILES)
-
-.PHONY:
-install-tools: .stamp-poetry .stamp-deps 
-	$(HR)
-	$(TITLE) All dependencies installed now.
-
-.stamp-deps:
-	$(HR)
-	$(TITLE)
-	$(TITLE)  Install dependencies.
-	$(POETRY) install
-	$(POETRY) update
-	$(POETRY) export > requirements.txt
-	$(MAYLOG) touch $@
+	touch $@
 
 .PHONY:
 install-poetry:
@@ -146,30 +189,28 @@ install-poetry:
 	$(MAYLOG) 	touch $@
 	$(TITLE)
 	$(TITLE) Poetry installed in $$(which poetry)
-	touch $@
-
+	$(POETRY) install
+	$(POETRY) update
+	$(POETRY) export > requirements.txt
+	$(MAYLOG) touch $@
 
 ######################################################################
 # examples
-.PHONY:
-examples: $(COMPILED_EXAMPLES)  
 
-%.nc:%.py  $(P2G_SRC) $(VSTAMP) 
+%.nc:%.py  $(P2G_SRC) 
 	$(RUN_P2G) $<  $@
 
 ######################################################################
 # Doc and machine generated headers.
 
-doc: $(GENERATED_DOC)
-
-$(P2G_SRC_DIR)/haas.py: $(TOOL_DIR)/makestdvars.py 
+p2g/haas.py: tools/makestdvars.py 
 	$(RUN_MAKESTDVARS)  --py=$@ 
 
-$(DOC_DIR)/haas.txt: $(TOOL_DIR)/makestdvars.py
+doc/haas.txt: tools/makestdvars.py
 	echo 	$(RUN_MAKESTDVARS)  --txt=$@ 
 	$(RUN_MAKESTDVARS)  --txt=$@ 
 
-$(DOC_DIR)/haas.org: $(TOOL_DIR)/makestdvars.py 
+doc/haas.org: $(TOOL_DIR)/makestdvars.py 
 	$(RUN_MAKESTDVARS)  --org=$@ 
 
 # emacs may not be installed, so after running with -, touch the output.
@@ -177,23 +218,22 @@ $(DOC_DIR)/haas.org: $(TOOL_DIR)/makestdvars.py
 
 
 WRITE_RESULT= --eval '(write-region (point-min) (point-max) "$(@F)")'
-
 # witout this evals won't eval, so speed things up.
 DO_EVAL'=--eval "(require 'ob-python)"	'
 
 ELCOMMON=						\
         --directory $(OX_GFM_DIR)			\
-	-q --batch					\
+	-nsl -q --batch					\
         --chdir doc $(<F)				\
 	--eval "(org-mode)"				\
         --eval "(require 'ox-gfm)"			\
 	--eval "(setq org-confirm-babel-evaluate nil)"		
 
-$(README_STAMP): doc/readme.org  
-	- $(EMACS)   $(ELCOMMON) $(DO_EVAL) $(WRITE_RESULT)
+doc/%.org:doc/%.in:
+	- $(EMACS) $(ELCOMMON) $(DO_EVAL) $(WRITE_RESULT)
 	touch $@
 
-doc/readme.md: $(VERSION_STAMP) $(README_STAMP)
+%.md:%.in:
 	$(HR)
 	$(TITLE) Build md from org
 	$(TITLE)
@@ -201,6 +241,7 @@ doc/readme.md: $(VERSION_STAMP) $(README_STAMP)
 	# fix the initial table of contents.
 	$(PR) python	tools/repairmd.py --src $@ --dst $@
 	rm -f readme.md.tmp 
+
 
 #doc/%.md:doc/%.org
 #	- $(emacs) $(ELCOMMON) -f org-gfm-export-as-markdown $(WRITE_RESULT)
@@ -324,7 +365,7 @@ $(RELEASE_FILE):
 	rm -rf  $(P2G_SRC_DIR)/doc
 	rm -rf  $(P2G_SRC_DIR)/examples
 
-	cp -a $(DOC_DIR) $(P2G_SRC_DIR)
+	cp -a doc $(P2G_SRC_DIR)
 	cp -a  $(EXAMPLE_DIR) $(P2G_SRC_DIR)
 	$(POETRY) build
 	rm -rf  $(P2G_SRC_DIR)/doc $(P2G_SRC_DIR)/examples

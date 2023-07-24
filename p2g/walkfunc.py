@@ -79,7 +79,7 @@ def gather_func_formals(func_def, *args, **kwargs):
     final_dict = {}
     formalspec = func_def.node.args
     if formalspec.vararg:
-        final_dict[formalspec.vararg.arg] = args[len(formalspec.args) :]
+        final_dict[formalspec.vararg.arg] = args[len(formalspec.args):]
     else:
         if len(args) > len(formalspec.args):
             err.compiler(

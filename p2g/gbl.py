@@ -18,6 +18,8 @@ class Config(typing.NamedTuple):
 config = Config()
 
 # pylint: disable=too-few-public-methods
+
+
 class Control:
     block_delete = False
     symbol_table = False

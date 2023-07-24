@@ -17,6 +17,7 @@ from .coords import Const
 from .coords import CoType
 from .coords import Fixed
 from .coords import Var
+from .gbl import Control
 from .goto import goto
 from .scalar import Scalar
 from .stat import code
@@ -36,7 +37,6 @@ from .usrlib import WCS
 from .vector import TupleV
 from .vector import Vec
 
-from .gbl import Control
 
 __all__ = [
     "CoType",

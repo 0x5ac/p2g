@@ -1,3 +1,5 @@
+
+
 PATH=$(HOME)/.local/bin:/usr/bin
 export TERM:=dumb
 export NO_COLOR:=true
@@ -104,8 +106,8 @@ GENERATED_DOC:=					\
 	doc/readme.md				\
 	doc/readme.org				\
 	readme.md				\
-	license.md				\
-	authors.md
+	license.org				\
+	authors.org
 
 ALL_DOC:=   doc/readme.in			\
             doc/thanksto.txt                    \
@@ -127,10 +129,16 @@ DIST_FILE=dist/p2g-$(THIS_VERSION).tar.gz
 
 ALL_GENERATED_FILES:=$(GENERATED_DOC) $(P2G_GEN_SRC) $(COMPILED_EXAMPLES)
 
-top: | announce  $(POETRY_STAMP) $(VERSION_STAMP) $(ALL_GENERATED_FILES) test lint $(DIST_FILE) 
-	$(HR)
-	$(TITLE)
-	$(TITLE)
+
+top:  announce					\
+      $(POETRY_STAMP)				\
+      $(VERSION_STAMP)				\
+      $(ALL_GENERATED_FILES)			\
+      test					\
+      lint					\
+      $(DIST_FILE) 
+finally: \
+     sanity
 
 release: sanity
 ######################################################################
@@ -224,6 +232,7 @@ doc/haas.org: $(TOOL_DIR)/makestdvars.py $(POETRY_STAMP)
 
 ELCOMMON=					\
 	--directory $(OX_GFM_DIR)		\
+        --chdir /tmp \
 	-q --batch				\
 	--load $(abspath tools/org-to-x.el)	\
          $(abspath $<)

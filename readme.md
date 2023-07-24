@@ -6,7 +6,7 @@
 
 
 
-# Version  0.2.222
+# Version  0.2.222+2
 
 ---
 
@@ -29,7 +29,7 @@ It comes with a set of macro variable definitions for a Haas mill with NCD. And 
 
 # Table of Contents
 
-1.  [Version  0.2.222](#version)
+1.  [Version  0.2.222+2](#version)
 2.  [Introduction](#introduction)
 3.  [Usage](#usage)
 4.  [Install](#install)
@@ -421,7 +421,7 @@ def exp11():
     theta = Var(0.3)
     angle = Var(sin(theta))
 
-    com("Constants don't exist in G-code.")
+    com("Constants are elided in G-code.")
     thetak = Const(0.3)
     anglek = Var(sin(thetak))
 
@@ -985,190 +985,6 @@ N1003
 # HAAS macro var definitions
 
 Names predefined in p2g.haas:
-
-| <code>Name</code>                          | <code>Size</code>  | <code>Address</code>          |
-| ---                                        | ---                | ---                           |
-| <code>NULL</code>                          | <code>    1</code> | <code>     #    0    </code>  |
-| <code>MACRO\_ARGUMENTS</code>              | <code>   33</code> | <code>#    1 … #   33</code>  |
-| <code>GAP01</code>                         | <code>   66</code> | <code>#   34 … #   99</code>  |
-| <code>GP\_SAVED1</code>                    | <code>  100</code> | <code>#  100 … #  199</code>  |
-| <code>GAP02</code>                         | <code>  300</code> | <code>#  200 … #  499</code>  |
-| <code>GP\_SAVED2</code>                    | <code>   50</code> | <code>#  500 … #  549</code>  |
-| <code>PROBE\_CALIBRATION1</code>           | <code>    6</code> | <code>#  550 … #  555</code>  |
-| <code>PROBE\_R</code>                      | <code>    3</code> | <code>#  556 … #  558</code>  |
-| <code>PROBE\_CALIBRATION2</code>           | <code>   22</code> | <code>#  559 … #  580</code>  |
-| <code>GP\_SAVED3</code>                    | <code>  119</code> | <code>#  581 … #  699</code>  |
-| <code>GAP03</code>                         | <code>  100</code> | <code>#  700 … #  799</code>  |
-| <code>GP\_SAVED4</code>                    | <code>  200</code> | <code>#  800 … #  999</code>  |
-| <code>INPUTS</code>                        | <code>   64</code> | <code># 1000 … # 1063</code>  |
-| <code>MAX\_LOADS\_XYZAB</code>             | <code>    5</code> | <code># 1064 … # 1068</code>  |
-| <code>GAP04</code>                         | <code>   11</code> | <code># 1069 … # 1079</code>  |
-| <code>RAW\_ANALOG</code>                   | <code>   10</code> | <code># 1080 … # 1089</code>  |
-| <code>FILTERED\_ANALOG</code>              | <code>    8</code> | <code># 1090 … # 1097</code>  |
-| <code>SPINDLE\_LOAD</code>                 | <code>    1</code> | <code>     # 1098    </code>  |
-| <code>GAP05</code>                         | <code>  165</code> | <code># 1099 … # 1263</code>  |
-| <code>MAX\_LOADS\_CTUVW</code>             | <code>    5</code> | <code># 1264 … # 1268</code>  |
-| <code>GAP06</code>                         | <code>  332</code> | <code># 1269 … # 1600</code>  |
-| <code>TOOL\_TBL\_FLUTES</code>             | <code>  200</code> | <code># 1601 … # 1800</code>  |
-| <code>TOOL\_TBL\_VIBRATION</code>          | <code>  200</code> | <code># 1801 … # 2000</code>  |
-| <code>TOOL\_TBL\_OFFSETS</code>            | <code>  200</code> | <code># 2001 … # 2200</code>  |
-| <code>TOOL\_TBL\_WEAR</code>               | <code>  200</code> | <code># 2201 … # 2400</code>  |
-| <code>TOOL\_TBL\_DROFFSET</code>           | <code>  200</code> | <code># 2401 … # 2600</code>  |
-| <code>TOOL\_TBL\_DRWEAR</code>             | <code>  200</code> | <code># 2601 … # 2800</code>  |
-| <code>GAP07</code>                         | <code>  199</code> | <code># 2801 … # 2999</code>  |
-| <code>ALARM</code>                         | <code>    1</code> | <code>     # 3000    </code>  |
-| <code>T\_MS</code>                         | <code>    1</code> | <code>     # 3001    </code>  |
-| <code>T\_HR</code>                         | <code>    1</code> | <code>     # 3002    </code>  |
-| <code>SINGLE\_BLOCK\_OFF</code>            | <code>    1</code> | <code>     # 3003    </code>  |
-| <code>FEED\_HOLD\_OFF</code>               | <code>    1</code> | <code>     # 3004    </code>  |
-| <code>GAP08</code>                         | <code>    1</code> | <code>     # 3005    </code>  |
-| <code>MESSAGE</code>                       | <code>    1</code> | <code>     # 3006    </code>  |
-| <code>GAP09</code>                         | <code>    4</code> | <code># 3007 … # 3010</code>  |
-| <code>YEAR\_MONTH\_DAY</code>              | <code>    1</code> | <code>     # 3011    </code>  |
-| <code>HOUR\_MINUTE\_SECOND</code>          | <code>    1</code> | <code>     # 3012    </code>  |
-| <code>GAP10</code>                         | <code>    7</code> | <code># 3013 … # 3019</code>  |
-| <code>POWER\_ON\_TIME</code>               | <code>    1</code> | <code>     # 3020    </code>  |
-| <code>CYCLE\_START\_TIME</code>            | <code>    1</code> | <code>     # 3021    </code>  |
-| <code>FEED\_TIMER</code>                   | <code>    1</code> | <code>     # 3022    </code>  |
-| <code>CUR\_PART\_TIMER</code>              | <code>    1</code> | <code>     # 3023    </code>  |
-| <code>LAST\_COMPLETE\_PART\_TIMER</code>   | <code>    1</code> | <code>     # 3024    </code>  |
-| <code>LAST\_PART\_TIMER</code>             | <code>    1</code> | <code>     # 3025    </code>  |
-| <code>TOOL\_IN\_SPIDLE</code>              | <code>    1</code> | <code>     # 3026    </code>  |
-| <code>SPINDLE\_RPM</code>                  | <code>    1</code> | <code>     # 3027    </code>  |
-| <code>PALLET\_LOADED</code>                | <code>    1</code> | <code>     # 3028    </code>  |
-| <code>GAP11</code>                         | <code>    1</code> | <code>     # 3029    </code>  |
-| <code>SINGLE\_BLOCK</code>                 | <code>    1</code> | <code>     # 3030    </code>  |
-| <code>AGAP</code>                          | <code>    1</code> | <code>     # 3031    </code>  |
-| <code>BLOCK\_DELETE</code>                 | <code>    1</code> | <code>     # 3032    </code>  |
-| <code>OPT\_STOP</code>                     | <code>    1</code> | <code>     # 3033    </code>  |
-| <code>GAP12</code>                         | <code>  162</code> | <code># 3034 … # 3195</code>  |
-| <code>TIMER\_CELL\_SAFE</code>             | <code>    1</code> | <code>     # 3196    </code>  |
-| <code>GAP13</code>                         | <code>    4</code> | <code># 3197 … # 3200</code>  |
-| <code>TOOL\_TBL\_DIAMETER</code>           | <code>  200</code> | <code># 3201 … # 3400</code>  |
-| <code>TOOL\_TBL\_COOLANT\_POSITION</code>  | <code>  200</code> | <code># 3401 … # 3600</code>  |
-| <code>GAP14</code>                         | <code>  300</code> | <code># 3601 … # 3900</code>  |
-| <code>M30\_COUNT1</code>                   | <code>    1</code> | <code>     # 3901    </code>  |
-| <code>M30\_COUNT2</code>                   | <code>    1</code> | <code>     # 3902    </code>  |
-| <code>GAP15</code>                         | <code>   98</code> | <code># 3903 … # 4000</code>  |
-| <code>LAST\_BLOCK\_G</code>                | <code>   13</code> | <code># 4001 … # 4013</code>  |
-| <code>LAST\_WCS</code>                     | <code>    1</code> | <code>     # 4014    </code>  |
-| <code>GAP16</code>                         | <code>   79</code> | <code># 4022 … # 4100</code>  |
-| <code>LAST\_BLOCK\_ADDRESS</code>          | <code>   26</code> | <code># 4101 … # 4126</code>  |
-| <code>GAP17</code>                         | <code>  874</code> | <code># 4127 … # 5000</code>  |
-| <code>LAST\_TARGET\_POS</code>             | <code>naxes</code> | <code>    # 5001…    </code>  |
-| <code>MACHINE\_POS</code>                  | <code>naxes</code> | <code>    # 5021…    </code>  |
-| <code>MACHINE</code>                       | <code>naxes</code> | <code>    # 5021…    </code>  |
-| <code>G53</code>                           | <code>naxes</code> | <code>    # 5021…    </code>  |
-| <code>WORK\_POS</code>                     | <code>naxes</code> | <code>    # 5041…    </code>  |
-| <code>WORK</code>                          | <code>naxes</code> | <code>    # 5041…    </code>  |
-| <code>SKIP\_POS</code>                     | <code>naxes</code> | <code>    # 5061…    </code>  |
-| <code>PROBE</code>                         | <code>naxes</code> | <code>    # 5061…    </code>  |
-| <code>TOOL\_OFFSET</code>                  | <code>   20</code> | <code># 5081 … # 5100</code>  |
-| <code>GAP18</code>                         | <code>  100</code> | <code># 5101 … # 5200</code>  |
-| <code>G52</code>                           | <code>naxes</code> | <code>    # 5201…    </code>  |
-| <code>G54</code>                           | <code>naxes</code> | <code>    # 5221…    </code>  |
-| <code>G55</code>                           | <code>naxes</code> | <code>    # 5241…    </code>  |
-| <code>G56</code>                           | <code>naxes</code> | <code>    # 5261…    </code>  |
-| <code>G57</code>                           | <code>naxes</code> | <code>    # 5281…    </code>  |
-| <code>G58</code>                           | <code>naxes</code> | <code>    # 5301…    </code>  |
-| <code>G59</code>                           | <code>naxes</code> | <code>    # 5321…    </code>  |
-| <code>GAP19</code>                         | <code>   60</code> | <code># 5341 … # 5400</code>  |
-| <code>TOOL\_TBL\_FEED\_TIMERS</code>       | <code>  100</code> | <code># 5401 … # 5500</code>  |
-| <code>TOOL\_TBL\_TOTAL\_TIMERS</code>      | <code>  100</code> | <code># 5501 … # 5600</code>  |
-| <code>TOOL\_TBL\_LIFE\_LIMITS</code>       | <code>  100</code> | <code># 5601 … # 5700</code>  |
-| <code>TOOL\_TBL\_LIFE\_COUNTERS</code>     | <code>  100</code> | <code># 5701 … # 5800</code>  |
-| <code>TOOL\_TBL\_LIFE\_MAX\_LOADS</code>   | <code>  100</code> | <code># 5801 … # 5900</code>  |
-| <code>TOOL\_TBL\_LIFE\_LOAD\_LIMITS</code> | <code>  100</code> | <code># 5901 … # 6000</code>  |
-| <code>GAP20</code>                         | <code>  197</code> | <code># 6001 … # 6197</code>  |
-| <code>NGC\_CF</code>                       | <code>    1</code> | <code>     # 6198    </code>  |
-| <code>GAP21</code>                         | <code>  802</code> | <code># 6199 … # 7000</code>  |
-| <code>G154\_P1</code>                      | <code>naxes</code> | <code>    # 7001…    </code>  |
-| <code>G154\_P2</code>                      | <code>naxes</code> | <code>    # 7021…    </code>  |
-| <code>G154\_P3</code>                      | <code>naxes</code> | <code>    # 7041…    </code>  |
-| <code>G154\_P4</code>                      | <code>naxes</code> | <code>    # 7061…    </code>  |
-| <code>G154\_P5</code>                      | <code>naxes</code> | <code>    # 7081…    </code>  |
-| <code>G154\_P6</code>                      | <code>naxes</code> | <code>    # 7101…    </code>  |
-| <code>G154\_P7</code>                      | <code>naxes</code> | <code>    # 7121…    </code>  |
-| <code>G154\_P8</code>                      | <code>naxes</code> | <code>    # 7141…    </code>  |
-| <code>G154\_P9</code>                      | <code>naxes</code> | <code>    # 7161…    </code>  |
-| <code>G154\_P10</code>                     | <code>naxes</code> | <code>    # 7181…    </code>  |
-| <code>G154\_P11</code>                     | <code>naxes</code> | <code>    # 7201…    </code>  |
-| <code>G154\_P12</code>                     | <code>naxes</code> | <code>    # 7221…    </code>  |
-| <code>G154\_P13</code>                     | <code>naxes</code> | <code>    # 7241…    </code>  |
-| <code>G154\_P14</code>                     | <code>naxes</code> | <code>    # 7261…    </code>  |
-| <code>G154\_P15</code>                     | <code>naxes</code> | <code>    # 7281…    </code>  |
-| <code>G154\_P16</code>                     | <code>naxes</code> | <code>    # 7301…    </code>  |
-| <code>G154\_P17</code>                     | <code>naxes</code> | <code>    # 7321…    </code>  |
-| <code>G154\_P18</code>                     | <code>naxes</code> | <code>    # 7341…    </code>  |
-| <code>G154\_P19</code>                     | <code>naxes</code> | <code>    # 7361…    </code>  |
-| <code>G154\_P20</code>                     | <code>naxes</code> | <code>    # 7381…    </code>  |
-| <code>GAP22</code>                         | <code>  100</code> | <code># 7401 … # 7500</code>  |
-| <code>PALLET\_PRIORITY</code>              | <code>  100</code> | <code># 7501 … # 7600</code>  |
-| <code>PALLET\_STATUS</code>                | <code>  100</code> | <code># 7601 … # 7700</code>  |
-| <code>PALLET\_PROGRAM</code>               | <code>  100</code> | <code># 7701 … # 7800</code>  |
-| <code>PALLET\_USAGE</code>                 | <code>  100</code> | <code># 7801 … # 7900</code>  |
-| <code>GAP23</code>                         | <code>  599</code> | <code># 7901 … # 8499</code>  |
-| <code>ATM\_ID</code>                       | <code>    1</code> | <code>     # 8500    </code>  |
-| <code>ATM\_PERCENT</code>                  | <code>    1</code> | <code>     # 8501    </code>  |
-| <code>ATM\_TOTAL\_AVL\_USAGE</code>        | <code>    1</code> | <code>     # 8502    </code>  |
-| <code>ATM\_TOTAL\_AVL\_HOLE\_COUNT</code>  | <code>    1</code> | <code>     # 8503    </code>  |
-| <code>ATM\_TOTAL\_AVL\_FEED\_TIME</code>   | <code>    1</code> | <code>     # 8504    </code>  |
-| <code>ATM\_TOTAL\_AVL\_TOTAL\_TIME</code>  | <code>    1</code> | <code>     # 8505    </code>  |
-| <code>GAP24</code>                         | <code>    4</code> | <code># 8506 … # 8509</code>  |
-| <code>ATM\_NEXT\_TOOL\_NUMBER</code>       | <code>    1</code> | <code>     # 8510    </code>  |
-| <code>ATM\_NEXT\_TOOL\_LIFE</code>         | <code>    1</code> | <code>     # 8511    </code>  |
-| <code>ATM\_NEXT\_TOOL\_AVL\_USAGE</code>   | <code>    1</code> | <code>     # 8512    </code>  |
-| <code>ATM\_NEXT\_TOOL\_HOLE\_COUNT</code>  | <code>    1</code> | <code>     # 8513    </code>  |
-| <code>ATM\_NEXT\_TOOL\_FEED\_TIME</code>   | <code>    1</code> | <code>     # 8514    </code>  |
-| <code>ATM\_NEXT\_TOOL\_TOTAL\_TIME</code>  | <code>    1</code> | <code>     # 8515    </code>  |
-| <code>GAP25</code>                         | <code>   34</code> | <code># 8516 … # 8549</code>  |
-| <code>TOOL\_ID</code>                      | <code>    1</code> | <code>     # 8550    </code>  |
-| <code>TOOL\_FLUTES</code>                  | <code>    1</code> | <code>     # 8551    </code>  |
-| <code>TOOL\_MAX\_VIBRATION</code>          | <code>    1</code> | <code>     # 8552    </code>  |
-| <code>TOOL\_LENGTH\_OFFSETS</code>         | <code>    1</code> | <code>     # 8553    </code>  |
-| <code>TOOL\_LENGTH\_WEAR</code>            | <code>    1</code> | <code>     # 8554    </code>  |
-| <code>TOOL\_DIAMETER\_OFFSETS</code>       | <code>    1</code> | <code>     # 8555    </code>  |
-| <code>TOOL\_DIAMETER\_WEAR</code>          | <code>    1</code> | <code>     # 8556    </code>  |
-| <code>TOOL\_ACTUAL\_DIAMETER</code>        | <code>    1</code> | <code>     # 8557    </code>  |
-| <code>TOOL\_COOLANT\_POSITION</code>       | <code>    1</code> | <code>     # 8558    </code>  |
-| <code>TOOL\_FEED\_TIMER</code>             | <code>    1</code> | <code>     # 8559    </code>  |
-| <code>TOOL\_TOTAL\_TIMER</code>            | <code>    1</code> | <code>     # 8560    </code>  |
-| <code>TOOL\_LIFE\_LIMIT</code>             | <code>    1</code> | <code>     # 8561    </code>  |
-| <code>TOOL\_LIFE\_COUNTER</code>           | <code>    1</code> | <code>     # 8562    </code>  |
-| <code>TOOL\_LIFE\_MAX\_LOAD</code>         | <code>    1</code> | <code>     # 8563    </code>  |
-| <code>TOOL\_LIFE\_LOAD\_LIMIT</code>       | <code>    1</code> | <code>     # 8564    </code>  |
-| <code>GAP26</code>                         | <code>  435</code> | <code># 8565 … # 8999</code>  |
-| <code>THERMAL\_COMP\_ACC</code>            | <code>    1</code> | <code>     # 9000    </code>  |
-| <code>GAP27</code>                         | <code>   15</code> | <code># 9001 … # 9015</code>  |
-| <code>THERMAL\_SPINDLE\_COMP\_ACC</code>   | <code>    1</code> | <code>     # 9016    </code>  |
-| <code>GAP28</code>                         | <code>  983</code> | <code># 9017 … # 9999</code>  |
-| <code>GVARIABLES3</code>                   | <code> 1000</code> | <code>#10000 … #10999</code>  |
-| <code>INPUTS1</code>                       | <code>  256</code> | <code>#11000 … #11255</code>  |
-| <code>GAP29</code>                         | <code>  744</code> | <code>#11256 … #11999</code>  |
-| <code>OUTPUT1</code>                       | <code>  256</code> | <code>#12000 … #12255</code>  |
-| <code>GAP30</code>                         | <code>  744</code> | <code>#12256 … #12999</code>  |
-| <code>FILTERED\_ANALOG1</code>             | <code>   13</code> | <code>#13000 … #13012</code>  |
-| <code>COOLANT\_LEVEL</code>                | <code>    1</code> | <code>     #13013    </code>  |
-| <code>FILTERED\_ANALOG2</code>             | <code>   50</code> | <code>#13014 … #13063</code>  |
-| <code>GAP31</code>                         | <code>  936</code> | <code>#13064 … #13999</code>  |
-| <code>SETTING</code>                       | <code>10000</code> | <code>#20000 … #29999</code>  |
-| <code>PARAMETER</code>                     | <code>10000</code> | <code>#30000 … #39999</code>  |
-| <code>TOOL\_TYP</code>                     | <code>  200</code> | <code>#50001 … #50200</code>  |
-| <code>TOOL\_MATERIAL</code>                | <code>  200</code> | <code>#50201 … #50400</code>  |
-| <code>GAP32</code>                         | <code>50600</code> | <code>#50401 … #101000</code> |
-| <code>CURRENT\_OFFSET</code>               | <code>  200</code> | <code>#50601 … #50800</code>  |
-| <code>CURRENT\_OFFSET2</code>              | <code>  200</code> | <code>#50801 … #51000</code>  |
-| <code>GAP32</code>                         | <code>51300</code> | <code>#51001 … #102300</code> |
-| <code>VPS\_TEMPLATE\_OFFSET</code>         | <code>  100</code> | <code>#51301 … #51400</code>  |
-| <code>WORK\_MATERIAL</code>                | <code>  200</code> | <code>#51401 … #51600</code>  |
-| <code>VPS\_FEEDRATE</code>                 | <code>  200</code> | <code>#51601 … #51800</code>  |
-| <code>APPROX\_LENGTH</code>                | <code>  200</code> | <code>#51801 … #52000</code>  |
-| <code>APPROX\_DIAMETER</code>              | <code>  200</code> | <code>#52001 … #52200</code>  |
-| <code>EDGE\_MEASURE\_HEIGHT</code>         | <code>  200</code> | <code>#52201 … #52400</code>  |
-| <code>TOOL\_TOLERANCE</code>               | <code>  200</code> | <code>#52401 … #52600</code>  |
-| <code>PROBE\_TYPE</code>                   | <code>  200</code> | <code>#52601 … #52800</code>  |
-
-x
 
 | <code>Name</code>                          | <code>Size</code>  | <code>Address</code>          |
 | ---                                        | ---                | ---                           |

@@ -3,7 +3,6 @@ import datetime
 import pathlib
 import re
 import shutil
-import sys
 import typing
 
 import docopt
@@ -14,14 +13,15 @@ from p2g import VERSION
 from p2g import walkfunc
 
 
-DOC = """Example of program with many options using docopt.
+DOC = """
+p2g - Turn Python into G-Code.
 
 Usage:
-  p2g.py [options]  <srcfile> [<dstfile>]
-  p2g.py --help [<topic>]
-  p2g.py --version
-  p2g.py --location
-  p2g.py --examples <dstdir>
+  p2g [options]  <srcfile> [<dstfile>]
+  p2g --help [<topic>]
+  p2g --version
+  p2g --location
+  p2g --examples <dstdir>
 
 
 #   Example:
@@ -43,8 +43,9 @@ Arguments:
                the directory once a day.)
   <topic>     [ topics | all | <topic>]
         # <topic>  Print from readme starting at topic.
-        # topics:  List all topics.
+        # topics   List all topics.
         # all      Print all readme.
+        # maint    Print maintenance options.
 
 Options:
      --job=<jobname>      Olabel for output code.
@@ -64,11 +65,13 @@ Options:
 #              p2g showme/vicecenter.py showme/vicecenter.nc
 #              p2g showme/checkprobe.py showme/checkprobe.nc
 #
-#For maintenance:
-     --emit-rtl           Write internal format to output file.
-     --break              pdb.set_trace() on error.
-     --no-version         Don't put version number in outputs.
-     --verbose=<level>    Set verbosity level [default: 0]
+#
+!
+!For maintenance:
+!     --emit-rtl           Write internal format to output file.
+!     --break              pdb.set_trace() on error.
+!     --no-version         Don't put version number in outputs.
+!     --verbose=<level>    Set verbosity level [default: 0]
 """
 
 
@@ -157,10 +160,11 @@ def do_gen(src_name, job_name, func_name, output_name):
 
 
 def main(options: typing.Optional[list[str]] = None):
-
     # remove comments from source to docopt.
-
-    parseable_opts = re.sub("#.*\n", "", DOC)
+    parseable_opts = re.sub("\n# .*", "", DOC)
+    # uncomment the maint options so they can
+    # be parsed.
+    parseable_opts = re.sub("\n!(.*)", "\n\\1", parseable_opts)
     opts = docopt.docopt(parseable_opts, help=False, argv=options)
     gbl.config = gbl.config._replace(
         bp_on_error=opts["--break"],
@@ -175,16 +179,24 @@ def main(options: typing.Optional[list[str]] = None):
         gbl.sprint(VERSION)
         return 0
     if opts["--location"]:
-        gbl.sprint(f"{sys.argv[0]}")
+        gbl.sprint(f"{__file__}")
         return 0
     if opts["--help"]:
         match opts["<topic>"]:
             case None:
-                gbl.sprint(DOC.strip("\n").replace("#", ""))
+                # remove comment chars from usage
+                # and the maint commands too.
+                docstr = DOC.strip("\n").replace("#", "")
+                docstr = re.sub("\n!.*", "", docstr)
+                gbl.sprint(docstr)
             case "topics":
                 do_doc("topics")
             case "all":
                 do_doc("all")
+            case "maint":
+                # just print the maint stuff.
+                docstr = re.sub("\n!", "\n", re.sub("\n[^!].*", "", DOC))
+                gbl.sprint(docstr)
             case _:
                 do_doc(opts["<topic>"])
 

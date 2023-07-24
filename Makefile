@@ -1,8 +1,6 @@
 PATH=$(HOME)/.local/bin:/usr/bin
 export TERM:=dumb
 export NO_COLOR:=true
-
-
 EMACS:=emacs
 POETRY:=poetry
 PR:=$(POETRY) run
@@ -102,7 +100,6 @@ ALL_TEST_SRC:=					\
 GENERATED_DOC:=					\
 	doc/haas.org				\
 	doc/haas.txt				\
-	doc/license.org				\
 	doc/readme.txt				\
 	doc/readme.md				\
 	doc/readme.org				\
@@ -111,6 +108,9 @@ GENERATED_DOC:=					\
 	authors.md
 
 ALL_DOC:=   doc/readme.in			\
+            doc/thanksto.txt                    \
+	    doc/license.org			\
+	    doc/authors.org			\
 	$(GENERATED_DOC)
 
 COMPILED_EXAMPLES:=examples/vicecenter.nc	\
@@ -127,11 +127,12 @@ DIST_FILE=dist/p2g-$(THIS_VERSION).tar.gz
 
 ALL_GENERATED_FILES:=$(GENERATED_DOC) $(P2G_GEN_SRC) $(COMPILED_EXAMPLES)
 
-top: | announce $(VERSION_STAMP) $(POETRY_STAMP) $(ALL_GENERATED_FILES) test lint $(DIST_FILE) sanity
+top: | announce  $(POETRY_STAMP) $(VERSION_STAMP) $(ALL_GENERATED_FILES) test lint $(DIST_FILE) 
 	$(HR)
 	$(TITLE)
 	$(TITLE)
 
+release: sanity
 ######################################################################
 
 
@@ -157,7 +158,7 @@ HR=@echo  "********************************************************"
 
 VERSIONED_FILES=p2g/__init__.py pyproject.toml doc/readme.in
 
-ALL_SRC_FOR_DIST=$(CONTROL_FILES) $(COMPILED_EXAMPLES)  $(GENERATED_DOC) $(GENERATED_SRC) $(ALL_P2G_SRC) $(ALL_TEST_SRC)
+IN_DIST:=$(ALL_EXAMPLES)  $(ALL_DOC) $(ALL_P2G_SRC)
 
 ######################################################################
 # convenience rules, for maintenance only
@@ -172,20 +173,17 @@ poetry: $(POETRY_STAMP)
 ######################################################################
 # Init environment
 
-$(VERSION_STAMP): VERSION
+$(VERSION_STAMP): VERSION $(POETRY_STAMP)
 	$(RUN_MODVERSION) --truth VERSION --list $(VERSIONED_FILES)
 	touch $@
 
-.PHONY:
-install-poetry:
-	$(HR)
-	$(TITLE) Install poetry
-	curl -sSL https://install.python-poetry.org | python3
 
-.stamp-poetry:
+$(POETRY_STAMP):
 	$(HR)
-	$(MAYLOG) if [ ! $$(which poetry) ] ; then make install-poetry ; fi
-	$(MAYLOG)	touch $@
+	if [ ! $(shell which poetry) ] ; then \
+	   curl -sSL https://install.python-poetry.org | python3 ; \
+	fi
+	type poetry
 	$(TITLE)
 	$(TITLE) Poetry installed in $$(which poetry)
 	$(POETRY) install
@@ -243,6 +241,10 @@ ELCOMMON=						\
 	$(NON_WRITEABLEOUT)
 
 %.md:doc/%.md
+	$(WRITEABLEOUT)
+	cp $< $@
+	$(NON_WRITEABLEOUT)
+%.org:doc/%.org
 	$(WRITEABLEOUT)
 	cp $< $@
 	$(NON_WRITEABLEOUT)
@@ -375,7 +377,7 @@ sanity:  .stamp-sanity
          | sed -E "s:p2g/(doc|examples):\\1:g"			\
          | grep -v PKG-INFO | sort > .found-in-dist		
 	echo $(IN_DIST) | xargs -n 1 | sort > .release-deps	
-	diff .found-in-dist .release-deps | tee $@
+	sdiff .found-in-dist .release-deps | tee $@
 
 
 ##########

@@ -12,7 +12,7 @@ import p2g.walkfunc
 def pytest_addoption(parser):
     # fake so that command parser doesn't get syntax error,
     # real check is in writefile.
-    parser.addoption("--goldify", action="store_true", default="remember callow as gold")
+    parser.addoption("--gif", action="store_true", default="remember callow as gold")
 
 
 # the assert here will get rewritten by pytest.
@@ -101,8 +101,7 @@ def make_file_path(func, new_suffix) -> pathlib.Path:
 
 
 def writelines(fn, suffix, txt):
-
-    if "--goldify" in sys.argv:
+    if "--gif" in sys.argv:
         path = make_file_path(fn, suffix)
         p2g.gbl.log(f"Ptest output {path}")
         path.write_text("\n".join(txt))

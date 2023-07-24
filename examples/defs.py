@@ -30,7 +30,7 @@ FAST_PROBE_FEED = 40.0
 must_skip_probe = p2g.goto.probe.mcode(haas.MUST_SKIP)
 may_skip_probe = p2g.goto.probe
 
-_slow_rel_probe = must_skip_probe.delay(10).relative.feed(SLOW_PROBE_FEED).all
+_slow_rel_probe = must_skip_probe.delay(0).relative.feed(SLOW_PROBE_FEED).all
 _fast_rel_probe = must_skip_probe.relative.relative.all.feed(FAST_PROBE_FEED)
 _fast_work_probe = may_skip_probe.work.feed(FAST_PROBE_FEED).all
 

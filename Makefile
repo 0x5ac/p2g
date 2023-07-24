@@ -454,13 +454,14 @@ MAKEONE=poetry run p2g
 #
 
 
-goldify-examples:
+gif-examples:
+	-	$(PR) pytest tests/test_examples.py --gif
 	cp tests/golden/vicecenter_vicecenter.got tests/golden/vicecenter_vicecenter.nc
 	cp tests/golden/probecalibrate_probecalibrate.got tests/golden/probecalibrate_probecalibrate.nc
 
 
-goldify-%: tests/test_%.py
-	@	echo "RUNNING " $<
+gif-%: tests/test_%.py
+	- $(PR) pytest tests/test_$*.py --gif
 	sed '/^# TESTS BELOW/q' $< > t1
 	- cat tests/golden/test_$*_* >> t1
 	cp t1 $<

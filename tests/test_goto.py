@@ -29,7 +29,7 @@ def test_cerror_9810_2():
 @want(
     errors=[
         "MCODE with 9810 move is illegal.                  ",
-        'tests/test_goto.py:9:52:53:     p2g.goto.r9810.feed(7).mcode("a").z_first(1, 2, 3)',
+        "tests/test_goto.py:9:52:53:     p2g.goto.r9810.feed(7).mcode(\"a\").z_first(1, 2, 3)",
         "                                                                                ^",
     ]
 )
@@ -218,6 +218,20 @@ def test_probe0():
 )
 def test_probe1():
     p2g.goto.work.feed(123).z_first(1, 2, 3)
+
+
+@want(
+    "O00001 (test_probe2)",
+    "( goto.probe.relative.delay[12].feed[123].z_first[1, 2, 3])",
+    "  G91 G31 G55 F123. z3.",
+    "  G103 P12",
+    "  G91 G31 G55 F123. x1. y2.",
+    "  G103 P12",
+    "  M30",
+    "%",
+)
+def test_probe2():
+    p2g.goto.probe.relative.delay(12).feed(123).z_first(1, 2, 3)
 
 
 @want(

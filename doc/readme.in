@@ -228,7 +228,7 @@ N1000
 (     sch.go[cursor]            )
   G90 G01 G55 F640. x#100 y#101 z#102
   G90 G31 G55 F30. z-0.4          (     sch.probe[z=sch.search_depth])
-  IF [#5063 LT -0.5] GOTO 1001    (     if SKIP_POS.z < sch.search_depth + sch.iota:)
+ IF [#5063 LT -0.5] GOTO 1001    (     if SKIP_POS.z < sch.search_depth + sch.iota:)
   #100= #100 + 1.5                (     cursor.xy += sch.delta    )
   #103= #103 - 1.                 (     its -= 1                  )
   GOTO 1000
@@ -282,7 +282,7 @@ def ex2():
     above_tdc = Const(111, 222, 1333)
 
     com("Use it. ")
-    tmp0 += above_tdc 
+    tmp0 += above_tdc  + 3
 
 #+End_SRC
 
@@ -296,9 +296,9 @@ O0001 (ex2)
   #102= #5063 * 2. + #5043 + #5063
 ( Define a constant  )
 ( Use it.  )
-  #100= #100 + 113.               ( tmp0 += above_tdc + 2         )
-  #101= #101 + 224.
-  #102= #102 + 1335.
+  #100= #100 + 114.               ( tmp0 += above_tdc  + 3        )
+  #101= #101 + 225.
+  #102= #102 + 1336.
   M30
 %
 #+end_example
@@ -408,15 +408,17 @@ folding is done in degrees.
 
 
 #+NAME: exp1
-#+BEGIN_SRC python -i  :eval always :exports both :results output  
+#+BEGIN_SRC python -i :results output :python poetry run p2g --no-version    -
+
 from p2g import *  # this is the common header
 from p2g.haas import *  # to all the examples
 
+
 def exp11():
-    Var(7)
     com("Variables go into macro variables.")
     theta = Var(0.3)
     angle = Var(sin(theta))
+
     com("Constants are elided in G-code.")
     thetak = Const(0.3)
     anglek = Var(sin(thetak))
@@ -440,11 +442,39 @@ def exp11():
 
 
 
-
-
 #+END_SRC     
 ⇨ ~p2g exp1.py~ ⇨
 #+RESULTS: exp1
+#+begin_example
+O0001 (exp11)
+( Variables go into macro variables. )
+  #100= 0.3                       ( theta = Var[0.3]              )
+  #101= SIN[#100]                 ( angle = Var[sin[theta]]       )
+( Constants are elided in G-code. )
+  #102= 0.0052                    ( anglek = Var[sin[thetak]]     )
+( Lots of things are folded. )
+  #103= 7.6                       ( t1 = Var[2 * thetak + 7]      )
+( Simple array math: )
+  #104= -2.                       ( tlhc = Var[-box_size / 2]     )
+  #105= -2.
+  #106= -1.
+  #107= 2.                        ( brhc = Var[box_size / 2]      )
+  #108= 2.
+  #109= 1.
+  #110= #104 - #107               ( diff = Var[tlhc - brhc]       )
+  #111= #105 - #108
+  #112= #106 - #109
+  #113= #104 / #105               ( a = tlhc[0] / tlhc[1]         )
+  #114= #104 MOD #105             ( b = tlhc[0] % tlhc[1]         )
+  #115= #104 AND #105             ( x = tlhc[0] & tlhc[1]         )
+( tlhc.xy = [[a - b + 3] / sin[x], [a + b + 3] / cos[x]])
+  #104= [#113 - #114 + 3.] / SIN[#115]
+  #105= [#113 + #114 + 3.] / COS[#115]
+  M30
+%
+#+end_example
+
+
 
 -----------------------------------
 * Axes
@@ -461,7 +491,7 @@ coordinates to turn up in work offset registers.
 
 
 #+NAME: axes
-#+BEGIN_SRC python -i  :eval always :exports both :results output  
+#+BEGIN_SRC python -i :results output :python poetry run p2g --no-version    -
 import p2g
 from p2g.haas import *
 
@@ -500,6 +530,37 @@ def axes():
 #+END_SRC     
 ⇨ ~p2g axes.py~ ⇨
 #+RESULTS: axes
+#+begin_example
+O0001 (axes)
+( rhs of vector ops get expanded as needed )
+  #5241= 0.                       ( G55.var = [0, 1]              )
+  #5242= 1.
+  #5243= 0.
+  #5244= 1.
+  #5245= 0.
+  #5246= 1.
+( fill yz and c with some stuff )
+( Unmentioned axes values are assumed    )
+( to be 0, so adding them makes no code. )
+  #5242= #5242 + 3.               ( G55.var += tmp1               )
+  #5243= #5243 + 9.
+  #5246= #5246 + 30.
+
+  #5244= #5244 * 2.               ( G55.ac *= 2.0                 )
+  #5246= #5246 * 2.
+( Rotaries. )
+  #203= 180.                      ( p4.a = 180                    )
+  #205= 30.                       ( p4.c = asin[0.5]              )
+( Filling to number of axes. )
+  #5241= 0.                       ( G55.var = [0]                 )
+  #5242= 0.
+  #5243= 0.
+  #100= #5241 * 34.               ( tmp = Var[G55 * 34]           )
+  #101= #5242 * 34.
+  #102= #5243 * 34.
+  M30
+%
+#+end_example
 
 
 -----------------------------------
@@ -513,7 +574,7 @@ useful for turning on probing and magically getting it turned
 off,.  Or setting and restoring the wcs etc etc (look in p2g/lib.py)
 
 #+NAME: whendemo
-#+BEGIN_SRC python -i  :eval always :exports both :results output  
+#+BEGIN_SRC python -i :results output :python poetry run p2g --no-version    -
 import p2g
 from p2g import haas
 
@@ -524,14 +585,15 @@ class Optional:
     prev: str
 
     def __init__(self):
-        self.prev = p2g.stat.OPT_PREFIX
-        p2g.stat.OPT_PREFIX = "/ "
+        self.prev = p2g.Control.block_delete
+        p2g.Control.block_delete = True
 
     def __enter__(self):
         pass
 
     def __exit__(self, *_):
-        p2g.stat.OPT_PREFIX = self.prev
+        p2g.Control.block_delete = self.prev
+
 
 
 class Probe:
@@ -554,6 +616,15 @@ def when_demo():
 #+END_SRC
 ⇨ ~p2g whendemo.py~ ⇨
 #+RESULTS: whendemo
+: O0001 (when_demo)
+:   T01 M06                         (     load_tool[PROBE]          )
+:   G65 P9832                       ( Probe on.                     )
+:   #100= 9.                        (     tmp = Var[9]              )
+:   #100= #100 + 98.                (         tmp.var += 98         )
+: DPRNT[tmp*is*[#100]]
+:   G65 P9833                       ( Probe off.                    )
+:   M30
+: %
 
 
 
@@ -594,7 +665,7 @@ building  blocks when partially applied.
      
 
 #+NAME: goto1
-#+BEGIN_SRC python -i  :eval always :exports both :results output  
+#+BEGIN_SRC python -i :results output :python poetry run p2g --no-version    -
 from p2g import *
 
 
@@ -636,6 +707,43 @@ def goto1():
 #+END_SRC  
 ⇨ `p2g goto1.py` ⇨
 #+RESULTS: goto1
+#+begin_example
+O0001 (goto1)
+
+( in work cosys, goto x=1, y=2, z=3 at 20ips )
+  G90 G01 G55 F20. x1. y2. z3.    ( g1[1, 2, 3]                   )
+
+( make a variable, 2,3,4 )
+  #100= 2.                        ( v1 = Var[x=2, y=3, z=4]       )
+  #101= 3.
+  #102= 4.
+
+( In the machine cosys, move to v1.z then v1.xy, slowly )
+  G90 G53 G01 G55 F10. z#102      ( absslow.z_first[v1]           )
+  G90 G53 G01 G55 F10. x#100 y#101
+
+( p1 is whatever absslow was, with feed adjusted to 100. )
+( p1.z_last[v1]                 )
+  G90 G53 G01 G55 F100. x#100 y#101
+  G90 G53 G01 G55 F100. z#102
+
+( p2 is whatever p1 was, with changed to a probe. )
+( p2.z_last[v1]                 )
+  G90 G53 G31 G55 F100. x#100 y#101
+  G90 G53 G31 G55 F100. z#102
+
+( move a and c axes  )
+  G91 G01 G55 F20. a9. c90.       ( goto.feed[20].all.relative[a=9, c=90])
+
+( probe with a hass MUST_SKIP mcode. )
+  G91 G31 G55 M79 F10. x3. y4. z5.( goto.probe.feed[10].mcode["M79"].relative.all[3, 4, 5])
+
+( Define shortcut for safe_goto and use. )
+  G65 R9810 F20. z3.              ( safe_goto.z_first[1, 2, 3]    )
+  G65 R9810 F20. x1. y2.
+  M30
+%
+#+end_example
 
 -----------------------------------
 * Printing
@@ -649,7 +757,7 @@ your machine considers to be illegal in a DPRNT string.
 
 
 #+NAME: exprnt
-#+BEGIN_SRC python -i  :eval always :exports both :results output  
+#+BEGIN_SRC python -i :results output :python poetry run p2g --no-version    -
 from p2g import *
 from p2g.haas import *
 
@@ -665,6 +773,20 @@ def exprnt():
 #+END_SRC
 ⇨ ~p2g exprnt.py~ ⇨
 #+RESULTS: exprnt
+#+begin_example
+O0001 (exprnt)
+  #100= 2.                        ( x = Var[2]                    )
+  #101= 27.                       ( y = Var[27]                   )
+  #103= 0.                        ( for q in range[10]:           )
+N1000
+  IF [#103 GE 10.] GOTO 1002      ( for q in range[10]:           )
+DPRNT[X*is*[#100][31],*Y+Q*is*[#101+#103][52]]
+  #103= #103 + 1.                 (     dprint[f"X is {x:3.1f}, Y+Q is {y+q:5.2f}"])
+  GOTO 1000
+N1002
+  M30
+%
+#+end_example
 
 -----------------------------------
 * Symbol Tables
@@ -676,7 +798,7 @@ Set the global ~p2g.Control.symbol_table~ to get a symbol
 table in the output file.
 
 #+NAME: stest
-#+BEGIN_SRC python -i  :eval always :exports both :results output  
+#+BEGIN_SRC python -i :results output :python poetry run p2g --no-version    -
 import p2g
 x1 = -7
 MACHINE_ABS_ABOVE_OTS = p2g.Const(x=x1, y=8, z=9)
@@ -696,6 +818,29 @@ def stest():
 #+END_SRC  
 ⇨ `p2g stest.py` ⇨
 #+RESULTS: stest
+#+begin_example
+O0001 (stest)
+( Symbol Table )
+
+ ( MACHINE_ABS_ABOVE_OTS                   :  -7.000,  8.000,  9.000 )
+ ( MACHINE_ABS_ABOVE_SEARCH_ROTARY_LHS_5X8 : 100.000,101.000,102.000 )
+ ( MACHINE_ABS_ABOVE_VICE                  :  17.000, 18.000, 19.000 )
+
+ ( RAW_ANALOG                              : #1080[10]               )
+ ( v1                                      :  #106.x                 )
+
+
+( Only used symbols are in output table. )
+  #100= -7.                       (   Var[MACHINE_ABS_ABOVE_OTS]  )
+  #101= 8.
+  #102= 9.
+  #103= 170.                      (   Var[MACHINE_ABS_ABOVE_VICE * fish])
+  #104= 180.
+  #105= 190.
+  #106= #106 + #1087              (   v1 += RAW_ANALOG[7]         )
+  M30
+%
+#+end_example
 
 -----------------------------------
 * Notes
@@ -708,7 +853,7 @@ for my own limited purposes.
 
 Nice things:
 
-#+BEGIN_SRC python -i  :eval always :exports both :results output  
+#+BEGIN_SRC python -i :results output :python poetry run p2g --no-version    -
 
 from p2g import *
 from p2g.haas import *
@@ -753,6 +898,14 @@ def cool():
 #+END_SRC
 
 #+RESULTS:
+: O0001 (cool)
+: ( You can do surprising things. )
+:   #100= 100.                      ( avariable = Var[100]          )
+:   #101= 7.                        ( another = Var[7, 8]           )
+:   #102= 8.
+: DPRNT[[#101*[#100+#5081]+3.][#102*[#5082+34.]+3.]]
+:   M30
+: %
 
   ⇨ ~p2g notes.py~ ⇨
 #+RESULTS:
@@ -764,10 +917,7 @@ def cool():
 : %                                 ( 0.2.301                       )
 
 
-
-
-
-#+BEGIN_SRC python -i  :eval always :exports both :results output  
+#+BEGIN_SRC python -i :results output :python poetry run p2g --no-version    -
 import p2g
 from p2g.haas import *
 
@@ -796,6 +946,25 @@ def beware():
 #+END_SRC
 
 #+RESULTS:
+#+begin_example
+O0001 (beware)
+( Names on the left hand side of an assignment need to be )
+( treated with care.  A simple.                           )
+( Will not do what you want - this will overwrite the definition )
+( of G55 above - so no code will be generated.                   )
+( You need to use .var [for everything], explicitly name the axes,or use magic slicing. )
+  #5261= 1.                       (     G56.var = [1, 1, 1]       )
+  #5262= 1.
+  #5263= 1.
+  #5261= 2.                       (     G56.xyz = [2, 2, 2]       )
+  #5262= 2.
+  #5263= 2.
+  #5261= 3.                       (     G56[:] = [3, 3, 3]        )
+  #5262= 3.
+  #5263= 3.
+  M30
+%
+#+end_example
 
   ⇨ ~p2g beware.py~ ⇨
 #+RESULTS:
@@ -819,7 +988,7 @@ O0001 (beware)
 %                                 ( 0.2.301                       )
 #+end_example
 
-#+BEGIN_SRC python -i  :eval always :exports both :results output  
+#+BEGIN_SRC python -i :results output :python poetry run p2g --no-version    -
 from p2g import *
 from p2g.haas import *
 
@@ -845,6 +1014,24 @@ def beware1():
 #+END_SRC     
 
 #+RESULTS:
+#+begin_example
+O0001 (beware1)
+( It's easy to forget that only macro variables will get into )
+( the output code. Other code will go away.                   )
+  #100= 7.                        ( y = Var[7]                    )
+( Should look like: )
+  #101= 123.                      ( x = Var[123]  # is a var      )
+  #102= 7.                        ( y = Var[7]                    )
+  #100= #102
+  IF [#101 NE 23.] GOTO 1002      ( if x == 23:  # look here      )
+  #100= 9.                        (     y = 9                     )
+  GOTO 1003
+N1002
+  #100= 99.                       (     y = 99                    )
+N1003
+  M30
+%
+#+end_example
 
 -----------------------------------
 * HAAS macro var definitions

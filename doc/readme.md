@@ -59,20 +59,24 @@ It comes with a set of macro variable definitions for a Haas mill with NCD. And 
 ```
 
 ```
-Example of program with many options using docopt.
+p2g - Turn Python into G-Code.
 
 Usage:
-  p2g.py [options]  <srcfile> [<dstfile>] 
-  p2g.py --help [<topic>]
+  p2g [options]  <srcfile> [<dstfile>]
+  p2g --help [ all | topics | maint | <topic>]
+  p2g --version
+  p2g --location
+  p2g --examples <dstdir>
 
-    Example:
-        p2g foo.py ~/_nc_/O{countdown}vc1-foo.nc
-         Makes an output of the form ~/_nc_/O1234vc1-foo.nc
- 
-        p2g --func=thisone -
-         Read from stdin, look for the 'thisone' function and write to
-         to stdout.
- 
+
+   Example:
+       p2g tram-rotary.py ~/_nc_/O{countdown}tr.nc
+        Makes an output of the form ~/_nc_/O1234tr.nc
+
+       p2g --func=thisone -
+        Read from stdin, look for the 'thisone' function and write to
+        to stdout.
+
 
 Arguments:
   <srcfile>   Source python file. [default: stdin]
@@ -80,35 +84,33 @@ Arguments:
                {countdown} in file name creates a decrementing prefix
                for the output file which makes looking for the .nc in
                a crowded directory less painful - it's at the top.
-               (It's the number of minutes until midnight, so clear
+               (It's the number of seconds until midnight, so clear
                the directory once a day.)
-  
   <topic>     [ topics | all | <topic>]
-          <topic>  Print from readme starting at topic.                 
-          topics:  List all topics.
-          all      Print all readme.
+         <topic>  Print from readme starting at topic.
+         topics   List all topics.
+         all      Print all readme.
+         maint    Print maintenance options.
 
 Options:
      --job=<jobname>      Olabel for output code.
      --function=<fname>   Function to be compiled,
                            default is last one in source file.
-     --break              pdb.set_trace() on error.
-     --no-version         Don't put version number in outputs.
      --narrow             Emit comments on their own line,
                            makes text fit more easily into
                            a narrow program window.
-     --verbose=<level>    Set verbosity level [default: 0]
      --version            Print version.
      --location           Print path of running executable.
      --examples=<dstdir>  Create <dstdir>, populate with
                               examples and compile.
- 
-          Examples:
-            p2g examples showme
-              Copies the examples into ./showme and then runs
-               p2g showme/vicecenter.py showme/vicecenter.nc
-               p2g showme/checkprobe.py showme/checkprobe.nc
- 
+
+         Examples:
+           p2g --examples showme
+             Copies the examples into ./showme and then runs
+              p2g showme/vicecenter.py showme/vicecenter.nc
+              p2g showme/checkprobe.py showme/checkprobe.nc
+
+
 ```
 
 ---
@@ -161,7 +163,7 @@ def t():
 ```
 
 ```
-O0001 (t: 0.2.351)
+O0001 (t)
   #100= 99.                       (   x = Var[99]                 )
   #102= 0.                        (   for y in range[10]:         )
 N1000
@@ -214,7 +216,7 @@ def search(cursor, sch):
 
 
 def demo1():
-    cursor = Var[3](2, 3, 4)
+    cursor = Var[3](2, 3, 41)
     # searching right, look down 0.4", move
     # 1.5" right if nothing hit.
     sch1 = SearchParams(name="right", search_depth=-0.4, iota=-0.1, delta=(1.5, 0))
@@ -226,18 +228,19 @@ def demo1():
 ⇨ `p2g demo1.py` ⇨
 
 ```
-O0001 (demo1: 0.2.350)
-  #100= 2.                        (   cursor = Var[3][2, 3, 4]    )
+O0001 (demo1)
+  #100= 2.                        ( cursor = Var[3][2, 3, 41]     )
   #101= 3.
-  #102= 4.
-  #103= 10.                       (   its = Var[sch.its]          )
+  #102= 41.
+  #103= 10.                       ( its = Var[sch.its]            )
 N1000
-  IF [#103 LE 0.] GOTO 1002       (   while its > 0:              )
-  G90 G01 F640. x#100 y#101 z#102 (       sch.go[cursor]          )
-  G90 G31 F30. z-0.4              (       sch.probe[z=sch.search_depth])
-  IF [#5063 LT -0.5] GOTO 1001    (       if SKIP_POS.z < sch.search_depth + sch.iota:)
-  #100= #100 + 1.5                (       cursor.xy += sch.delta  )
-  #103= #103 - 1.                 (       its -= 1                )
+  IF [#103 LE 0.] GOTO 1002       ( while its > 0:                )
+(     sch.go[cursor]            )
+  G90 G01 G55 F640. x#100 y#101 z#102
+  G90 G31 G55 F30. z-0.4          (     sch.probe[z=sch.search_depth])
+ IF [#5063 LT -0.5] GOTO 1001    (     if SKIP_POS.z < sch.search_depth + sch.iota:)
+  #100= #100 + 1.5                (     cursor.xy += sch.delta    )
+  #103= #103 - 1.                 (     its -= 1                  )
   GOTO 1000
 N1002
   #3000 = 101 (too far right.)
@@ -288,8 +291,8 @@ def ex2():
     com("Define a constant ")
     above_tdc = Const(111, 222, 1333)
 
-    com("Use it ")
-    tmp0 += above_tdc
+    com("Use it. ")
+    tmp0 += above_tdc  + 3
 
 ```
 
@@ -297,16 +300,16 @@ def ex2():
 
 ```
 O0001 (ex2)
-  #100= #5061 * 2. + #5041 + #5061( tmp0 = Var[ skip0.xyz * 2.0 + workpos + skip1])
+  #100= #5061 * 2. + #5041 + #5061( tmp0 = Var[skip0.xyz * 2.0 + workpos + skip1])
   #101= #5062 * 2. + #5042 + #5062
   #102= #5063 * 2. + #5043 + #5063
 ( Define a constant  )
-( Use it  )
-  #100= #100 + 111.               ( tmp0 += above_tdc             )
-  #101= #101 + 222.
-  #102= #102 + 1333.
+( Use it.  )
+  #100= #100 + 114.               ( tmp0 += above_tdc  + 3        )
+  #101= #101 + 225.
+  #102= #102 + 1336.
   M30
-%                                 ( 0.2.301                       )
+%
 ```
 
 ---
@@ -325,8 +328,8 @@ from p2g.haas import *  # to all the examples
 def co1():
     com("Describe 3 variables at 3000")
     dst = Fixed[3](addr=3000)
-    com("Fill with 1,2,3")
-    dst.var = (1, 2, 3)
+    com("Fill with 1,2,31")
+    dst.var = (1, 2, 31)
 
     com("Set by parts")
     dst.y = 7
@@ -362,16 +365,16 @@ def co1():
 ```
 O0001 (co1)
 ( Describe 3 variables at 3000 )
-( Fill with 1,2,3 )
-  #3000= 1.                       ( dst.var = [1,2,3]             )
+( Fill with 1,2,31 )
+  #3000= 1.                       ( dst.var = [1, 2, 31]          )
   #3001= 2.
-  #3002= 3.
+  #3002= 31.
 ( Set by parts )
   #3001= 7.                       ( dst.y = 7                     )
   #3002= 71.                      ( dst.z = 71                    )
   #3000= 19.                      ( dst.x = 19                    )
 ( Arithmetic )
-  #3000= #3000 + 1.               ( dst.var += [1,2,3]            )
+  #3000= #3000 + 1.               ( dst.var += [1, 2, 3]          )
   #3001= #3001 + 2.
   #3002= #3002 + 3.
   #3000= #3000 - 0.101            ( dst.var -= offset             )
@@ -400,7 +403,7 @@ O0001 (co1)
   #101= #202                      ( p1.yz = p2.yz[1]              )
   #102= #202
   M30
-%                                 ( 0.2.301                       )
+%
 ```
 
 ---
@@ -412,6 +415,7 @@ O0001 (co1)
 Python expressions turn into G-Code as you may expect, save that native Python uses radians for trig, and G-Code uses degrees, so folding is done in degrees.
 
 ```python
+
 from p2g import *  # this is the common header
 from p2g.haas import *  # to all the examples
 
@@ -453,12 +457,12 @@ O0001 (exp11)
 ( Variables go into macro variables. )
   #100= 0.3                       ( theta = Var[0.3]              )
   #101= SIN[#100]                 ( angle = Var[sin[theta]]       )
-( Constants don't exist in G-code. )
+( Constants are elided in G-code. )
   #102= 0.0052                    ( anglek = Var[sin[thetak]]     )
 ( Lots of things are folded. )
-  #103= 7.6                       ( t1 = Var[2 * thetak  + 7]     )
+  #103= 7.6                       ( t1 = Var[2 * thetak + 7]      )
 ( Simple array math: )
-  #104= -2.                       ( tlhc = Var[ - box_size / 2]   )
+  #104= -2.                       ( tlhc = Var[-box_size / 2]     )
   #105= -2.
   #106= -1.
   #107= 2.                        ( brhc = Var[box_size / 2]      )
@@ -470,11 +474,11 @@ O0001 (exp11)
   #113= #104 / #105               ( a = tlhc[0] / tlhc[1]         )
   #114= #104 MOD #105             ( b = tlhc[0] % tlhc[1]         )
   #115= #104 AND #105             ( x = tlhc[0] & tlhc[1]         )
-( tlhc.xy = [[a - b + 3] / sin[x],)
+( tlhc.xy = [[a - b + 3] / sin[x], [a + b + 3] / cos[x]])
   #104= [#113 - #114 + 3.] / SIN[#115]
   #105= [#113 + #114 + 3.] / COS[#115]
   M30
-%                                 ( 0.2.301                       )
+%
 ```
 
 ---
@@ -530,7 +534,7 @@ def axes():
 ```
 O0001 (axes)
 ( rhs of vector ops get expanded as needed )
-  #5241= 0.                       (    G55.var = [0,1]            )
+  #5241= 0.                       ( G55.var = [0, 1]              )
   #5242= 1.
   #5243= 0.
   #5244= 1.
@@ -539,24 +543,24 @@ O0001 (axes)
 ( fill yz and c with some stuff )
 ( Unmentioned axes values are assumed    )
 ( to be 0, so adding them makes no code. )
-  #5242= #5242 + 3.               (    G55.var += tmp1            )
+  #5242= #5242 + 3.               ( G55.var += tmp1               )
   #5243= #5243 + 9.
   #5246= #5246 + 30.
 
-  #5244= #5244 * 2.               (    G55.ac *= 2.0              )
+  #5244= #5244 * 2.               ( G55.ac *= 2.0                 )
   #5246= #5246 * 2.
 ( Rotaries. )
-  #203= 180.                      (    p4.a = 180                 )
-  #205= 30.                       (    p4.c = asin [0.5]          )
+  #203= 180.                      ( p4.a = 180                    )
+  #205= 30.                       ( p4.c = asin[0.5]              )
 ( Filling to number of axes. )
-  #5241= 0.                       (    G55.var = [0]              )
+  #5241= 0.                       ( G55.var = [0]                 )
   #5242= 0.
   #5243= 0.
-  #100= #5241 * 34.               (    tmp = Var[G55 * 34]        )
+  #100= #5241 * 34.               ( tmp = Var[G55 * 34]           )
   #101= #5242 * 34.
   #102= #5243 * 34.
   M30
-%                                 ( 0.2.301                       )
+%
 ```
 
 ---
@@ -578,14 +582,15 @@ class Optional:
     prev: str
 
     def __init__(self):
-        self.prev = p2g.stat.OPT_PREFIX
-        p2g.stat.OPT_PREFIX = "/ "
+        self.prev = p2g.Control.block_delete
+        p2g.Control.block_delete = True
 
     def __enter__(self):
         pass
 
     def __exit__(self, *_):
-        p2g.stat.OPT_PREFIX = self.prev
+        p2g.Control.block_delete = self.prev
+
 
 
 class Probe:
@@ -609,11 +614,11 @@ def when_demo():
 
 ⇨ `p2g whendemo.py` ⇨
 
-    O0001 (when_demo : 0.2.333)
+    O0001 (when_demo)
       T01 M06                         (     load_tool[PROBE]          )
       G65 P9832                       ( Probe on.                     )
-      #100= 9.                        (  tmp = Var[9]                 )
-    /   #100= #100 + 98.                (     tmp.var += 98             )
+      #100= 9.                        (     tmp = Var[9]              )
+      #100= #100 + 98.                (         tmp.var += 98         )
     DPRNT[tmp*is*[#100]]
       G65 P9833                       ( Probe off.                    )
       M30
@@ -648,7 +653,7 @@ from p2g import *
 
 
 def goto1():
-    symbol.Table.print = True
+
     g1 = goto.work.feed(20).all
 
     comment("in work cosys, goto x=1, y=2, z=3 at 20ips")
@@ -688,42 +693,40 @@ def goto1():
 
 ```
 O0001 (goto1)
-( Symbol Table )
-
- ( v1 :  #100.x  #101.y  #102.z )
-
 
 ( in work cosys, goto x=1, y=2, z=3 at 20ips )
-  G90 G01 F20. x1. y2. z3.        ( g1 [1,2,3]                    )
+  G90 G01 G55 F20. x1. y2. z3.    ( g1[1, 2, 3]                   )
 
 ( make a variable, 2,3,4 )
-  #100= 2.                        ( v1 = Var[x=2,y=3,z=4]         )
+  #100= 2.                        ( v1 = Var[x=2, y=3, z=4]       )
   #101= 3.
   #102= 4.
 
 ( In the machine cosys, move to v1.z then v1.xy, slowly )
-  G90 G53 G01 F10. z#102          ( absslow.z_first[v1]           )
-  G90 G53 G01 F10. x#100 y#101
+  G90 G53 G01 G55 F10. z#102      ( absslow.z_first[v1]           )
+  G90 G53 G01 G55 F10. x#100 y#101
 
 ( p1 is whatever absslow was, with feed adjusted to 100. )
-  G90 G53 G01 F100. x#100 y#101   ( p1.z_last[v1]                 )
-  G90 G53 G01 F100. z#102
+( p1.z_last[v1]                 )
+  G90 G53 G01 G55 F100. x#100 y#101
+  G90 G53 G01 G55 F100. z#102
 
 ( p2 is whatever p1 was, with changed to a probe. )
-  G90 G53 G31 F100. x#100 y#101   ( p2.z_last[v1]                 )
-  G90 G53 G31 F100. z#102
+( p2.z_last[v1]                 )
+  G90 G53 G31 G55 F100. x#100 y#101
+  G90 G53 G31 G55 F100. z#102
 
 ( move a and c axes  )
-  G91 G01 F20. a9. c90.           ( goto.feed[20].all.relative [a=9, c= 90])
+  G91 G01 G55 F20. a9. c90.       ( goto.feed[20].all.relative[a=9, c=90])
 
 ( probe with a hass MUST_SKIP mcode. )
-  G91 G31 M79 F10. x3. y4. z5.    ( goto.probe.feed[10].mcode["M79"].relative.all[3,4,5])
+  G91 G31 G55 M79 F10. x3. y4. z5.( goto.probe.feed[10].mcode["M79"].relative.all[3, 4, 5])
 
 ( Define shortcut for safe_goto and use. )
-  G65 R9810 F20. z3.              ( safe_goto.z_first[1,2,3]      )
+  G65 R9810 F20. z3.              ( safe_goto.z_first[1, 2, 3]    )
   G65 R9810 F20. x1. y2.
   M30
-%                                 ( 0.2.301                       )
+%
 ```
 
 ---
@@ -752,14 +755,14 @@ def exprnt():
 ⇨ `p2g exprnt.py` ⇨
 
 ```
-O0001 (exprnt : 0.2.333)
-  #100= 2.                        (   x = Var[2]                  )
-  #101= 27.                       (   y = Var[27]                 )
-  #103= 0.                        (   for q in range[10]:         )
+O0001 (exprnt)
+  #100= 2.                        ( x = Var[2]                    )
+  #101= 27.                       ( y = Var[27]                   )
+  #103= 0.                        ( for q in range[10]:           )
 N1000
-  IF [#103 GE 10.] GOTO 1002      (   for q in range[10]:         )
+  IF [#103 GE 10.] GOTO 1002      ( for q in range[10]:           )
 DPRNT[X*is*[#100][31],*Y+Q*is*[#101+#103][52]]
-  #103= #103 + 1.                 ( dprint[f"X is {x:3.1f}, Y+Q is {y+q:5.2f}"])
+  #103= #103 + 1.                 (     dprint[f"X is {x:3.1f}, Y+Q is {y+q:5.2f}"])
   GOTO 1000
 N1002
   M30
@@ -772,7 +775,7 @@ N1002
 
 # Symbol Tables
 
-Set the global `p2g.symbol.Table.print` to get a symbol table in the output file.
+Set the global `p2g.Control.symbol_table` to get a symbol table in the output file.
 
 ```python
 import p2g
@@ -780,12 +783,12 @@ x1 = -7
 MACHINE_ABS_ABOVE_OTS = p2g.Const(x=x1, y=8, z=9)
 MACHINE_ABS_ABOVE_SEARCH_ROTARY_LHS_5X8 = p2g.Const(100, 101, 102)
 MACHINE_ABS_ABOVE_VICE = p2g.Const(x=17, y=18, z=19)
- RAW_ANALOG = p2g.Fixed[10](addr=1080)
+RAW_ANALOG = p2g.Fixed[10](addr=1080)
 fish = 10
 not_used = 12
 
 def stest():
-      p2g.symbol.Table.print = True    
+      p2g.Control.symbol_table = True    
       p2g.comment("Only used symbols are in output table.")
       p2g.Var(MACHINE_ABS_ABOVE_OTS)
       p2g.Var(MACHINE_ABS_ABOVE_VICE * fish)
@@ -808,15 +811,15 @@ O0001 (stest)
 
 
 ( Only used symbols are in output table. )
-  #100= -7.                       ( Var[MACHINE_ABS_ABOVE_OTS]    )
+  #100= -7.                       (   Var[MACHINE_ABS_ABOVE_OTS]  )
   #101= 8.
   #102= 9.
-  #103= 170.                      ( Var[MACHINE_ABS_ABOVE_VICE * fish])
+  #103= 170.                      (   Var[MACHINE_ABS_ABOVE_VICE * fish])
   #104= 180.
   #105= 190.
-  #106= #106 + #1087              ( v1 += RAW_ANALOG[7]           )
+  #106= #106 + #1087              (   v1 += RAW_ANALOG[7]         )
   M30
-%                                 ( 0.2.301                       )
+%
 ```
 
 ---
@@ -873,10 +876,17 @@ def cool():
 
 ```
 
-⇨ `p2g notes.py` ⇨
-
     O0001 (cool)
     ( You can do surprising things. )
+      #100= 100.                      ( avariable = Var[100]          )
+      #101= 7.                        ( another = Var[7, 8]           )
+      #102= 8.
+    DPRNT[[#101*[#100+#5081]+3.][#102*[#5082+34.]+3.]]
+      M30
+    %
+
+⇨ `p2g notes.py` ⇨
+
       #100= 100.                      (   avariable = Var[100]        )
       #101= 7.                        (   another = Var[7,8]          )
       #102= 8.
@@ -910,6 +920,26 @@ def beware():
         G56.xyz = [2, 2, 2]
         G56[:] = [3, 3, 3]
 
+```
+
+```
+O0001 (beware)
+( Names on the left hand side of an assignment need to be )
+( treated with care.  A simple.                           )
+( Will not do what you want - this will overwrite the definition )
+( of G55 above - so no code will be generated.                   )
+( You need to use .var [for everything], explicitly name the axes,or use magic slicing. )
+  #5261= 1.                       (     G56.var = [1, 1, 1]       )
+  #5262= 1.
+  #5263= 1.
+  #5261= 2.                       (     G56.xyz = [2, 2, 2]       )
+  #5262= 2.
+  #5263= 2.
+  #5261= 3.                       (     G56[:] = [3, 3, 3]        )
+  #5262= 3.
+  #5263= 3.
+  M30
+%
 ```
 
 ⇨ `p2g beware.py` ⇨

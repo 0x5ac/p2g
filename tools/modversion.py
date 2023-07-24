@@ -2,7 +2,6 @@
 import argparse
 import pathlib
 import re
-import subprocess
 import sys
 import typing
 
@@ -12,7 +11,7 @@ import typing
 
 def dig_out_semver(txt) -> typing.Optional[str]:
     semver_found = re.match(
-        f'^(\\d*\\.\\d*\\.\\d*[$"]?.*)', txt, re.DOTALL | re.IGNORECASE
+        '^(\\d*\\.\\d*\\.\\d*[$"]?.*)', txt, re.DOTALL | re.IGNORECASE
     )
     if semver_found:
         return semver_found.group(1)

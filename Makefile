@@ -115,6 +115,8 @@ GENERATED_DOC:= \
 	authors.md 
 
 
+ALL_GENERATED_FILES:=$(GENERATED_DOC) $(P2G_GEN_SRC)
+
 DOC:=   doc/haas.in			\
 	$(GENERATED_DOC)	  
 
@@ -130,7 +132,7 @@ EXAMPLE_SRC:= \
 RELEASE_FILE=dist/p2g-$(THIS_VERSION).tar.gz
 
 
-top: | announce $(VERSION_STAMP) install-tools generate test lint release
+top: | announce $(VERSION_STAMP) $(POETRY_STAMP) $(ALL_GENERATED_FILES) test lint release
 	$(HR)
 	$(TITLE) 
 	$(TITLE) 
@@ -241,7 +243,6 @@ ELCOMMON=						\
         --eval "(require 'ox-gfm)"			\
 	--eval "(setq org-confirm-babel-evaluate nil)"		
 
-
 %.md:%.org
 	$(WRITEABLEOUT)
 	- $(EMACS) $< $(ELCOMMON) -f org-gfm-export-as-markdown $(WRITE_RESULT)
@@ -279,7 +280,7 @@ sanity:
 .PHONY:
 test: .stamp-tests
 
-.stamp-tests: install-tools $(ALL_SRC_FOR_DIST)
+.stamp-tests:  $(POETRY_STAMP) $(P2G_SRC) $(TEST_SRC)
 	$(HR)
 	$(TITLE) Run pytest and coverage.
 	PYTHONPATH=. COLUMNS=80 $(PYTEST) 
@@ -290,14 +291,14 @@ test: .stamp-tests
 
 sometest:
 	poetry run pytest -x --lf
+T=local
+packup:
+	git commit -m --allow-empty -m "rel v$(VERSION)" -a
+	git tag -a v$(VERSION)
+	git push $(T)
+	git push --tags $(T)
 
-gitrel-push-part2:
-	# need two parts otherwise version is wrong.
-	make
-	git commit -m 'bump' -a
 
-	git push origin HEAD 
-	git push github
 
 foop:
 	echo $(THIS_VERSION)
@@ -371,13 +372,13 @@ $(RELEASE_FILE):
 	$(TILE)
 	# want to distribute docs and examples, so copy
 	# into src tree
-	rm -rf  $(P2G_SRC_DIR)/doc
-	rm -rf  $(P2G_SRC_DIR)/examples
+	rm -rf  p2g/doc
+	rm -rf  p2g/examples
 
-	cp -a doc $(P2G_SRC_DIR)
-	cp -a  $(EXAMPLE_DIR) $(P2G_SRC_DIR)
+	cp -a doc p2g
+	cp -a  examples p2g
 	$(POETRY) build
-	rm -rf  $(P2G_SRC_DIR)/doc $(P2G_SRC_DIR)/examples
+	rm -rf  p2g/doc p2g/examples
 
 
 .PHONY:
@@ -390,36 +391,58 @@ release: | $(RELEASE_FILE) tox
 # # linty stuff
 
 .PHONY:
-vulture: install-tools | $(LINTABLE_SRC)
+vulture:.stamp-vulture
+
+.stamp-vulture: $(POETRY_STAMP) | $(LINTABLE_SRC)
 	 $(PR) vulture
+	touch $@
 
 .PHONY:
-pyright:  install-tools | $(LINTABLE_SRC)
-	 $(PR) pyright 
+pyright:.stamp-pyright
+
+.stamp-pyright: $(POETRY_STAMP) | $(LINTABLE_SRC)
+	 $(PR) pyright
+	touch $@
 .PHONY:
-mypy: install-tools |  $(LINTABLE_SRC)
-	 $(PR) mypy  
+mypy:.stamp-mypy
+
+.stamp-mypy: $(POETRY_STAMP) |  $(LINTABLE_SRC)
+	 $(PR) mypy
+	touch $@
 .PHONY: 
-flake8:  install-tools | $(LINTABLE_SRC)
+flake8:.stamp-flake8
+
+.stamp-flake8: $(POETRY_STAMP) | $(LINTABLE_SRC)
 	$(PR) flake8p
+	touch $@
 
 .PHONY:
-pylint:  install-tools | $(LINTABLE_SRC)
+pylint:.stamp-pylint
+
+.stamp-pylint: $(POETRY_STAMP) | $(LINTABLE_SRC)
 	 $(PR) pylint tools p2g
+	touch $@
 .PHONY:
-ruff:  install-tools | $(LINTABLE_SRC)
-	$(PR) ruff check tools p2g  
+ruff:.stamp-ruff
+
+.stamp-ruff: $(POETRY_STAMP) | $(LINTABLE_SRC)
+	$(PR) ruff check tools p2g
+	touch $@
 
 .PHONY:
-deptry: 
-	$(PR) deptry . 
+deptry:.stamp-deptry
+
+.stamp-deptry: 
+	$(PR) deptry .
+	touch $@
 .PHONY:
-pytype:  install-tools | $(LINTABLE_SRC)
-	@# needs python < 3.11 
+pytype:.stamp-pytype
+
+.stamp-pytype: $(POETRY_STAMP) | $(LINTABLE_SRC)
+	@# needs python < 3.11
+	touch $@
 	@#	pytype p2g
 
-.PHONY:
-tlint:lint test
 
 .PHONY:
 lint: pyright mypy pytype pylint vulture ruff   flake8

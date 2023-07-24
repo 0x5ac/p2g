@@ -1,7 +1,9 @@
 from p2g import axis
 from p2g import coords
 
+from p2g.coords import Fixed
 
+# j = coords.Fixed[3](addr=2001)
 NAME = "HAAS NGC"
 ORIGIN = [0, 0, 0]
 NAXES = axis.Axes()
@@ -12,7 +14,7 @@ FEED_SLOW = 50.0
 PROBE_FAST = 50.0
 PROBE_SLOW = 10.0
 PROBE_ON = ["G65 P9832"]
-PROBE_H = coords.Fixed[3](addr=2001)
+PROBE_H = Fixed[3](addr=2001)
 OTS_ON = ["M59 P2", "G04 P1.0", "M59 P3"]
 OTS_OFF = ["M69 P2", "M68 P3"]
 SPINDLE_PROBE_ON = "G65 P9832"

@@ -42,15 +42,15 @@ class ConstantBase(Scalar):
 class Constant(ConstantBase):
     _value: int | float
 
+    def __init__(self, value: int | float):
+        super().__init__(nd.const_nd)
+        self._value = value
+
     def rtl_arg_info_(self):
         return ["constant"]
 
     def rtl_get_arg_(self, _idx):
         return self._value
-
-    def __init__(self, value: int | float):
-        super().__init__(nd.const_nd)
-        self._value = value
 
     # def get_address(self):
     #     err.compiler("Can't take address of constant.")

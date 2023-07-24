@@ -9,6 +9,7 @@ import p2g
 from conftest import want
 from p2g.main import main
 
+
 std = [
     "import p2g",
     "def testfish():",

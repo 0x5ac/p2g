@@ -2,11 +2,17 @@ import contextlib
 import difflib
 import inspect
 import pathlib
-
+import sys
 
 import p2g
 import p2g.gbl
 import p2g.walkfunc
+
+
+def pytest_addoption(parser):
+    # fake so that command parser doesn't get syntax error,
+    # real check is in writefile.
+    parser.addoption("--goldify", action="store_true", default="remember callow as gold")
 
 
 # the assert here will get rewritten by pytest.
@@ -95,9 +101,11 @@ def make_file_path(func, new_suffix) -> pathlib.Path:
 
 
 def writelines(fn, suffix, txt):
-    path = make_file_path(fn, suffix)
-    p2g.gbl.log(f"Ptest output {path}")
-    return path.write_text("\n".join(txt))
+
+    if "--goldify" in sys.argv:
+        path = make_file_path(fn, suffix)
+        p2g.gbl.log(f"Ptest output {path}")
+        path.write_text("\n".join(txt))
 
 
 # compile fn, return generated errors or text.
@@ -130,6 +138,14 @@ def check_golden_worker(fn):
     return (gold_data, []), callow
 
 
+@contextlib.contextmanager
+def save_config(**kwargs):
+    old = p2g.gbl.config
+    p2g.gbl.config = p2g.gbl.config._replace(**kwargs)
+    yield
+    p2g.gbl.config = old
+
+
 # check golden file of fn,.
 def check_golden_nodec(fn):
     def check_golden__():
@@ -139,6 +155,7 @@ def check_golden_nodec(fn):
             callow_data = list(get_all_comp_outputs(fn))
             gold_path = make_file_path(fn, ".nc")
             gold_data = list(read_and_trim(gold_path))
+
             writelines(fn, ".got", callow_data[0])
 
             checkit(gold_data, [], callow_data)
@@ -204,11 +221,3 @@ def want(*text, narrow_output=True, errors=[], no_version=True, emit_rtl=False):
         return must_be__
 
     return must_be_
-
-
-@contextlib.contextmanager
-def save_config(**kwargs):
-    old = p2g.gbl.config
-    p2g.gbl.config = p2g.gbl.config._replace(**kwargs)
-    yield
-    p2g.gbl.config = old

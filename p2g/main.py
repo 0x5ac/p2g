@@ -13,6 +13,7 @@ from p2g import gbl
 from p2g import VERSION
 from p2g import walkfunc
 
+
 DOC = """Example of program with many options using docopt.
 
 Usage:

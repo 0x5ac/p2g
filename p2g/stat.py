@@ -67,14 +67,6 @@ def compress_and_clean(line: str):
 class StatBase(abc.ABC):
     _comment: str
 
-    @abc.abstractmethod
-    def rtl_arg_info_(self):
-        return []
-
-    @abc.abstractmethod
-    def rtl_get_arg_(self, _idx):
-        raise IndexError
-
     def __init__(self, *, comment_txt=CType.FAIL_COMMENT):
         self.prefix = OPT_PREFIX
         self.pos = err.state.last_pos
@@ -89,6 +81,14 @@ class StatBase(abc.ABC):
             comment_txt = err.src_code_from_node_place(self.pos)
         comment_txt = compress_and_clean(comment_txt)
         self._comment = comment_txt
+
+    @abc.abstractmethod
+    def rtl_arg_info_(self):
+        return []
+
+    @abc.abstractmethod
+    def rtl_get_arg_(self, _idx):
+        raise IndexError
 
     def talkabout(self, orig):
         return f"{orig} {self._comment}"
@@ -137,17 +137,17 @@ class Nest:
     slist: list[StatBase]
     cur: typing.Optional["Nest"] = None
 
-    def nest_to_rtl(self):
-
-        for stat in self.slist:
-
-            yield "".join(stat.stat_to_rtl())
-
     def __init__(self):
         self.prev_comtxt = ""
         self.first_label = 1000
         self.next_label = self.first_label
         self.slist = []
+
+    def nest_to_rtl(self):
+
+        for stat in self.slist:
+
+            yield "".join(stat.stat_to_rtl())
 
     @classmethod
     def get_label(cls):
@@ -180,15 +180,15 @@ class Nest:
 
 
 class CommentLines(StatBase):
+    def __init__(self, lines):
+        super().__init__(comment_txt=CType.NO_COMMENT)
+        self.lines = lines
+
     def rtl_arg_info_(self):
         return []
 
     def rtl_get_arg_(self, _idx):
         raise AssertionError
-
-    def __init__(self, lines):
-        super().__init__(comment_txt=CType.NO_COMMENT)
-        self.lines = lines
 
     def to_full_lines(self, _):
         lines = list(map(str, self.lines))
@@ -246,6 +246,11 @@ class If(StatBase):
     exp: typing.Any
     on_t: Label
 
+    def __init__(self, exp, on_t: Label):
+        super().__init__(comment_txt=CType.SRC_COMMENT)
+        self.exp = exp
+        self.on_t = on_t
+
     def rtl_arg_info_(self):
         return ["exp", "labelref"]
 
@@ -253,11 +258,6 @@ class If(StatBase):
         if idx == 0:
             return self.exp
         return self.on_t
-
-    def __init__(self, exp, on_t: Label):
-        super().__init__(comment_txt=CType.SRC_COMMENT)
-        self.exp = exp
-        self.on_t = on_t
 
     def to_line_lhs(self):
         lhs = f"IF [{nd.to_gcode(self.exp)}] "
@@ -270,6 +270,11 @@ class IfSet(StatBase):
     cond: typing.Any
     ass: "Set"
 
+    def __init__(self, cond, ass, comment_txt=CType.SRC_COMMENT):
+        super().__init__(comment_txt=comment_txt)
+        self.cond = cond
+        self.ass = ass
+
     def rtl_arg_info_(self):
         return ["exp", "dst", "src"]
 
@@ -281,11 +286,6 @@ class IfSet(StatBase):
             return self.ass.args[0]
         return self.ass.args[1]
 
-    def __init__(self, cond, ass, comment_txt=CType.SRC_COMMENT):
-        super().__init__(comment_txt=comment_txt)
-        self.cond = cond
-        self.ass = ass
-
     def to_line_lhs(self):
         yield f"{NORMAL_PREFIX}IF [{nd.to_gcode(self.cond)}] {self.ass}"
 
@@ -293,15 +293,15 @@ class IfSet(StatBase):
 class Code(StatBase):
     txt: str
 
+    def __init__(self, txtargs, comment_txt=CType.SRC_COMMENT):
+        super().__init__(comment_txt=comment_txt)
+        self.txt = gbl.unwind(txtargs)
+
     def rtl_arg_info_(self):
         return ["?string"]
 
     def rtl_get_arg_(self, _idx):
         return self.txt
-
-    def __init__(self, txtargs, comment_txt=CType.SRC_COMMENT):
-        super().__init__(comment_txt=comment_txt)
-        self.txt = gbl.unwind(txtargs)
 
     def to_line_lhs(self):
         if self.txt and (self.txt[0] in "O%LN"):
@@ -317,15 +317,15 @@ class Code(StatBase):
 class Dprint(StatBase):
     txt: str
 
+    def __init__(self, txt):
+        super().__init__(comment_txt=CType.NO_COMMENT)
+        self.txt = txt
+
     def rtl_get_arg_(self, _idx):
         raise AssertionError
 
     def rtl_arg_info_(self):
         return []
-
-    def __init__(self, txt):
-        super().__init__(comment_txt=CType.NO_COMMENT)
-        self.txt = txt
 
     def to_line_lhs(self):
         yield "DPRNT[" + self.txt + "]"
@@ -388,15 +388,15 @@ def codenl(txtlst, comment_txt=CType.SRC_COMMENT):
 class Lazy(StatBase):
     todo: typing.Generator[str, None, None]
 
+    def __init__(self, todo: typing.Generator[str, None, None]):
+        super().__init__(comment_txt=CType.NO_COMMENT)
+        self.todo = todo
+
     def rtl_arg_info_(self):
         return []
 
     def rtl_get_arg_(self, _idx):
         raise AssertionError
-
-    def __init__(self, todo: typing.Generator[str, None, None]):
-        super().__init__(comment_txt=CType.NO_COMMENT)
-        self.todo = todo
 
     @gbl.g2l
     def to_full_lines(self, _):
@@ -408,16 +408,16 @@ class Lazy(StatBase):
 class LabelDef(StatBase):
     labeldef: Label
 
+    def __init__(self, labeldef: Label):
+        self.labeldef = labeldef
+        super().__init__(comment_txt=CType.NO_COMMENT)
+
     def rtl_arg_info_(self):
         return ["labeldef"]
 
     def rtl_get_arg_(self, _idx):
 
         return self.labeldef
-
-    def __init__(self, labeldef: Label):
-        self.labeldef = labeldef
-        super().__init__(comment_txt=CType.NO_COMMENT)
 
     def to_line_lhs(self):
         yield f"{self.labeldef.as_gcode_definition()}"

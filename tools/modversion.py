@@ -5,6 +5,7 @@ import re
 import sys
 import typing
 
+
 # yet another grab version from project and update tool.
 # takes from the known truth and puts it everywhere else.
 

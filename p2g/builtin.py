@@ -1,5 +1,6 @@
 from p2g import scalar
 
+
 # Just type hints, can't be called.
 # pylint: disable=redefined-builtin
 # pylint: disable=invalid-name

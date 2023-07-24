@@ -3,6 +3,7 @@ import dataclasses
 import itertools
 import typing
 
+import p2g
 from p2g import err
 from p2g import gbl
 from p2g import nd
@@ -68,7 +69,7 @@ class StatBase(abc.ABC):
     _comment: str
 
     def __init__(self, *, comment_txt=CType.FAIL_COMMENT):
-        if gbl.BLOCK_DELETE:
+        if p2g.Control.block_delete == True:
             self.prefix = "/ "
         else:
             self.prefix = ""

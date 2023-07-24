@@ -508,4 +508,4 @@ sacpdb:
 
 
 st:
-	 poetry run pytest tests/test_symtab.py
+	 poetry run pytest tests/test_coords.py

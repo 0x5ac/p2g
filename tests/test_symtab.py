@@ -56,7 +56,7 @@ T3 = p2g.Const(111111, 22222, 33333)
     "%",
 )
 def test_long_symtab():
-    p2g.SYMBOL_TABLE = True
+    p2g.Control.symbol_table = True
     fish = p2g.Const(1, 2, 3, 4, 5, 6, 7)
     XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX = p2g.Var()
     p2g.Var(fish)
@@ -89,7 +89,7 @@ def test_long_symtab():
     "%",
 )
 def test_symtab():
-    p2g.SYMBOL_TABLE = True
+    p2g.Control.symbol_table = True
     st = S()
     st.EXTRALONGONEWITHEXTRA = p2g.Fixed[9](addr=100)
     p = p2g.Fixed[9](addr=100)
@@ -128,7 +128,7 @@ def test_symtab():
     "%",
 )
 def test_symtab1():
-    p2g.SYMBOL_TABLE = True
+    p2g.Control.symbol_table = True
     st = S()
     st.p = p2g.Fixed[90](addr=100)
     st.q = p2g.Fixed[3](addr=200)
@@ -197,4 +197,4 @@ def test_symtab_long():
     pop = T1 * T3
     p2g.Var(delta)
     p2g.Var(pop)
-    p2g.SYMBOL_TABLE = True
+    p2g.Control.symbol_table = True

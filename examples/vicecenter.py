@@ -186,7 +186,7 @@ def vicecenter():
         "Find center of plate in vice,",
         *sch.comment,
     )
-    p2g.SYMBOL_TABLE = True
+    p2g.Control.symbol_table = True
     with (
         p2g.WCS(haas.G55) as wcs,
         defs.Probe(),

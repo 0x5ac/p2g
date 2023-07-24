@@ -3,6 +3,7 @@ from p2g import gbl
 from p2g import haas
 from p2g import stat
 from p2g import vector
+import p2g
 
 
 def load_tool(tool):
@@ -13,14 +14,14 @@ class Optional:
     prev: bool
 
     def __init__(self):
-        self.prev = gbl.BLOCK_DELETE
-        gbl.BLOCK_DELETE = True
+        self.prev = p2g.Control.block_delete
+        p2g.Control.block_delete = True
 
     def __enter__(self):
         pass
 
     def __exit__(self, *_):
-        gbl.BLOCK_DELETE = self.prev
+        p2g.Control.block_delete = self.prev
 
 
 class WCS:

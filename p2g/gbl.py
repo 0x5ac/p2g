@@ -4,9 +4,6 @@ import pathlib
 import sys
 import typing
 
-BLOCK_DELETE = False
-SYMBOL_TABLE = False
-
 
 class Config(typing.NamedTuple):
     narrow_output: bool = False
@@ -19,6 +16,11 @@ class Config(typing.NamedTuple):
 
 
 config = Config()
+
+
+class Control:
+    block_delete = False
+    symbol_table = False
 
 
 class PerTranslation:

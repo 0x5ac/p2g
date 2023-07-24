@@ -63,7 +63,7 @@ class Table:
 
     @classmethod
     def yield_table(cls):
-        if not p2g.SYMBOL_TABLE and not cls.print_all:
+        if not p2g.Control.symbol_table and not cls.print_all:
             return
         lsize = 0
         rsize = 0
@@ -95,7 +95,7 @@ class Table:
     def reset(cls):
         cls.name_to_thing = collections.defaultdict(list)
         cls.addrs_used = set()
-        p2g.SYMBOL_TABLE = False
+        p2g.Control.symbol_table = False
 
 
 class TSUB:

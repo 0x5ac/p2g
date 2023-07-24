@@ -36,8 +36,7 @@ from .usrlib import WCS
 from .vector import TupleV
 from .vector import Vec
 
-SYMBOL_TABLE = False
-BLOCK_DELETE = False
+from .gbl import Control
 
 __all__ = [
     "CoType",
@@ -78,7 +77,6 @@ __all__ = [
     "Optional",
     "VERSION",
     "load_tool",
-    "SYMBOL_TABLE",
-    "BLOCK_DELETE",
+    "Control",
 ]
 VERSION = "0.2.222+2"

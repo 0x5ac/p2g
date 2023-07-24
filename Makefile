@@ -25,7 +25,7 @@ NON_WRITEABLEOUT=chmod -w $@
 
 
 VERSION_FILE=VERSION
-THIS_VERSION=$(shell cat $(VERSION_FILE))
+THIS_VERSION:=$(shell cat $(VERSION_FILE))
 
 # all things which depend version depend on the stamp.
 VERSION_STAMP:=.stamp-version-$(THIS_VERSION)
@@ -293,8 +293,8 @@ sometest:
 	poetry run pytest -x --lf
 T=local
 packup:
-	git commit -m --allow-empty -m "rel v$(VERSION)" -a
-	git tag -a v$(VERSION) -m v$(VERSION)
+	git commit -m --allow-empty -m "rel v$(THIS_VERSION)" -a
+	git tag -a v$(VERSION) -m v$(THIS_VERSION)
 	git push $(T)
 	git push --tags $(T)
 

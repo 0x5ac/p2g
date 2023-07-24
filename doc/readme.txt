@@ -9,7 +9,7 @@
 Table of Contents
 _________________
 
-1. Version  0.2.120
+1. Version  0.2.220
 2. Introduction
 3. Usage
 4. Install
@@ -35,7 +35,7 @@ _________________
 (<file:https://img.shields.io/badge/License-MIT%20v3-blue.svg>)
 
 
-1 Version  0.2.120
+1 Version  0.2.220
 ==================
 
   ----------------------------------------------------------------------
@@ -67,7 +67,7 @@ _________________
   Table of Contents
   _________________
 
-  1. Version  0.2.120
+  1. Version  0.2.220
   2. Introduction
   3. Usage
   4. Install

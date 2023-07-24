@@ -184,13 +184,13 @@ def test_native_capfd_help(capfd):
     assert "Usage" in got.out
 
 
-def test_native_capfd_doc(capfd):
+def test_native_capfd_doc0(capfd):
     main(["--help", "all"])
     got = capfd.readouterr()
     assert "Many styli" in got.out
 
 
-def test_native_capfd_doc(capfd):
+def test_native_capfd_doc1(capfd):
     main(["--help", "maint"])
     got = capfd.readouterr()
     assert "--break" in got.out

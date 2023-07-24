@@ -6,7 +6,7 @@
 
 
 
-# Version  0.2.122
+# Version  0.2.120
 
 ---
 
@@ -29,7 +29,7 @@ It comes with a set of macro variable definitions for a Haas mill with NCD. And 
 
 # Table of Contents
 
-1.  [Version  0.2.122](#version)
+1.  [Version  0.2.120](#version)
 2.  [Introduction](#introduction)
 3.  [Usage](#usage)
 4.  [Install](#install)

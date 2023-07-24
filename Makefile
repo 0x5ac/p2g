@@ -13,9 +13,14 @@ COVERAGE:=$(PR) coverage
 PYTEST:=$(PR) pytest
 OX_GFM_DIR=~/.emacs.d/straight/build/ox-gfm
 
+# used to bracket machine generated files
+# so I don't mod them by accident.
+WRITEABLEOUT=if [ -f $@ ]  ; then chmod +w $@; fi
+NON_WRITEABLEOUT=chmod -w $@
 
-check:
-	rm -f .deps; ../fabricate/fabricate.py make install-tools ; cat .deps
+
+#check:
+#	rm -f .deps; ../fabricate/fabricate.py make install-tools ; cat .deps
 
 
 
@@ -153,9 +158,9 @@ MAYLOG=@
 HR=@echo  "********************************************************"
 ######################################################################
 
-VERSIONED_FILES=p2g/__init__.py pyproject.toml doc/readme.org
+VERSIONED_FILES=p2g/__init__.py pyproject.toml doc/readme.in
 
-$(VERSIONED_FILES): $(VERSION_STAMP)
+#$(VERSIONED_FILES): $(VERSION_FILE)
 
 ALL_SRC_FOR_DIST=$(CONTROL_FILES) $(COMPILED_EXAMPLES)  $(GENERATED_DOC) $(GENERATED_SRC) $(P2G_SRC) $(TEST_SRC)
 
@@ -201,47 +206,65 @@ install-poetry:
 	$(RUN_P2G) $<  $@
 
 ######################################################################
-# Doc and machine generated headers.
+# machine generated code
 
-p2g/haas.py: tools/makestdvars.py 
+p2g/haas.py: tools/makestdvars.py
+	$(WRITEABLEOUT)
 	$(RUN_MAKESTDVARS)  --py=$@ 
-
+	$(NON_WRITEABLEOUT)
 doc/haas.txt: tools/makestdvars.py
-	echo 	$(RUN_MAKESTDVARS)  --txt=$@ 
+	$(WRITEABLEOUT)
 	$(RUN_MAKESTDVARS)  --txt=$@ 
+	$(NON_WRITEABLEOUT)
 
-doc/haas.org: $(TOOL_DIR)/makestdvars.py 
+doc/haas.org: $(TOOL_DIR)/makestdvars.py
+	$(WRITEABLEOUT)
 	$(RUN_MAKESTDVARS)  --org=$@ 
-
+	$(NON_WRITEABLEOUT)
+######################################################################
+#
+# doc
+#
 # emacs may not be installed, so after running with -, touch the
 # output,  so next make stage will run using existing output files.
 
 
-WRITE_RESULT= --eval '(write-region (point-min) (point-max) "$(@F)")'
+WRITE_RESULT= --eval '(write-region (point-min) (point-max) "$(abspath $@)")'
 # witout this evals won't eval, so speed things up.
 DO_EVAL'=--eval "(require 'ob-python)"	'
+
 
 ELCOMMON=						\
         --directory $(OX_GFM_DIR)			\
 	-nsl -q --batch					\
-        --chdir doc $(<F)				\
 	--eval "(org-mode)"				\
         --eval "(require 'ox-gfm)"			\
 	--eval "(setq org-confirm-babel-evaluate nil)"		
 
+
 %.md:%.org
-	- $(EMACS) $(ELCOMMON) -f org-gfm-export-as-markdown $(WRITE_RESULT)
+	$(WRITEABLEOUT)
+	- $(EMACS) $< $(ELCOMMON) -f org-gfm-export-as-markdown $(WRITE_RESULT)
 	# fix the initial table of contents.
 	$(PR) python tools/repairmd.py --src $@ --dst $@
 	rm -f $@.tmp
+	$(NON_WRITEABLEOUT)
 
-%.org:%.in
-	- $(EMACS) $(ELCOMMON) $(DO_EVAL) $(WRITE_RESULT)
-	touch $@
+%.md:doc/%.md
+	$(WRITEABLEOUT)
+	cp $< $@
+	$(NON_WRITEABLEOUT)
 
-doc/%.txt: doc/%.org 
-	-  $(EMACS)  $(ELCOMMON) -f org-ascii-export-as-ascii $(WRITE_RESULT)
+%.org:%.in $(VERSION_FILE)
+	$(WRITEABLEOUT)
+	- $(EMACS) $< $(ELCOMMON) $(DO_EVAL) $(WRITE_RESULT)
 	touch $@
+	$(NON_WRITEABLEOUT)
+
+%.txt: %.org
+	$(WRITEABLEOUT)
+	-  $(EMACS) $< $(ELCOMMON) -f org-ascii-export-as-ascii $(WRITE_RESULT)
+	$(NON_WRITEABLEOUT)
 
 
 ######################################################################
@@ -430,6 +453,7 @@ cleanup: isort ssort  black
 
 # ######################################################################
 # utils
+
 
 .PHONY:
 force-version:

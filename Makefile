@@ -294,7 +294,7 @@ sometest:
 T=local
 packup:
 	git commit -m --allow-empty -m "rel v$(THIS_VERSION)" -a
-	git tag -a v$(VERSION) -m v$(THIS_VERSION)
+	git tag -a v$(THIS_VERSION) -m v$(THIS_VERSION)
 	git push $(T)
 	git push --tags $(T)
 

@@ -1,7 +1,24 @@
-top: | announce install-tools  check-version generate test lint release
+check:
+	rm -f .deps; ../fabricate/fabricate.py make install-tools ; cat .deps
+
+
+top: | announce version-update install-tools generate test lint release
 	$(HR)
 	$(TITLE) 
 	$(TITLE) 
+
+VERSION_FILE=VERSION
+THIS_VERSION=$(shell cat $(VERSION_FILE))
+
+# all things which depend version depend on the stamp.
+VERSION_STAMP=.stamp-version-$(THIS_VERSION)
+
+# trick because .org is self modifying
+README_STAMP=.stamp-readme-$(THIS_VERSION)
+
+.PHONY:
+announce:
+	@	echo "running for version " $(THIS_VERSION)
 
 PATH=$(HOME)/.local/bin:/usr/bin
 export TERM:=dumb
@@ -22,6 +39,7 @@ PYTEST:=$(PR) pytest
 OX_GFM_DIR=~/.emacs.d/straight/build/ox-gfm
 
 
+
 TITLE=@ echo
 MAYLOG=@
 HR=@echo  "********************************************************"
@@ -32,7 +50,7 @@ GENERATED_SRC=$(P2G_SRC_DIR)/haas.py
 TOOL_SRC=$(TOOL_DIR)/modversion.py     $(TOOL_DIR)/makestdvars.py		
 
 
-P2G_SRC:= \
+P2G_SRC= \
     $(P2G_SRC_DIR)/__init__.py			\
     $(P2G_SRC_DIR)/__main__.py			\
     $(P2G_SRC_DIR)/axis.py			\
@@ -54,24 +72,19 @@ P2G_SRC:= \
     $(P2G_SRC_DIR)/walkstat.py                  \
     $(GENERATED_SRC)
 
-TEST_NAMES:=$(notdir $(basename $(wildcard $(TEST_DIR)/test*.py))) 
+TEST_NAMES=$(notdir $(basename $(wildcard $(TEST_DIR)/test*.py))) 
 
-TEST_SRC:=$(TEST_DIR)/conftest.py \
+TEST_SRC=$(TEST_DIR)/conftest.py \
          $(addprefix $(TEST_DIR)/,$(addsuffix .py,$(TEST_NAMES)))
 
 
-VERSIONED_FILES:=$(P2G_SRC_DIR)/__init__.py pyproject.toml $(DOC_DIR)/readme.org
+VERSIONED_FILES=$(P2G_SRC_DIR)/__init__.py pyproject.toml $(DOC_DIR)/readme.org
 
 
-THIS_VERSION:=$(shell $(RUN_MODVERSION) $(VERSIONED_FILES) --git --show )
-VSTAMP:=.stamp-$(THIS_VERSION)
 
-.PHONY:
-announce:
-	echo "running for version " $(THIS_VERSION)
 
-fish:
-	echo $(THIS_VERSION)
+
+
 RELEASE_FILE=dist/p2g-$(THIS_VERSION).tar.gz
 
 LINTABLE_SRC=$(P2G_SRC) $(GENERATED_SRC) $(TEST_SRC) $(TOOL_SRC)
@@ -88,29 +101,24 @@ GENERATED_DOC=\
 	readme.md \
 	license.md					\
 	authors.md \
-	.stamp-readme.org  # used to rebuild readme.org which updates self.
+	.stamp-readme$(THIS_VERSION).org  # used to rebuild readme.org which updates self as side effect	
 
 CONTROL_FILES=Makefile pyproject.toml .scrutinizer.yml 
 
 ALL_SRC_FOR_DIST=$(CONTROL_FILES) $(COMPILED_EXAMPLES)  $(GENERATED_DOC) $(GENERATED_SRC) $(P2G_SRC) $(TEST_SRC)
 
 
-# make sure version number is correct by checking that there's
-# stamp file with the same as the version we want. If not then
-# update the relvant sources.
-check-version: $(VSTAMP)
-
-$(VSTAMP):
-	$(RUN_MODVERSION) --inplace --git $(VERSIONED_FILES)
-	$(RUN_MODVERSION) --report $(VERSIONED_FILES)
-	touch $@
-
 ######################################################################
 # Generate intermediates
+
 generate: $(COMPILED_EXAMPLES)  $(GENERATED_SRC) $(GENERATED_DOC)
 ######################################################################
 # Init environment
 
+version-update: .stamp-version$(THIS_VERSION) 
+
+$(VERSION_STAMP): VERSION
+	$(RUN_MODVERSION) --truth VERSION --list $(VERSIONED_FILES)
 
 .PHONY:
 install-tools: .stamp-poetry .stamp-deps 
@@ -125,7 +133,6 @@ install-tools: .stamp-poetry .stamp-deps
 	$(POETRY) update
 	$(POETRY) export > requirements.txt
 	$(MAYLOG) touch $@
-
 
 .PHONY:
 install-poetry:
@@ -147,7 +154,7 @@ install-poetry:
 .PHONY:
 examples: $(COMPILED_EXAMPLES)  
 
-%.nc:%.py  $(P2G_SRC) $(VSTAMP) examples/*.py
+%.nc:%.py  $(P2G_SRC) $(VSTAMP) 
 	$(RUN_P2G) $<  $@
 
 ######################################################################
@@ -182,13 +189,11 @@ ELCOMMON=						\
         --eval "(require 'ox-gfm)"			\
 	--eval "(setq org-confirm-babel-evaluate nil)"		
 
-.stamp-readme.org: doc/readme.org  doc/haas.org $(VSTAMP)
+$(README_STAMP): doc/readme.org  
 	- $(EMACS)   $(ELCOMMON) $(DO_EVAL) $(WRITE_RESULT)
 	touch $@
 
-VERSIONED_FILES: $(VSTAMP)
-.PRECIOUS: .stamp-%.md
-doc/readme.md: .stamp-readme.org $(VSTAMP)
+doc/readme.md: $(VERSION_STAMP) $(README_STAMP)
 	$(HR)
 	$(TITLE) Build md from org
 	$(TITLE)
@@ -196,24 +201,20 @@ doc/readme.md: .stamp-readme.org $(VSTAMP)
 	# fix the initial table of contents.
 	$(PR) python	tools/repairmd.py --src $@ --dst $@
 	rm -f readme.md.tmp 
-	touch $@
 
-doc/%.md:doc/%.org
-	- $(emacs) $(ELCOMMON) -f org-gfm-export-as-markdown $(WRITE_RESULT)
+#doc/%.md:doc/%.org
+#	- $(emacs) $(ELCOMMON) -f org-gfm-export-as-markdown $(WRITE_RESULT)
 
 # .PRECIOUS: .stamp-%.txt
 # doc/%.txt: .stamp-%.txt
 # 	touch $@
 
-doc/%.txt: doc/%.org $(VSTAMP)
-	$(HR)
-	$(TITLE) Build txt from org
-	$(TITLE)
-	-  $(EMACS)  $(ELCOMMON) -f org-ascii-export-as-ascii $(WRITE_RESULT)
-	touch $@
-
-%.md:doc/%.md
-	cp $< $@
+#doc/%.txt: doc/%.org 
+#	$(HR)
+#	$(TITLE) Build txt from org
+#	$(TITLE)
+#	-  $(EMACS)  $(ELCOMMON) -f org-ascii-export-as-ascii $(WRITE_RESULT)
+#	touch $@
 
 
 ######################################################################
@@ -453,16 +454,16 @@ wip-vicecenter: vicecenter.diff
 
 MAKEONE=poetry run p2g 
 
-%.diff: examples/%.nc
-	@	touch -f $<.old
-	-	diff $<  $<.old > $@
-	cat $@
-	@	cp $< $<.old
+# %.diff: examples/%.nc
+# 	@	touch -f $<.old
+# 	-	diff $<  $<.old > $@
+# 	cat $@
+# 	@	cp $< $<.old
 
-.mark-%: $(EXAMPLE_DIR)/%.py $(EXAMPLE_DIR)/defs.py
-	poetry run p2g  $<   tmp.nc
-	poetry run p2g  $< --narrow  $(DSTDIR)/{countdown}-pc.nc 
-
+#.mark-%: $(EXAMPLE_DIR)/%.py $(EXAMPLE_DIR)/defs.py
+#	poetry run p2g  $<   tmp.nc
+#	poetry run p2g  $< --narrow  $(DSTDIR)/{countdown}-pc.nc 
+# 
 
 .PHONY:
 $(DSTDIR)/ZZ%.nc: %.py

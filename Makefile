@@ -153,9 +153,9 @@ MAYLOG=@
 HR=@echo  "********************************************************"
 ######################################################################
 
-VERSIONED_FILES=$(P2G_SRC_DIR)/__init__.py pyproject.toml doc/readme.org
+VERSIONED_FILES=p2g/__init__.py pyproject.toml doc/readme.org
 
-
+$(VERSIONED_FILES): $(VERSION_STAMP)
 
 ALL_SRC_FOR_DIST=$(CONTROL_FILES) $(COMPILED_EXAMPLES)  $(GENERATED_DOC) $(GENERATED_SRC) $(P2G_SRC) $(TEST_SRC)
 
@@ -213,17 +213,8 @@ doc/haas.txt: tools/makestdvars.py
 doc/haas.org: $(TOOL_DIR)/makestdvars.py 
 	$(RUN_MAKESTDVARS)  --org=$@ 
 
-# emacs may not be installed, so after running with -, touch the output.
-# so next make stage will run using existing output files.
-%.md:%.in
-	$(HR)
-	$(TITLE) Build md from org
-	$(TITLE)
-	- $(EMACS) $(ELCOMMON) -f org-gfm-export-as-markdown $(WRITE_RESULT)
-	# fix the initial table of contents.
-	$(PR) python	tools/repairmd.py --src $@ --dst $@
-	rm -f readme.md.tmp 
-
+# emacs may not be installed, so after running with -, touch the
+# output,  so next make stage will run using existing output files.
 
 
 WRITE_RESULT= --eval '(write-region (point-min) (point-max) "$(@F)")'
@@ -238,24 +229,19 @@ ELCOMMON=						\
         --eval "(require 'ox-gfm)"			\
 	--eval "(setq org-confirm-babel-evaluate nil)"		
 
-doc/%.org:doc/%.in
+%.md:%.org
+	- $(EMACS) $(ELCOMMON) -f org-gfm-export-as-markdown $(WRITE_RESULT)
+	# fix the initial table of contents.
+	$(PR) python tools/repairmd.py --src $@ --dst $@
+	rm -f $@.tmp
+
+%.org:%.in
 	- $(EMACS) $(ELCOMMON) $(DO_EVAL) $(WRITE_RESULT)
 	touch $@
 
-
-#doc/%.md:doc/%.org
-#	- $(emacs) $(ELCOMMON) -f org-gfm-export-as-markdown $(WRITE_RESULT)
-
-# .PRECIOUS: .stamp-%.txt
-# doc/%.txt: .stamp-%.txt
-# 	touch $@
-
-#doc/%.txt: doc/%.org 
-#	$(HR)
-#	$(TITLE) Build txt from org
-#	$(TITLE)
-#	-  $(EMACS)  $(ELCOMMON) -f org-ascii-export-as-ascii $(WRITE_RESULT)
-#	touch $@
+doc/%.txt: doc/%.org 
+	-  $(EMACS)  $(ELCOMMON) -f org-ascii-export-as-ascii $(WRITE_RESULT)
+	touch $@
 
 
 ######################################################################
@@ -452,7 +438,7 @@ force-version:
 clean:
 	if [  $$(which p2g) ] ; then rm -f $$(which p2g); fi
 	git clean -fdx
-	rm -f $(COMPILED_EXAMPLES)
+
 
 # # remove poetry and env and try from scratch
 # .PHONY:

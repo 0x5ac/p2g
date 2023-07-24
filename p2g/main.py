@@ -18,7 +18,7 @@ p2g - Turn Python into G-Code.
 
 Usage:
   p2g [options]  <srcfile> [<dstfile>]
-  p2g --help [<topic>]
+  p2g --help [ all | topics | maint | <topic>]
   p2g --version
   p2g --location
   p2g --examples <dstdir>
@@ -182,23 +182,22 @@ def main(options: typing.Optional[list[str]] = None):
         gbl.sprint(f"{__file__}")
         return 0
     if opts["--help"]:
-        match opts["<topic>"]:
-            case None:
-                # remove comment chars from usage
-                # and the maint commands too.
-                docstr = DOC.strip("\n").replace("#", "")
-                docstr = re.sub("\n!.*", "", docstr)
-                gbl.sprint(docstr)
-            case "topics":
-                do_doc("topics")
-            case "all":
-                do_doc("all")
-            case "maint":
-                # just print the maint stuff.
-                docstr = re.sub("\n!", "\n", re.sub("\n[^!].*", "", DOC))
-                gbl.sprint(docstr)
-            case _:
-                do_doc(opts["<topic>"])
+        if opts["topics"]:
+            do_doc("topics")
+        elif opts["all"]:
+            do_doc("all")
+        elif opts["maint"]:
+            # just print the maint stuff.
+            docstr = re.sub("\n!", "\n", re.sub("\n[^!].*", "", DOC))
+            gbl.sprint(docstr)
+        elif opts["<topic>"]:
+            do_doc(opts["<topic>"])
+        else:
+            # remove comment chars from usage
+            # and the maint commands too.
+            docstr = DOC.strip("\n").replace("#", "")
+            docstr = re.sub("\n!.*", "", docstr)
+            gbl.sprint(docstr)
 
     elif opts["--examples"]:
         do_examples(pathlib.Path(opts["--examples"]))

@@ -6,7 +6,7 @@
 
 
 
-# Version  0.2.222+3
+# Version  0.2.222+4
 
 ---
 
@@ -29,7 +29,7 @@ It comes with a set of macro variable definitions for a Haas mill with NCD. And 
 
 # Table of Contents
 
-1.  [Version  0.2.222+3](#version)
+1.  [Version  0.2.222+4](#version)
 2.  [Introduction](#introduction)
 3.  [Usage](#usage)
 4.  [Install](#install)
@@ -163,7 +163,7 @@ def t():
 ```
 
 ```
-O0001 (t: 0.2.222+3)
+O0001 (t: 0.2.222+4)
   #100= 99.                       (   x = Var[99]                 )
   #102= 0.                        (   for y in range[10]:         )
 N1000
@@ -228,7 +228,7 @@ def demo1():
 ⇨ `p2g demo1.py` ⇨
 
 ```
-O0001 (demo1: 0.2.222+3)
+O0001 (demo1: 0.2.222+4)
   #100= 2.                        ( cursor = Var[3][2, 3, 41]     )
   #101= 3.
   #102= 41.
@@ -299,7 +299,7 @@ def ex2():
 ⇨ `p2g var1.py` ⇨
 
 ```
-O0001 (ex2: 0.2.222+3)
+O0001 (ex2: 0.2.222+4)
   #100= #5061 * 2. + #5041 + #5061( tmp0 = Var[skip0.xyz * 2.0 + workpos + skip1])
   #101= #5062 * 2. + #5042 + #5062
   #102= #5063 * 2. + #5043 + #5063
@@ -363,7 +363,7 @@ def co1():
 ⇨ `p2g co1.py` ⇨
 
 ```
-O0001 (co1: 0.2.222+3)
+O0001 (co1: 0.2.222+4)
 ( Describe 3 variables at 3000 )
 ( Fill with 1,2,31 )
   #3000= 1.                       ( dst.var = [1, 2, 31]          )
@@ -453,7 +453,7 @@ def exp11():
 ⇨ `p2g exp1.py` ⇨
 
 ```
-O0001 (exp11: 0.2.222+3)
+O0001 (exp11: 0.2.222+4)
 ( Variables go into macro variables. )
   #100= 0.3                       ( theta = Var[0.3]              )
   #101= SIN[#100]                 ( angle = Var[sin[theta]]       )
@@ -532,7 +532,7 @@ def axes():
 ⇨ `p2g axes.py` ⇨
 
 ```
-O0001 (axes: 0.2.222+3)
+O0001 (axes: 0.2.222+4)
 ( rhs of vector ops get expanded as needed )
   #5241= 0.                       ( G55.var = [0, 1]              )
   #5242= 1.
@@ -614,7 +614,7 @@ def when_demo():
 
 ⇨ `p2g whendemo.py` ⇨
 
-    O0001 (when_demo: 0.2.222+3)
+    O0001 (when_demo: 0.2.222+4)
       T01 M06                         (     load_tool[PROBE]          )
       G65 P9832                       ( Probe on.                     )
       #100= 9.                        (     tmp = Var[9]              )
@@ -692,7 +692,7 @@ def goto1():
 ⇨ \`p2g goto1.py\` ⇨
 
 ```
-O0001 (goto1: 0.2.222+3)
+O0001 (goto1: 0.2.222+4)
 
 ( in work cosys, goto x=1, y=2, z=3 at 20ips )
   G90 G01 G55 F20. x1. y2. z3.    ( g1[1, 2, 3]                   )
@@ -755,7 +755,7 @@ def exprnt():
 ⇨ `p2g exprnt.py` ⇨
 
 ```
-O0001 (exprnt: 0.2.222+3)
+O0001 (exprnt: 0.2.222+4)
   #100= 2.                        ( x = Var[2]                    )
   #101= 27.                       ( y = Var[27]                   )
   #103= 0.                        ( for q in range[10]:           )
@@ -799,7 +799,7 @@ def stest():
 ⇨ \`p2g stest.py\` ⇨
 
 ```
-O0001 (stest: 0.2.222+3)
+O0001 (stest: 0.2.222+4)
 ( Symbol Table )
 
  ( MACHINE_ABS_ABOVE_OTS                   :  -7.000,  8.000,  9.000 )
@@ -876,7 +876,7 @@ def cool():
 
 ```
 
-    O0001 (cool: 0.2.222+3)
+    O0001 (cool: 0.2.222+4)
     ( You can do surprising things. )
       #100= 100.                      ( avariable = Var[100]          )
       #101= 7.                        ( another = Var[7, 8]           )
@@ -925,7 +925,7 @@ def beware0():
 ⇨ `p2g beware.py` ⇨
 
 ```
-O0001 (beware0: 0.2.222+3)
+O0001 (beware0: 0.2.222+4)
 ( Names on the left hand side of an assignment need to be )
 ( treated with care.  A simple.                           )
 ( Will not do what you want - this will overwrite the definition )
@@ -969,7 +969,7 @@ def beware1():
 ```
 
 ```
-O0001 (beware1: 0.2.222+3)
+O0001 (beware1: 0.2.222+4)
 ( It's easy to forget that only macro variables will get into )
 ( the output code. Other code will go away.                   )
   #100= 7.                        ( y = Var[7]                    )

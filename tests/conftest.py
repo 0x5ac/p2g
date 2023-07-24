@@ -149,7 +149,7 @@ def save_config(**kwargs):
 def check_golden_nodec(fn):
     def check_golden__():
         with save_config(
-            tin_test=True, force_no_tintest=True, narrow_output=True, no_version=True
+            tin_test=True, force_no_tintest=True, narrow_output=True, with_id=False
         ):
             callow_data = list(get_all_comp_outputs(fn))
             gold_path = make_file_path(fn, ".nc")
@@ -197,13 +197,13 @@ def make_decorated_source_seed(fn, callow_data):
 
 
 # check inline gold of fn.
-def want(*text, narrow_output=True, errors=[], no_version=True, emit_rtl=False):
+def want(*text, narrow_output=True, errors=[], with_id=False, emit_rtl=False):
     def must_be_(fn):
         def must_be__():
             with save_config(
                 tin_test=True,
                 narrow_output=narrow_output,
-                no_version=no_version,
+                with_id=with_id,
                 emit_rtl=emit_rtl,
             ):
 

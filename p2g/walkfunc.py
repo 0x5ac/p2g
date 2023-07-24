@@ -79,7 +79,7 @@ def gather_func_formals(func_def, *args, **kwargs):
     final_dict = {}
     formalspec = func_def.node.args
     if formalspec.vararg:
-        final_dict[formalspec.vararg.arg] = args[len(formalspec.args):]
+        final_dict[formalspec.vararg.arg] = args[len(formalspec.args) :]
     else:
         if len(args) > len(formalspec.args):
             err.compiler(
@@ -259,7 +259,7 @@ def compile2g(func_name_arg, srcfile_name, job_name):
             sourcelines = gbl.logread(inf)
             func_name = find_main_func_name(sourcelines, func_name_arg)
 
-            version = "" if gbl.config.no_version else f": {p2g.VERSION}"
+            version = f": {p2g.VERSION}" if gbl.config.with_id else ""
             stat.code(
                 f"{job_name} ({func_name}{version})", comment_txt=stat.CType.NO_COMMENT
             )

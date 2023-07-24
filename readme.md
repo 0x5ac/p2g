@@ -227,28 +227,6 @@ def demo1():
 
 ⇨ `p2g demo1.py` ⇨
 
-```
-O0001 (demo1)
-  #100= 2.                        ( cursor = Var[3][2, 3, 41]     )
-  #101= 3.
-  #102= 41.
-  #103= 10.                       ( its = Var[sch.its]            )
-N1000
-  IF [#103 LE 0.] GOTO 1002       ( while its > 0:                )
-(     sch.go[cursor]            )
-  G90 G01 G55 F640. x#100 y#101 z#102
-  G90 G31 G55 F30. z-0.4          (     sch.probe[z=sch.search_depth])
- IF [#5063 LT -0.5] GOTO 1001    (     if SKIP_POS.z < sch.search_depth + sch.iota:)
-  #100= #100 + 1.5                (     cursor.xy += sch.delta    )
-  #103= #103 - 1.                 (     its -= 1                  )
-  GOTO 1000
-N1002
-  #3000 = 101 (too far right.)
-N1001
-  M30
-%
-```
-
 ---
 
 

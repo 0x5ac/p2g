@@ -140,7 +140,7 @@ $ p2g examples dstdir
 $ echo "
 #+END_EXAMPLE
 #+NAME: stdin
-#+BEGIN_SRC python -i :results output :python poetry run p2g --no-version    -
+#+BEGIN_SRC python -i :results output :python poetry run p2g --id    -
 import p2g
 def t():
   x = p2g.Var(99)
@@ -173,7 +173,7 @@ N1002
 :END:
 
 #+NAME: demo1
-#+BEGIN_SRC python -i :results output :python poetry run p2g --no-version    -
+#+BEGIN_SRC python -i :results output :python poetry run p2g --id    -
 from p2g import *
 from p2g.haas import *
 class SearchParams:
@@ -217,27 +217,6 @@ def demo1():
 #+End_SRC
   ⇨ ~p2g demo1.py~ ⇨
 #+RESULTS: demo1
-#+begin_example
-O0001 (demo1)
-  #100= 2.                        ( cursor = Var[3][2, 3, 41]     )
-  #101= 3.
-  #102= 41.
-  #103= 10.                       ( its = Var[sch.its]            )
-N1000
-  IF [#103 LE 0.] GOTO 1002       ( while its > 0:                )
-(     sch.go[cursor]            )
-  G90 G01 G55 F640. x#100 y#101 z#102
-  G90 G31 G55 F30. z-0.4          (     sch.probe[z=sch.search_depth])
- IF [#5063 LT -0.5] GOTO 1001    (     if SKIP_POS.z < sch.search_depth + sch.iota:)
-  #100= #100 + 1.5                (     cursor.xy += sch.delta    )
-  #103= #103 - 1.                 (     its -= 1                  )
-  GOTO 1000
-N1002
-  #3000 = 101 (too far right.)
-N1001
-  M30
-%
-#+end_example
 
 -----------------------------------
 * Variables
@@ -259,7 +238,7 @@ N1001
 
 Example:   
 #+NAME: var1
-#+BEGIN_SRC python -i :results output :python poetry run p2g --no-version    -
+#+BEGIN_SRC python -i :results output :python poetry run p2g --id    -
 
 from p2g import *  # this is the common header
 from p2g.haas import *
@@ -290,7 +269,7 @@ def ex2():
 
 #+RESULTS: var1
 #+begin_example
-O0001 (ex2)
+O0001 (ex2: 0.2.222+3)
   #100= #5061 * 2. + #5041 + #5061( tmp0 = Var[skip0.xyz * 2.0 + workpos + skip1])
   #101= #5062 * 2. + #5042 + #5062
   #102= #5063 * 2. + #5043 + #5063
@@ -310,7 +289,7 @@ O0001 (ex2)
 
 Describe position, with axis by location, in sequence or by name.
 #+NAME: co1
-#+BEGIN_SRC python -i :results output :python poetry run p2g --no-version    -
+#+BEGIN_SRC python -i :results output :python poetry run p2g --id    -
 from p2g import *  # this is the common header
 from p2g.haas import *  # to all the examples
 
@@ -408,7 +387,7 @@ folding is done in degrees.
 
 
 #+NAME: exp1
-#+BEGIN_SRC python -i :results output :python poetry run p2g --no-version    -
+#+BEGIN_SRC python -i :results output :python poetry run p2g --id    -
 
 from p2g import *  # this is the common header
 from p2g.haas import *  # to all the examples
@@ -491,7 +470,7 @@ coordinates to turn up in work offset registers.
 
 
 #+NAME: axes
-#+BEGIN_SRC python -i :results output :python poetry run p2g --no-version    -
+#+BEGIN_SRC python -i :results output :python poetry run p2g --id    -
 import p2g
 from p2g.haas import *
 
@@ -574,7 +553,7 @@ useful for turning on probing and magically getting it turned
 off,.  Or setting and restoring the wcs etc etc (look in p2g/lib.py)
 
 #+NAME: whendemo
-#+BEGIN_SRC python -i :results output :python poetry run p2g --no-version    -
+#+BEGIN_SRC python -i :results output :python poetry run p2g --id    -
 import p2g
 from p2g import haas
 
@@ -665,7 +644,7 @@ building  blocks when partially applied.
      
 
 #+NAME: goto1
-#+BEGIN_SRC python -i :results output :python poetry run p2g --no-version    -
+#+BEGIN_SRC python -i :results output :python poetry run p2g --id    -
 from p2g import *
 
 
@@ -757,7 +736,7 @@ your machine considers to be illegal in a DPRNT string.
 
 
 #+NAME: exprnt
-#+BEGIN_SRC python -i :results output :python poetry run p2g --no-version    -
+#+BEGIN_SRC python -i :results output :python poetry run p2g --id    -
 from p2g import *
 from p2g.haas import *
 
@@ -798,7 +777,7 @@ Set the global ~p2g.Control.symbol_table~ to get a symbol
 table in the output file.
 
 #+NAME: stest
-#+BEGIN_SRC python -i :results output :python poetry run p2g --no-version    -
+#+BEGIN_SRC python -i :results output :python poetry run p2g --id    -
 import p2g
 x1 = -7
 MACHINE_ABS_ABOVE_OTS = p2g.Const(x=x1, y=8, z=9)
@@ -853,7 +832,7 @@ for my own limited purposes.
 
 Nice things:
 
-#+BEGIN_SRC python -i :results output :python poetry run p2g --no-version    -
+#+BEGIN_SRC python -i :results output :python poetry run p2g --id    -
 
 from p2g import *
 from p2g.haas import *
@@ -916,14 +895,14 @@ def cool():
 :   M30
 : %                                 ( 0.2.301                       )
 
-
-#+BEGIN_SRC python -i :results output :python poetry run p2g --no-version    -
+#+NAME: beware0
+#+BEGIN_SRC python -i :results output :python poetry run p2g --id    -
 import p2g
 from p2g.haas import *
 
 G55 = p2g.Fixed[3](addr=5241)
 
-def beware():
+def beware0():
         p2g.com(
             "Names on the left hand side of an assignment need to be",
             "treated with care.  A simple.",
@@ -944,10 +923,10 @@ def beware():
         G56[:] = [3, 3, 3]
 
 #+END_SRC
-
-#+RESULTS:
+  ⇨ ~p2g beware.py~ ⇨
+#+RESULTS: beware0
 #+begin_example
-O0001 (beware)
+O0001 (beware0: 0.2.222+3)
 ( Names on the left hand side of an assignment need to be )
 ( treated with care.  A simple.                           )
 ( Will not do what you want - this will overwrite the definition )
@@ -966,32 +945,10 @@ O0001 (beware)
 %
 #+end_example
 
-  ⇨ ~p2g beware.py~ ⇨
-#+RESULTS:
-#+begin_example
-O0001 (beware)
-( Names on the left hand side of an assignment need to be )
-( treated with care.  A simple.                           )
-( Will not do what you want - this will overwrite the definition )
-( of G55 above - so no code will be generated.                   )
-( You need to use .var [for everything], explicitly name the axes,or use magic slicing. )
-  #5261= 1.                       ( G56.var = [1, 1, 1]           )
-  #5262= 1.
-  #5263= 1.
-  #5261= 2.                       ( G56.xyz = [2, 2, 2]           )
-  #5262= 2.
-  #5263= 2.
-  #5261= 3.                       ( G56[:] = [3, 3, 3]            )
-  #5262= 3.
-  #5263= 3.
-  M30
-%                                 ( 0.2.301                       )
-#+end_example
-
-#+BEGIN_SRC python -i :results output :python poetry run p2g --no-version    -
+#+NAME: beware1
+#+BEGIN_SRC python -i :results output :python poetry run p2g --id    -
 from p2g import *
 from p2g.haas import *
-
 
 def beware1():
     com(
@@ -1013,9 +970,9 @@ def beware1():
 
 #+END_SRC     
 
-#+RESULTS:
+#+RESULTS: beware1
 #+begin_example
-O0001 (beware1)
+O0001 (beware1: 0.2.222+3)
 ( It's easy to forget that only macro variables will get into )
 ( the output code. Other code will go away.                   )
   #100= 7.                        ( y = Var[7]                    )
@@ -1044,7 +1001,7 @@ Names predefined in p2g.haas:
 
 #+NAME: haas table
 #+BEGIN_SRC python -i  :exports results :results output  raw :python poetry run ../tools/makestdvars.py --org=-
-
+`<
 #+END_SRC     
 
 #+RESULTS: haas table

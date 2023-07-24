@@ -13,8 +13,8 @@ OX_GFM_DIR=~/.emacs.d/straight/build/ox-gfm
 
 # used to bracket machine generated files
 # so I don't mod them by accident.
-WRITEABLEOUT=if [ -f $@ ]  ; then chmod +w $@; fi
-NON_WRITEABLEOUT=chmod -w $@
+#RITEABLEOUT=if [ -f $@ ]  ; then chmod +w $@; fi
+#NON_WRITEABLEOUT=chmod -w $@
 
 VERSION_FILE=VERSION
 THIS_VERSION:=$(shell cat $(VERSION_FILE))
@@ -221,29 +221,31 @@ doc/haas.org: $(TOOL_DIR)/makestdvars.py $(POETRY_STAMP)
 # output,  so next make stage will run using existing output files.
 
 
-WRITE_RESULT= --eval '(write-region (point-min) (point-max) "$(abspath $@)")'
-# witout this evals won't eval, so speed things up.
-DO_EVAL:=--eval "(require 'ob-python)"
 
-ELCOMMON=						\
-	--directory $(OX_GFM_DIR)			\
-	-nsl -q --batch					\
-	--eval "(org-mode)"				\
-	--eval "(require 'ox-gfm)"			\
-	--eval "(setq org-confirm-babel-evaluate nil)"
+ELCOMMON=					\
+	--directory $(OX_GFM_DIR)		\
+	-q --batch				\
+	--load $(abspath tools/org-to-x.el)	\
+         $(abspath $<)
 
 %.md:%.org
 	$(WRITEABLEOUT)
-	- $(EMACS) $< $(ELCOMMON) -f org-gfm-export-as-markdown $(WRITE_RESULT)
+	- $(EMACS) $(ELCOMMON) --eval '(to-markdown "$(abspath $@)")'
 	# fix the initial table of contents.
 	$(PR) python tools/repairmd.py --src $@ --dst $@
 	rm -f $@.tmp
+	$(NON_WRITEABLEOUT)
+
+%.txt: %.org
+	$(WRITEABLEOUT)
+	-  $(EMACS) $(ELCOMMON)  --eval '(to-txt "$(abspath $@)")' 
 	$(NON_WRITEABLEOUT)
 
 %.md:doc/%.md
 	$(WRITEABLEOUT)
 	cp $< $@
 	$(NON_WRITEABLEOUT)
+
 %.org:doc/%.org
 	$(WRITEABLEOUT)
 	cp $< $@
@@ -251,14 +253,12 @@ ELCOMMON=						\
 
 %.org:%.in $(VERSION_FILE)
 	$(WRITEABLEOUT)
-	- $(EMACS) $< $(ELCOMMON) $(DO_EVAL) $(WRITE_RESULT)
+	-  $(EMACS) $(ELCOMMON)   --eval '(to-org "$(abspath $@)")'
+	# refill in from generated, touch so stamps are ok
+	cp $@ $<
 	touch $@
 	$(NON_WRITEABLEOUT)
 
-%.txt: %.org
-	$(WRITEABLEOUT)
-	-  $(EMACS) $< $(ELCOMMON) -f org-ascii-export-as-ascii $(WRITE_RESULT)
-	$(NON_WRITEABLEOUT)
 
 #######################################################################
 # lints

@@ -70,7 +70,8 @@ Options:
 !For maintenance:
 !     --emit-rtl           Write internal format to output file.
 !     --break              pdb.set_trace() on error.
-!     --no-version         Don't put version number in outputs.
+!     --id                 Put id in outputs [default: True]
+!     --no-id              Don't put id in outputs.
 !     --verbose=<level>    Set verbosity level [default: 0]
 """
 
@@ -166,11 +167,13 @@ def main(options: typing.Optional[list[str]] = None):
     # be parsed.
     parseable_opts = re.sub("\n!(.*)", "\n\\1", parseable_opts)
     opts = docopt.docopt(parseable_opts, help=False, argv=options)
+    if opts["--no-id"]:
+        opts["--id"] = False
     gbl.config = gbl.config._replace(
         bp_on_error=opts["--break"],
         verbose=(int(opts["--verbose"])),
         narrow_output=gbl.config.narrow_output or opts["--narrow"],
-        no_version=gbl.config.no_version or opts["--no-version"],
+        with_id=gbl.config.with_id or opts["--id"],
         emit_rtl=gbl.config.emit_rtl or opts["--emit-rtl"],
     )
     res = 0

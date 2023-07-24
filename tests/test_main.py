@@ -155,6 +155,23 @@ def test_native_capfd_tmpdir_stdout(capfd, tmpdir):
     assert "testfish" in tmpdata.out
 
 
+def test_native_capfd_tmpdir_stdout0(capfd, tmpdir):
+    tmpfile = write_func(tmpdir, std)
+
+    main(
+        [
+            "--job=O123",
+            "--no-id",
+            str(tmpfile),
+            "-",
+        ]
+    )
+    tmpdata = capfd.readouterr()
+
+    assert "O123" in tmpdata.out
+    assert "testfish" in tmpdata.out
+
+
 def test_native_logger_capfd_setup(capfd):
     main(["--version"])
     got = capfd.readouterr()

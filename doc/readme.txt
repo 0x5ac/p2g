@@ -195,7 +195,7 @@ _________________
   | ⇨ directly ⇨
   `----
   ,----
-  | O0001 (t)
+  | O0001 (t: 0.2.222+3)
   |   #100= 99.                       (   x = Var[99]                 )
   |   #102= 0.                        (   for y in range[10]:         )
   | N1000
@@ -257,7 +257,7 @@ _________________
   `----
   ⇨ `p2g demo1.py' ⇨
   ,----
-  | O0001 (demo1)
+  | O0001 (demo1: 0.2.222+3)
   |   #100= 2.                        ( cursor = Var[3][2, 3, 41]     )
   |   #101= 3.
   |   #102= 41.
@@ -267,7 +267,7 @@ _________________
   | (     sch.go[cursor]            )
   |   G90 G01 G55 F640. x#100 y#101 z#102
   |   G90 G31 G55 F30. z-0.4          (     sch.probe[z=sch.search_depth])
-  |  IF [#5063 LT -0.5] GOTO 1001    (     if SKIP_POS.z < sch.search_depth + sch.iota:)
+  |   IF [#5063 LT -0.5] GOTO 1001    (     if SKIP_POS.z < sch.search_depth + sch.iota:)
   |   #100= #100 + 1.5                (     cursor.xy += sch.delta    )
   |   #103= #103 - 1.                 (     its -= 1                  )
   |   GOTO 1000
@@ -328,7 +328,7 @@ _________________
   ⇨ `p2g var1.py' ⇨
 
   ,----
-  | O0001 (ex2)
+  | O0001 (ex2: 0.2.222+3)
   |   #100= #5061 * 2. + #5041 + #5061( tmp0 = Var[skip0.xyz * 2.0 + workpos + skip1])
   |   #101= #5062 * 2. + #5042 + #5062
   |   #102= #5063 * 2. + #5043 + #5063
@@ -389,7 +389,7 @@ _________________
 
   ⇨ `p2g co1.py' ⇨
   ,----
-  | O0001 (co1)
+  | O0001 (co1: 0.2.222+3)
   | ( Describe 3 variables at 3000 )
   | ( Fill with 1,2,31 )
   |   #3000= 1.                       ( dst.var = [1, 2, 31]          )
@@ -480,7 +480,7 @@ _________________
   `----
   ⇨ `p2g exp1.py' ⇨
   ,----
-  | O0001 (exp11)
+  | O0001 (exp11: 0.2.222+3)
   | ( Variables go into macro variables. )
   |   #100= 0.3                       ( theta = Var[0.3]              )
   |   #101= SIN[#100]                 ( angle = Var[sin[theta]]       )
@@ -563,7 +563,7 @@ _________________
   `----
   ⇨ `p2g axes.py' ⇨
   ,----
-  | O0001 (axes)
+  | O0001 (axes: 0.2.222+3)
   | ( rhs of vector ops get expanded as needed )
   |   #5241= 0.                       ( G55.var = [0, 1]              )
   |   #5242= 1.
@@ -647,11 +647,11 @@ _________________
   `----
   ⇨ `p2g whendemo.py' ⇨
   ,----
-  | O0001 (when_demo)
+  | O0001 (when_demo: 0.2.222+3)
   |   T01 M06                         (     load_tool[PROBE]          )
   |   G65 P9832                       ( Probe on.                     )
   |   #100= 9.                        (     tmp = Var[9]              )
-  |   #100= #100 + 98.                (         tmp.var += 98         )
+  | /   #100= #100 + 98.                (         tmp.var += 98         )
   | DPRNT[tmp*is*[#100]]
   |   G65 P9833                       ( Probe off.                    )
   |   M30
@@ -729,7 +729,7 @@ _________________
   `----
   ⇨ `p2g goto1.py` ⇨
   ,----
-  | O0001 (goto1)
+  | O0001 (goto1: 0.2.222+3)
   | 
   | ( in work cosys, goto x=1, y=2, z=3 at 20ips )
   |   G90 G01 G55 F20. x1. y2. z3.    ( g1[1, 2, 3]                   )
@@ -793,7 +793,7 @@ _________________
   `----
   ⇨ `p2g exprnt.py' ⇨
   ,----
-  | O0001 (exprnt)
+  | O0001 (exprnt: 0.2.222+3)
   |   #100= 2.                        ( x = Var[2]                    )
   |   #101= 27.                       ( y = Var[27]                   )
   |   #103= 0.                        ( for q in range[10]:           )
@@ -836,7 +836,7 @@ _________________
   `----
   ⇨ `p2g stest.py` ⇨
   ,----
-  | O0001 (stest)
+  | O0001 (stest: 0.2.222+3)
   | ( Symbol Table )
   | 
   |  ( MACHINE_ABS_ABOVE_OTS                   :  -7.000,  8.000,  9.000 )
@@ -915,7 +915,7 @@ _________________
   `----
 
   ,----
-  | O0001 (cool)
+  | O0001 (cool: 0.2.222+3)
   | ( You can do surprising things. )
   |   #100= 100.                      ( avariable = Var[100]          )
   |   #101= 7.                        ( another = Var[7, 8]           )
@@ -937,14 +937,13 @@ _________________
   `----
 
 
-
   ,----
   | import p2g
   | from p2g.haas import *
   | 
   | G55 = p2g.Fixed[3](addr=5241)
   | 
-  | def beware():
+  | def beware0():
   |         p2g.com(
   |             "Names on the left hand side of an assignment need to be",
   |             "treated with care.  A simple.",
@@ -965,9 +964,9 @@ _________________
   |         G56[:] = [3, 3, 3]
   | 
   `----
-
+  ⇨ `p2g beware.py' ⇨
   ,----
-  | O0001 (beware)
+  | O0001 (beware0: 0.2.222+3)
   | ( Names on the left hand side of an assignment need to be )
   | ( treated with care.  A simple.                           )
   | ( Will not do what you want - this will overwrite the definition )
@@ -986,31 +985,9 @@ _________________
   | %
   `----
 
-  ⇨ `p2g beware.py' ⇨
-  ,----
-  | O0001 (beware)
-  | ( Names on the left hand side of an assignment need to be )
-  | ( treated with care.  A simple.                           )
-  | ( Will not do what you want - this will overwrite the definition )
-  | ( of G55 above - so no code will be generated.                   )
-  | ( You need to use .var [for everything], explicitly name the axes,or use magic slicing. )
-  |   #5261= 1.                       ( G56.var = [1, 1, 1]           )
-  |   #5262= 1.
-  |   #5263= 1.
-  |   #5261= 2.                       ( G56.xyz = [2, 2, 2]           )
-  |   #5262= 2.
-  |   #5263= 2.
-  |   #5261= 3.                       ( G56[:] = [3, 3, 3]            )
-  |   #5262= 3.
-  |   #5263= 3.
-  |   M30
-  | %                                 ( 0.2.301                       )
-  `----
-
   ,----
   | from p2g import *
   | from p2g.haas import *
-  | 
   | 
   | def beware1():
   |     com(
@@ -1033,7 +1010,7 @@ _________________
   `----
 
   ,----
-  | O0001 (beware1)
+  | O0001 (beware1: 0.2.222+3)
   | ( It's easy to forget that only macro variables will get into )
   | ( the output code. Other code will go away.                   )
   |   #100= 7.                        ( y = Var[7]                    )

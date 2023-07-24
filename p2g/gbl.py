@@ -9,7 +9,7 @@ class Config(typing.NamedTuple):
     narrow_output: bool = False
     bp_on_error: bool = False
     verbose: int = 0
-    no_version: bool = False
+    with_id: bool = True
     emit_rtl: bool = False
     tin_test: bool = False
     force_no_tintest: bool = False  # noqa

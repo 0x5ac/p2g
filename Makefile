@@ -20,7 +20,7 @@ NON_WRITEABLEOUT=chmod -w $@
 
 VERSION_FILE=VERSION
 THIS_VERSION:=$(shell cat $(VERSION_FILE))
-
+THIS_TAG:=v$(THIS_VERSION)
 # all things which depend version depend on the stamp.
 VERSION_STAMP:=.stamp-version-$(THIS_VERSION)
 POETRY_STAMP:=.stamp-poetry
@@ -32,28 +32,28 @@ README_STAMP=.stamp-readme-$(THIS_VERSION)
 
 
 P2G_GEN_SRC:= p2g/haas.py
-P2G_SRC:=					\
-p2g/axis.py					\
-p2g/builtin.py					\
-p2g/coords.py					\
-p2g/err.py					\
-p2g/gbl.py					\
-p2g/goto.py					\
-p2g/__init__.py					\
-p2g/__main__.py					\
-p2g/main.py					\
-p2g/nd.py					\
-p2g/op.py					\
-p2g/scalar.py					\
-p2g/stat.py					\
-p2g/symbol.py					\
-p2g/usrlib.py					\
-p2g/vector.py					\
-p2g/version.py					\
-p2g/walkbase.py					\
-p2g/walkexpr.py					\
-p2g/walkfunc.py					\
-p2g/walkstat.py					\
+ALL_P2G_SRC:=					\
+	 p2g/axis.py				\
+	 p2g/builtin.py				\
+	 p2g/coords.py				\
+	 p2g/err.py				\
+	 p2g/gbl.py				\
+	 p2g/goto.py				\
+	 p2g/__init__.py			\
+	 p2g/__main__.py			\
+	 p2g/main.py				\
+	 p2g/nd.py				\
+	 p2g/op.py				\
+	 p2g/scalar.py				\
+	 p2g/stat.py				\
+	 p2g/symbol.py				\
+	 p2g/usrlib.py				\
+	 p2g/vector.py				\
+	 p2g/version.py				\
+	 p2g/walkbase.py			\
+	 p2g/walkexpr.py			\
+	 p2g/walkfunc.py			\
+	 p2g/walkstat.py			\
 	$(P2G_GEN_SRC)
 
 TOOL_DIR:=tools
@@ -94,7 +94,7 @@ FUNC_TEST_FILES:=					\
 	tests/test_vars.py				\
 	tests/test_vector.py
 
-TEST_SRC:=					\
+ALL_TEST_SRC:=					\
 	$(FUNC_TEST_FILES)			\
 	tests/conftest.py
 
@@ -127,21 +127,21 @@ DIST_FILE=dist/p2g-$(THIS_VERSION).tar.gz
 
 ALL_GENERATED_FILES:=$(GENERATED_DOC) $(P2G_GEN_SRC) $(COMPILED_EXAMPLES)
 
-top: | announce $(VERSION_STAMP) $(POETRY_STAMP) $(ALL_GENERATED_FILES) test lint $(DIST_FILE) final-check
+top: | announce $(VERSION_STAMP) $(POETRY_STAMP) $(ALL_GENERATED_FILES) test lint $(DIST_FILE) sanity
 	$(HR)
 	$(TITLE)
 	$(TITLE)
 
 ######################################################################
 
-LINTABLE_SRC=$(P2G_SRC) $(TEST_SRC) $(TOOL_SRC)
 
-
+ALL_PY=$(ALL_P2G_SRC) $(TOOL_SRC) $(ALL_TEST_SRC)
+LINTABLE_SRC=$(ALL_P2G_SRC) $(TOOL_SRC)
 CONTROL_FILES=Makefile pyproject.toml .scrutinizer.yml
 
 
 mps:
-	echo $(TEST_SRC)
+	echo $(ALL_TEST_SRC)
 
 .PHONY:
 announce:
@@ -157,51 +157,7 @@ HR=@echo  "********************************************************"
 
 VERSIONED_FILES=p2g/__init__.py pyproject.toml doc/readme.in
 
-#$(VERSIONED_FILES): $(VERSION_FILE)
-
-ALL_SRC_FOR_DIST=$(CONTROL_FILES) $(COMPILED_EXAMPLES)  $(GENERATED_DOC) $(GENERATED_SRC) $(P2G_SRC) $(TEST_SRC)
-
-IN_DIST= \
-p2g/__init__.py					\
-p2g/__main__.py					\
-p2g/axis.py					\
-p2g/builtin.py					\
-p2g/coords.py					\
-doc/authors.org				\
-doc/haas.org				\
-doc/haas.txt				\
-doc/license.org				\
-doc/readme.in				\
-doc/readme.md				\
-doc/readme.org				\
-doc/readme.txt				\
-p2g/err.py					\
-examples/csearch.py				\
-examples/defs.py				\
-examples/probecalibrate.nc			\
-examples/probecalibrate.py			\
-examples/vicecenter.nc			\
-examples/vicecenter.py			\
-p2g/gbl.py					\
-p2g/goto.py					\
-p2g/haas.py					\
-p2g/main.py					\
-p2g/nd.py					\
-p2g/op.py					\
-p2g/scalar.py					\
-p2g/stat.py					\
-p2g/symbol.py					\
-p2g/thanksto					\
-p2g/usrlib.py					\
-p2g/vector.py					\
-p2g/version.py					\
-p2g/walkbase.py					\
-p2g/walkexpr.py					\
-p2g/walkfunc.py					\
-p2g/walkstat.py					\
-pyproject.toml			\
-readme.md
-
+ALL_SRC_FOR_DIST=$(CONTROL_FILES) $(COMPILED_EXAMPLES)  $(GENERATED_DOC) $(GENERATED_SRC) $(ALL_P2G_SRC) $(ALL_TEST_SRC)
 
 ######################################################################
 # convenience rules, for maintenance only
@@ -240,22 +196,22 @@ install-poetry:
 ######################################################################
 # examples
 
-%.nc:%.py  $(P2G_SRC)
+%.nc:%.py  $(ALL_P2G_SRC)
 	$(RUN_P2G) $<  $@
 
 ######################################################################
 # machine generated code
 
-p2g/haas.py: tools/makestdvars.py
+p2g/haas.py: tools/makestdvars.py $(POETRY_STAMP)
 	$(WRITEABLEOUT)
 	$(RUN_MAKESTDVARS)  --py=$@
 	$(NON_WRITEABLEOUT)
-doc/haas.txt: tools/makestdvars.py
+doc/haas.txt: tools/makestdvars.py $(POETRY_STAMP)
 	$(WRITEABLEOUT)
 	$(RUN_MAKESTDVARS)  --txt=$@
 	$(NON_WRITEABLEOUT)
 
-doc/haas.org: $(TOOL_DIR)/makestdvars.py
+doc/haas.org: $(TOOL_DIR)/makestdvars.py $(POETRY_STAMP)
 	$(WRITEABLEOUT)
 	$(RUN_MAKESTDVARS)  --org=$@
 	$(NON_WRITEABLEOUT)
@@ -302,158 +258,49 @@ ELCOMMON=						\
 	-  $(EMACS) $< $(ELCOMMON) -f org-ascii-export-as-ascii $(WRITE_RESULT)
 	$(NON_WRITEABLEOUT)
 
-######################################################################
-# release:
-#   first check for sanity.
+#######################################################################
+# lints
 
-sanity:
-
-.PHONY:
-
-
-.PHONY:
-test: .stamp-tests
-
-.stamp-tests:  $(POETRY_STAMP) $(P2G_SRC) $(TEST_SRC)
-	$(HR)
-	$(TITLE) Run pytest and coverage.
-	PYTHONPATH=. COLUMNS=80 $(PYTEST)
-	$(COVERAGE) lcov -q
-	$(MAYLOG) touch $@
-	$(TITLE) Tests passed.
-	$(HR)
-
-sometest:
-	poetry run pytest -x --lf
-T=local
-
-
-
-
-foop:
-	echo $(THIS_VERSION)
-
-togithub:
-	git commit --allow-empty -m v$(THIS_VERSION) -a
-	- git tag --delete v$(THIS_VERSION)
-	git tag  v$(THIS_VERSION)
-	git push $(T)
-	git push --tags $(T) --force
-
-
-
-
-#	python	$(MODVERSION) --report $(VERSIONED_FILES) --bump
-.bump-version:
-	$(HR)
-	$(TITLE) Update version numbers.
-	$(TITLE) "From $(THIS_VERSION)"
-
-	echo "NEW $(THIS_VERSION)"> .version_bumped
-	python	$(MODVERSION) --report $(VERSIONED_FILES) --bump
-
-	# need in another shell because version env change.
-	git checkout main
-	git pull
-	git tag $(NEXT_TAG)
-	git push local
-	# git push upstream MAJOR.{MINOR+1}.0.dev0
-
-
-
-diff:
-	echo $(IN_DIST) | xargs -n 1 | sort >want
-	echo $(ALL_EXAMPLES) $(CONTROL_FILES) $(ALL_DOC) $(P2G_SRC) | xargs -n 1 | sort > got
-	sdiff want got
-
-
-$(DIST_FILE): $(IN_DIST)
-	$(HR)
-	$(TITLE) Make dist
-	$(TILE)
-	# want to distribute docs and examples, so copy
-	# into src tree
-	rm -rf  p2g/doc
-	rm -rf  p2g/examples
-
-	cp -a doc p2g
-	cp -a  examples p2g
-	$(POETRY) build
-	rm -rf  p2g/doc p2g/examples
-
-packup: $(DIST_FILE)
-	git commit -m --allow-empty -m "rel v$(THIS_VERSION)" -a
-	git tag -a v$(THIS_VERSION) -m v$(THIS_VERSION)
-	git push $(T)
-	git push --tags $(T)
-
-
-# make sure everything in dist is in makefile and viceversa.
-# takes tar listing of form
-# -rwxr-xr-x 0/0            9790 2023-07-22 22:06 p2g-0.2.220/p2g/walkstat.py
-# dist with doc in top/p2g/doc, but in the tree as top/doc etc.
-# so remove up to /p2g/
-# move doc and examples
-# remove junk file
-
-all-there:
-	tar tzvf dist/p2g-$(THIS_VERSION).tar.gz		\
-         | sed -E 'sX.*[0-9][0-9]:[[:digit:]]{2} [^/]+/XXg'	\
-         | sed -E "s:p2g/(doc|examples):\\1:g"			\
-         | grep -v PKG-INFO | sort > .found-in-dist
-	echo $(IN_DIST) | xargs -n 1 | sort > .release-deps
-	diff .found-in-dist .release-deps
-
-.PHONY:
-final-check: all-there .stamp-tox
-
-.stamp-tox:$(DIST_FILE)
-	$(PR)	tox --installpkg $(DIST_FILE)
-	touch $@
-
-# ######################################################################
-# # linty stuff
-##########
 .PHONY:
 vulture:.stamp-vulture
 
-.stamp-vulture: $(POETRY_STAMP) | $(LINTABLE_SRC)
-	 $(PR) vulture
+.stamp-vulture:  $(LINTABLE_SRC)
+	 $(PR) vulture $(LINTABLE_SRC)
 	touch $@
 ##########
 .PHONY:
 pyright:.stamp-pyright
 
-.stamp-pyright: $(POETRY_STAMP) | $(LINTABLE_SRC)
-	 $(PR) pyright
+.stamp-pyright:   $(LINTABLE_SRC)
+	 $(PR) pyright $(LINTABLE_SRC)
 	touch $@
 ##########
 .PHONY:
 mypy:.stamp-mypy
 
-.stamp-mypy: $(POETRY_STAMP) |  $(LINTABLE_SRC)
-	 $(PR) mypy
+.stamp-mypy:    $(LINTABLE_SRC)
+	 $(PR) mypy $(LINTABLE_SRC)
 	touch $@
 ##########
 .PHONY:
 flake8:.stamp-flake8
 
-.stamp-flake8: $(POETRY_STAMP) | $(LINTABLE_SRC)
-	$(PR) flake8p
+.stamp-flake8:   $(LINTABLE_SRC)
+	$(PR) flake8p $(LINTABLE_SRC)
 	touch $@
 ##########
 .PHONY:
 pylint:.stamp-pylint
 
-.stamp-pylint: $(POETRY_STAMP) | $(LINTABLE_SRC)
-	 $(PR) pylint tools p2g
+.stamp-pylint:   $(LINTABLE_SRC)
+	 $(PR) pylint $(LINTABLE_SRC)
 	touch $@
 ##########
 .PHONY:
 ruff:.stamp-ruff
 
-.stamp-ruff: $(POETRY_STAMP) | $(LINTABLE_SRC)
-	$(PR) ruff check tools p2g
+.stamp-ruff:   $(LINTABLE_SRC)
+	$(PR) ruff check $(LINTABLE_SRC)
 	touch $@
 ##########
 .PHONY:
@@ -466,15 +313,87 @@ deptry:.stamp-deptry
 .PHONY:
 pytype:.stamp-pytype
 
-.stamp-pytype: $(POETRY_STAMP) | $(LINTABLE_SRC)
+.stamp-pytype:   $(LINTABLE_SRC)
 	@# needs python < 3.11
 	touch $@
-	@#	pytype p2g
+	@#	pytype p2g $(LINTABLE_SRC)
 ##########
 .PHONY:
 lint: pyright mypy pytype pylint vulture ruff   flake8
 
-# ######################################################################
+
+######################################################################
+# Tests
+
+test: .stamp-tests
+
+.stamp-tests:  $(ALL_P2G_SRC) $(ALL_TEST_SRC)
+	$(HR)
+	$(TITLE) Run pytest and coverage.
+	PYTHONPATH=. COLUMNS=80 $(PYTEST)
+	$(COVERAGE) lcov -q
+	$(MAYLOG) touch $@
+	$(TITLE) Tests passed.
+	$(HR)
+
+
+######################################################################
+# make a release : build the distribution .tar for pip
+# test it for sanity
+
+
+# want to distribute docs and examples, so copy
+# into src tree
+
+$(DIST_FILE): $(IN_DIST)
+	$(HR)
+	$(TITLE) Make dist
+	rm -rf  p2g/doc
+	rm -rf  p2g/examples
+	cp -a doc p2g
+	cp -a examples p2g
+	$(POETRY) build
+	rm -rf  p2g/doc p2g/examples
+
+######################################################################$
+sanity:  .stamp-sanity
+
+.stamp-sanity: $(DIST_FILE) .stamp_all_there .stamp-tox
+	touch $@
+
+# make sure everything in dist is in makefile and viceversa.
+
+# -rwxr-xr-x 0/0            9790 2023-07-22 22:06 p2g-0.2.220/p2g/walkstat.py
+# dist with doc in top/p2g/doc, but in the tree as top/doc etc.
+# so remove up to /p2g/
+# move doc and examples
+# remove junk file
+
+.stamp_all_there: $(IN_DIST) $(DIST_FILE)
+	tar tzvf $(DIST_FILE)					\
+         | sed -E 'sX.*[0-9][0-9]:[[:digit:]]{2} [^/]+/XXg'	\
+         | sed -E "s:p2g/(doc|examples):\\1:g"			\
+         | grep -v PKG-INFO | sort > .found-in-dist		
+	echo $(IN_DIST) | xargs -n 1 | sort > .release-deps	
+	diff .found-in-dist .release-deps | tee $@
+
+
+##########
+.PHONY:
+
+.stamp-tox:$(DIST_FILE)
+	$(PR)	tox --installpkg $(DIST_FILE)
+	touch $@
+
+##########
+togithub:
+	git commit --allow-empty -m v$(THIS_VERSION) -a
+	- git tag --delete v$(THIS_VERSION)
+	git tag  v$(THIS_VERSION)
+	git push $(T)
+	git push --tags $(T) --force
+
+######################################################################
 # cleanup stuff
 ##########
 .PHONY:
@@ -499,23 +418,17 @@ autoflake:$(LINTABLE_SRC)
 ##########
 .PHONY:
 cleanup: isort ssort  black
-##########
-# ######################################################################
+######################################################################
 # utils
-
-
 .PHONY:
-force-version:
-	$(RUN_MODVERSION) $(VERSIONED_FILES) --git --report --inplace
-# .PHONY:
 clean:
 	if [  $$(which p2g) ] ; then rm -f $$(which p2g); fi
 	git clean -fdx
 
+######################################################################
+# for my machine.
 
 DSTDIR=/home/sac/vf3/_nc_
-
-# .PRECIOUS:  vicecenter.ncwide probecalibrate.ncwide
 
 # off-wip:  vicecenter.diff probecalibrate.diff
 wip:  vicecenter.diff .mark-vicecenter
@@ -524,7 +437,6 @@ wip:  vicecenter.diff .mark-vicecenter
 wip-probe: probecalibrate.diff
 .PHONY:
 wip-vicecenter: vicecenter.diff
-
 
 MAKEONE=poetry run p2g
 
@@ -538,14 +450,6 @@ MAKEONE=poetry run p2g
 #	poetry run p2g  $<   tmp.nc
 #	poetry run p2g  $< --narrow  $(DSTDIR)/{countdown}-pc.nc
 #
-
-.PHONY:
-$(DSTDIR)/ZZ%.nc: %.py
-	poetry run p2g $<  --wide $@
-	poetry run p2g $< --wide  $(DSTDIR)/{countdown}-pc.nc
-	touch $@
-
-# wip-probe: .mark-probecalibrate
 
 
 goldify-test_examples:

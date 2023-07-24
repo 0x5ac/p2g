@@ -1,5 +1,5 @@
 [tool.poetry]
-version = "0.2.220"
+version = "0.2.222"
 name = "p2g"
 description = "Transpile python into cnc gcode."
 authors = ["sac <sac@0x5ac.com>"]
@@ -55,7 +55,6 @@ dill = "^0.3.6"
 exclude = ['(examples|tests)/*']
 
 [tool.pyright]
-include = ["p2g","tools"]
 
 [tool.isort]
 force_alphabetical_sort_within_sections = true
@@ -73,26 +72,19 @@ line-length=90
 max_line_length= 90
 aggresive=10
 in-place=true
-#recursive=true
 
 [tool.mypy] 
 ignore_missing_imports = true
 check_untyped_defs = true
 explicit_package_bases = true
-mypy_path=["."]
-files=["."]
 
-[tool.pydocstyle]
-#ignore  = "D103,D101,D107,D100,D102,D105, D104"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.vulture]
-exclude =[ 'examples']
 ignore_names = ['_visit*','[A-Z]*' ]
-paths = ['p2g','tools']
 
 [tool.pylint]
 init-import = false
@@ -112,7 +104,6 @@ console_output_style="classic"
 addopts=["--cov" , "--no-header", "-vv" ] 
 
 [tool.coverage.report]
-
 exclude_lines = [       "NotImplemented",
                         "AssertionError",
                         "for debug",
@@ -121,16 +112,11 @@ exclude_lines = [       "NotImplemented",
 
 omit = ["tests/*.py",
         "examples/*.py"] 
+
 [tool.flake8]
 ignore="E203"
-exclude = [
-"tests/*",
-".tox/*"
-
-]
 
 max-line-length = 90
-
 [tool.ruff]
 line-length = 90
 

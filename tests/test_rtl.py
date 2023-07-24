@@ -76,7 +76,7 @@ from conftest import want
 )
 def test_0():
 
-    p2g.symbol.Table.print = True
+    p2g.SYMBOL_TABLE = True
     p2g.comment("Yes this is a comment")
     i = p2g.Var()
     flutes = p2g.Fixed[10](addr=200)

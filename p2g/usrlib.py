@@ -13,14 +13,14 @@ class Optional:
     prev: str
 
     def __init__(self):
-        self.prev = stat.OPT_PREFIX
-        stat.OPT_PREFIX = "/ "
+        self.prev = p2g.BLOCK_DELETE
+        p2g.BLOCK_DELETE = True
 
     def __enter__(self):
         pass
 
     def __exit__(self, *_):
-        stat.OPT_PREFIX = self.prev
+        p2g.BLOCK_DELETE = self.prev
 
 
 class WCS:

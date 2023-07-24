@@ -1,10 +1,4 @@
 O0001 (probecalibrate: 0.2.222+2)
-( Symbol Table )
-
- ( KNOWNLEN_OFF     :   0.000,  0.000, -0.250 )
- ( MABS_ABOVE_OTS   :  -1.167, -7.560, -7.540 )
- ( MABS_INSIDE_RING : -16.420, -3.420,-22.600 )
-
 
 ( Start with fixed height probe,   )
 ( make sure probe stickout <2.25in )

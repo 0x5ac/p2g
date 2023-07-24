@@ -133,7 +133,7 @@ def test_cerror_zeros3():
     "%",
 )
 def test_kwargs():
-    p2g.symbol.Table.print = True
+    p2g.SYMBOL_TABLE = True
     v = p2g.Var(x=2, y=3)
     p2g.comment(v)
 

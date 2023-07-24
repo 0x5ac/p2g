@@ -454,16 +454,17 @@ MAKEONE=poetry run p2g
 #
 
 
-goldify-test_examples:
+goldify-examples:
 	cp tests/golden/vicecenter_vicecenter.got tests/golden/vicecenter_vicecenter.nc
 	cp tests/golden/probecalibrate_probecalibrate.got tests/golden/probecalibrate_probecalibrate.nc
 
-goldify-%: tests/%.py
-	echo "RUNNING " $*
-	sed '/^# TESTS BELOW/q' tests/$*.py > t1
-	- cat tests/golden/$** >> t1
-	cp t1 tests/$*.py
-	autopep8 -i   tests/$*.py
+
+goldify-%: tests/test_%.py
+	@	echo "RUNNING " $<
+	sed '/^# TESTS BELOW/q' $< > t1
+	- cat tests/golden/test_$*_* >> t1
+	cp t1 $<
+	autopep8 -i   $<
 
 # p:
 #	prospector p2g --tool bandit --tool dodgy --tool mccabe --tool mypy --tool profile-validator --tool  pycodestyle --tool pydocstyle --tool pyflakes --tool pylint --tool pyright --tool pyroma --tool vulture
@@ -507,4 +508,4 @@ sacpdb:
 
 
 st:
-	 poetry run pytest tests/test_rtl.py
+	 poetry run pytest tests/test_symtab.py

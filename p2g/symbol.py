@@ -3,6 +3,8 @@ import collections
 import enum
 import typing
 
+import p2g
+
 
 class Group(enum.IntEnum):
     IGNORE = enum.auto()
@@ -33,7 +35,6 @@ class HasToSymTabEntry(abc.ABC):
 # used.  walk through all address constants, find the symbols
 # assocaited and mark them as useful.  then print them out.
 class Table:
-    print = False
     print_all = False
     name_to_thing: typing.Dict[str, list[HasToSymTabEntry]] = collections.defaultdict(
         list
@@ -62,7 +63,7 @@ class Table:
 
     @classmethod
     def yield_table(cls):
-        if not cls.print and not cls.print_all:
+        if not p2g.SYMBOL_TABLE and not cls.print_all:
             return
         lsize = 0
         rsize = 0
@@ -94,7 +95,7 @@ class Table:
     def reset(cls):
         cls.name_to_thing = collections.defaultdict(list)
         cls.addrs_used = set()
-        cls.print = False
+        p2g.SYMBOL_TABLE = False
 
 
 class TSUB:

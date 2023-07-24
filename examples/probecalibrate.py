@@ -11,7 +11,7 @@ def probecalibrate():
         "make sure probe stickout <2.25in",
     )
 
-    p2g.Table.print = True
+    p2g.SYMBOL_TABLE = True
 
     defs.goto_home()
 

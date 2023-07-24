@@ -39,25 +39,27 @@ README_STAMP=.stamp-readme-$(THIS_VERSION)
 
 P2G_GEN_SRC:= p2g/haas.py
 P2G_SRC:=					\
-	p2g/__init__.py				\
-	p2g/__main__.py				\
-	p2g/axis.py				\
-	p2g/coords.py				\
-	p2g/err.py				\
-	p2g/gbl.py				\
-	p2g/goto.py				\
-	p2g/usrlib.py				\
-	p2g/main.py				\
-	p2g/nd.py				\
-	p2g/op.py				\
-	p2g/scalar.py				\
-	p2g/stat.py				\
-	p2g/symbol.py				\
-	p2g/vector.py				\
-	p2g/walkbase.py				\
-	p2g/walkexpr.py				\
-	p2g/walkfunc.py				\
-	p2g/walkstat.py				\
+p2g/axis.py					\
+p2g/builtin.py					\
+p2g/coords.py					\
+p2g/err.py					\
+p2g/gbl.py					\
+p2g/goto.py					\
+p2g/__init__.py					\
+p2g/__main__.py					\
+p2g/main.py					\
+p2g/nd.py					\
+p2g/op.py					\
+p2g/scalar.py					\
+p2g/stat.py					\
+p2g/symbol.py					\
+p2g/usrlib.py					\
+p2g/vector.py					\
+p2g/version.py					\
+p2g/walkbase.py					\
+p2g/walkexpr.py					\
+p2g/walkfunc.py					\
+p2g/walkstat.py					\
 	$(P2G_GEN_SRC)
 
 TOOL_DIR:=tools
@@ -107,6 +109,7 @@ TEST_SRC:=					\
 GENERATED_DOC:= \
 	doc/haas.org			\
 	doc/haas.txt			\
+	doc/license.org			\
 	doc/readme.txt			\
 	doc/readme.md			\
 	doc/readme.org			\
@@ -114,10 +117,7 @@ GENERATED_DOC:= \
 	license.md				\
 	authors.md 
 
-
-ALL_GENERATED_FILES:=$(GENERATED_DOC) $(P2G_GEN_SRC)
-
-DOC:=   doc/haas.in			\
+ALL_DOC:=   doc/readme.in			\
 	$(GENERATED_DOC)	  
 
 COMPILED_EXAMPLES:=examples/vicecenter.nc \
@@ -129,10 +129,12 @@ EXAMPLE_SRC:= \
 	examples/probecalibrate.py		\
 	examples/vicecenter.py 
 
+ALL_EXAMPLES:=$(EXAMPLE_SRC) $(COMPILED_EXAMPLES)
 RELEASE_FILE=dist/p2g-$(THIS_VERSION).tar.gz
 
+ALL_GENERATED_FILES:=$(GENERATED_DOC) $(P2G_GEN_SRC) $(COMPILED_EXAMPLES)
 
-top: | announce $(VERSION_STAMP) $(POETRY_STAMP) $(ALL_GENERATED_FILES) test lint release
+top: | announce $(VERSION_STAMP) $(POETRY_STAMP) $(ALL_GENERATED_FILES) test lint tox release
 	$(HR)
 	$(TITLE) 
 	$(TITLE) 
@@ -165,6 +167,48 @@ VERSIONED_FILES=p2g/__init__.py pyproject.toml doc/readme.in
 #$(VERSIONED_FILES): $(VERSION_FILE)
 
 ALL_SRC_FOR_DIST=$(CONTROL_FILES) $(COMPILED_EXAMPLES)  $(GENERATED_DOC) $(GENERATED_SRC) $(P2G_SRC) $(TEST_SRC)
+
+IN_RELEASE= \
+p2g/__init__.py					\
+p2g/__main__.py					\
+p2g/axis.py					\
+p2g/builtin.py					\
+p2g/coords.py					\
+doc/authors.org				\
+doc/haas.org				\
+doc/haas.txt				\
+doc/license.org				\
+doc/readme.in				\
+doc/readme.md				\
+doc/readme.org				\
+doc/readme.txt				\
+p2g/err.py					\
+examples/csearch.py				\
+examples/defs.py				\
+examples/probecalibrate.nc			\
+examples/probecalibrate.py			\
+examples/vicecenter.nc			\
+examples/vicecenter.py			\
+p2g/gbl.py					\
+p2g/goto.py					\
+p2g/haas.py					\
+p2g/main.py					\
+p2g/nd.py					\
+p2g/op.py					\
+p2g/scalar.py					\
+p2g/stat.py					\
+p2g/symbol.py					\
+p2g/thanksto					\
+p2g/usrlib.py					\
+p2g/vector.py					\
+p2g/version.py					\
+p2g/walkbase.py					\
+p2g/walkexpr.py					\
+p2g/walkfunc.py					\
+p2g/walkstat.py					\
+pyproject.toml			\
+readme.md				
+
 
 
 ######################################################################
@@ -351,12 +395,6 @@ bump-version: .bump-version
 # 	touch $@
 
 
-.PHONY:
-compiled-doc: $(COMPILED-DOC)
-
-.PHONY:
-build: clean compiled-doc lint
-	$(POETRY) build 
 
 #.PHONY:
 #publish:$(RELEASE_FILE)
@@ -366,7 +404,12 @@ build: clean compiled-doc lint
 # prepare-dist: $(ALL_SRC_FOR_DIST) test lint dist/p2g-$(THIS_VERSION).tar.gz
 
 
-$(RELEASE_FILE):
+diff:
+	echo $(IN_RELEASE) | xargs -n 1 | sort >want
+	echo $(ALL_EXAMPLES) $(CONTROL_FILES) $(ALL_DOC) $(P2G_SRC) | xargs -n 1 | sort > got
+	sdiff want got
+
+$(RELEASE_FILE): $(IN_RELEASE)
 	$(HR)
 	$(TITLE) Make dist
 	$(TILE)
@@ -382,8 +425,11 @@ $(RELEASE_FILE):
 
 
 .PHONY:
-tox: $(RELEASE_FILE)
+tox: .stamp-tox
+
+.stamp-tox:$(RELEASE_FILE)
 	$(PR)	tox --installpkg $(RELEASE_FILE)
+	touch $@
 
 release: | $(RELEASE_FILE) tox
 
@@ -547,7 +593,6 @@ $(DSTDIR)/ZZ%.nc: %.py
 
 # wip-probe: .mark-probecalibrate
 
-goldify-all: $(addprefix goldify-, $(TEST_NAMES)) 
 
 
 goldify-test_examples: 

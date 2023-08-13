@@ -1,4 +1,4 @@
-* TOC
+*
 
   * [[https://github.com/0x5ac/p2g/blob/main/docs/howto.md#introduction][Introduction]]
   * [[https://github.com/0x5ac/p2g/blob/main/docs/howto.md#variables][Variables]]

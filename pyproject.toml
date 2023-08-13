@@ -17,10 +17,10 @@ repository = 'https://github.com/0x5ac/p2g'
 homepage = 'https://github.com/0x5ac/p2g'
 packages = [
     { include = "p2g", format = "sdist"},
-
 ]
 include = [ "p2g/docs/*"]
 exclude = [ "p2g/examples/*.got" ]
+
 [tool.poetry.scripts]
 p2g = "p2g.main:main"
 
@@ -28,8 +28,6 @@ p2g = "p2g.main:main"
 python = ">= 3.10, < 4.0"
 typeguard = "^3.0.2"
 docopt = "^0.6.2"
-
-
 
 [tool.poetry.group.dev.dependencies]
 typeguard = "^3.0.2"
@@ -50,15 +48,9 @@ pytest-cov = "^4.1.0"
 wrapt = "^1.15.0"
 dill = "^0.3.6"
 
-
-
-
 [[tool.poetry.source]]
 name = "PyPI"
 priority = "primary"
-
-[tool.deptry]
-exclude = ['(examples|tests)/*']
 
 [tool.pyright]
 
@@ -83,7 +75,6 @@ in-place=true
 ignore_missing_imports = true
 check_untyped_defs = true
 explicit_package_bases = true
-
 
 [build-system]
 requires = ["poetry-core"]

@@ -1,10 +1,6 @@
 * TOC
 
   * [[https://github.com/0x5ac/p2g/blob/main/docs/howto.md#introduction][Introduction]]
-  * [[https://github.com/0x5ac/p2g/blob/main/docs/howto.md#demo][Video]]
-  * [[https://github.com/0x5ac/p2g/blob/main/docs/howto.md#install][Install]]
-  * [[https://github.com/0x5ac/p2g/blob/main/docs/howto.md#usage][Usage]]
-  * [[https://github.com/0x5ac/p2g/blob/main/docs/howto.md#examples][Examples]]
   * [[https://github.com/0x5ac/p2g/blob/main/docs/howto.md#variables][Variables]]
   * [[https://github.com/0x5ac/p2g/blob/main/docs/howto.md#coordinates][Coordinates]]
   * [[https://github.com/0x5ac/p2g/blob/main/docs/howto.md#expressions][Expressions]]

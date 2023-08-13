@@ -28,7 +28,7 @@ It comes with a set of macro variable definitions for a Haas mill with NCD. And 
 9.  [Axes](#axes)
 10. [When](#when)
 11. [DPRNT](#dprnt)
-12. [Symbol Tables](#symboltables)
+12. [Symbol Tables](#symbol-tables)
 13. [Notes](#notes)
 14. [MIT License](#mit-license)
 15. [Authors](#authors)
@@ -886,7 +886,7 @@ fish = 10
 not_used = 12
 
 def symbol_table_demo():
-      p2g.Control.symbol_table = True    
+      p2g.Control.symbol_table = True
       p2g.comment("Only used symbols are in output table.")
       p2g.Var(MACHINE_ABS_ABOVE_OTS)
       p2g.Var(MACHINE_ABS_ABOVE_VICE * fish)

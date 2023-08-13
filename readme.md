@@ -270,10 +270,6 @@ N1001
 ## TOC
 
 -   [Introduction](https://github.com/0x5ac/p2g/blob/main/docs/howto.md#introduction)
--   [Video](https://github.com/0x5ac/p2g/blob/main/docs/howto.md#demo)
--   [Install](https://github.com/0x5ac/p2g/blob/main/docs/howto.md#install)
--   [Usage](https://github.com/0x5ac/p2g/blob/main/docs/howto.md#usage)
--   [Examples](https://github.com/0x5ac/p2g/blob/main/docs/howto.md#examples)
 -   [Variables](https://github.com/0x5ac/p2g/blob/main/docs/howto.md#variables)
 -   [Coordinates](https://github.com/0x5ac/p2g/blob/main/docs/howto.md#coordinates)
 -   [Expressions](https://github.com/0x5ac/p2g/blob/main/docs/howto.md#expressions)

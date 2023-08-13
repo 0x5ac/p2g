@@ -916,7 +916,7 @@ Extended f-string syntax
   │ not_used = 12
   │ 
   │ def symbol_table_demo():
-  │       p2g.Control.symbol_table = True    
+  │       p2g.Control.symbol_table = True
   │       p2g.comment("Only used symbols are in output table.")
   │       p2g.Var(MACHINE_ABS_ABOVE_OTS)
   │       p2g.Var(MACHINE_ABS_ABOVE_VICE * fish)

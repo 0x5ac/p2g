@@ -42,7 +42,7 @@ def expressions():
 ⇨ ~p2g expressions.py~ ⇨
 #+results: expressions1
 #+begin_example
-O0001 (expressions: 0.3.9)
+O0001 (expressions: 0.3.10)
 ( Variables go into macro variables. )
   #100= 0.3                       ( theta = Var[0.3]              )
   #101= SIN[#100]                 ( angle = Var[sin[theta]]       )

@@ -66,4 +66,4 @@ __all__ = [
     "sqrt",
     "tan",
 ]
-VERSION = "0.3.9"
+VERSION = "0.3.10"

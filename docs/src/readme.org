@@ -15,7 +15,7 @@
 * Table of contents
 #+INCLUDE: "toc.org"
 
-**** Copyright © 2023 Steve Chamberlain
+ + Copyright © 2023 Steve Chamberlain
 
 # Local Variables:
 # org-confirm-babel-evaluate: nil

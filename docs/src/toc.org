@@ -14,4 +14,3 @@
   * [[https://github.com/0x5ac/p2g/blob/main/docs/howto.md#notes][Notes]]
   * [[https://github.com/0x5ac/p2g/blob/main/docs/howto.md#authors][Authors]]
   * [[https://github.com/0x5ac/p2g/blob/main/docs/howto.md#thanks][Thanks]]
-  * [[https://github.com/0x5ac/p2g/blob/main/docs/howto.md#video][Video]]

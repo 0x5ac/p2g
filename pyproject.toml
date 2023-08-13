@@ -1,5 +1,5 @@
 [tool.poetry]
-version = "0.3.9"
+version = "0.3.10"
 name = "p2g"
 description = "Transpile python into cnc gcode."
 authors = ["sac <sac@0x5ac.com>"]

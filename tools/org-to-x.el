@@ -26,7 +26,11 @@
   (setq org-confirm-babel-evaluate nil)
   (funcall (sc/fnfromext (downcase (file-name-extension dstfile))))
   (delete-file (concat dstfile ".tmp"))
-  (write-region (point-min) (point-max) dstfile))
+  (delete-file (concat dstfile ".md"))
+  (delete-file (concat dstfile ".md.tmp"))
+  (write-region (point-min) (point-max) dstfile)
+
+  )
 
 
 

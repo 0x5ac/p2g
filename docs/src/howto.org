@@ -10,7 +10,6 @@
 
 #+TOC: headlines 1
 
-
 #+INCLUDE: "install.org"
 #+INCLUDE: "usage.org"
 #+INCLUDE: "video.org"

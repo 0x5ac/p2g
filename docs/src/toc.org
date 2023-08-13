@@ -1,6 +1,7 @@
+* TOC
 
   * [[https://github.com/0x5ac/p2g/blob/main/docs/howto.md#introduction][Introduction]]
-  * [[https://github.com/0x5ac/p2g/blob/main/docs/howto.md#vdemo][Video]]
+  * [[https://github.com/0x5ac/p2g/blob/main/docs/howto.md#demo][Video]]
   * [[https://github.com/0x5ac/p2g/blob/main/docs/howto.md#install][Install]]
   * [[https://github.com/0x5ac/p2g/blob/main/docs/howto.md#usage][Usage]]
   * [[https://github.com/0x5ac/p2g/blob/main/docs/howto.md#examples][Examples]]

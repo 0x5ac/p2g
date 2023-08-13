@@ -20,7 +20,7 @@ It comes with a set of macro variable definitions for a Haas mill with NCD. And 
 1.  [Introduction](#introduction)
 2.  [Install](#install)
 3.  [Usage](#usage)
-4.  [Demo.](#vdemo)
+4.  [Demo.](#demo)
 5.  [Examples](#examples)
 6.  [Variables](#variables)
 7.  [Coordinates](#coordinates)

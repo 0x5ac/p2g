@@ -1,6 +1,6 @@
 * Demo.
 :PROPERTIES:
-:CUSTOM_ID: vdemo
+:CUSTOM_ID: demo
 :END:
 
 #+BEGIN_EXPORT html

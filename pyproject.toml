@@ -18,8 +18,9 @@ homepage = 'https://github.com/0x5ac/p2g'
 packages = [
     { include = "p2g", format = "sdist"},
 ]
-include = [ "p2g/docs/*"]
-exclude = [ "p2g/examples/*.got" ]
+#include = [ "p2g/docs/*.org"]
+#exclude = [ "p2g/examples/*.got" ,
+#            "p2g/docs/*.tmp" ]
 
 [tool.poetry.scripts]
 p2g = "p2g.main:main"

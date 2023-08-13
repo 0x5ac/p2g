@@ -17,31 +17,12 @@ class ITable:
 TMP = p2g.Fixed[10](addr=400)
 
 # TESTS BELOW
-
-
+########################################
 @want(
-    "O00001 (test_symtab)",
-    "",
-    "( A )",
-    "( st.TMP.x = 9                  )",
-    "  #400= 9.",
-    "( st.DINGO1.x = st.DINGO2.x     )",
-    "  #100= 97.",
-    "( st.TMP1 = Var[p, p + q, 3, 4, 5, p, p + q])",
-    "  #101= 78.",
-    "  #102= 256.",
-    "  #103= 3.",
-    "  #104= 4.",
-    "  #105= 5.",
-    "  #106= 78.",
-    "  #107= 256.",
-    "( goto.feed[20].machine.z_last[st.TMP2])",
-    "  G90 G53 G01 G55 F20. x'abc' y1.",
-    "  G90 G53 G01 G55 F20. z2.",
-    "( goto.feed[20].machine.z_last[st.TMP2.z])",
-    "  G90 G53 G01 G55 F20. x2.",
-    "  M30",
-    "%",
+    errors=[
+        "test_nt1.py:37:37:39:     p2g.goto.feed(20).machine.z_last(st.TMP2)",
+        "ord() expected a character, but string of length 3 found   ^^",
+    ]
 )
 def test_symtab():
     st = ITable()

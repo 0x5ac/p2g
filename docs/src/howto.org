@@ -1,0 +1,30 @@
+#+OPTIONS: broken-links:t
+#+OPTIONS: ^:nil
+#+OPTIONS: toc:nil
+#+OPTIONS: num:1
+#+TITLE: p2g - Python 2 G-code
+#+AUTHOR: sac@0x5ac.com
+#+PROPERTY: header-args :exports both     :python poetry run p2g   -
+#+INCLUDE: "badges.org"
+#+INCLUDE: "introduction.org"
+
+#+TOC: headlines 1
+
+
+#+INCLUDE: "install.org"
+#+INCLUDE: "usage.org"
+#+INCLUDE: "video.org"
+#+INCLUDE: "examples.org"
+#+INCLUDE: "variables.org"
+#+INCLUDE: "coordinates.org"
+#+INCLUDE: "goto.org"
+#+INCLUDE: "axes.org"
+#+INCLUDE: "when.org"
+#+INCLUDE: "dprnt.org"
+#+INCLUDE: "symboltables.org"
+#+INCLUDE: "notes.org"
+#+INCLUDE: "license.org"
+#+INCLUDE: "authors.org"
+#+INCLUDE: "thanksto.org"
+# OFF +INCLUDE: "release.org"
+#+INCLUDE: "haas.org"

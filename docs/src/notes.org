@@ -1,0 +1,138 @@
+** Notes
+:PROPERTIES:
+:CUSTOM_ID: notes
+:END:
+
+*** Stuff you already know
+As someone who uses a machine that can reduce $1000 of flat
+bar into a bucket of chips, bits and coolant before you can say  "I forgot
+to tighten the vice.", you know about some of the bad things that would  happen
+if skynet were to notice you.
+
+You'll make a wise and considered decision about using some random
+internet stranger's program to control your machine.
+
+If p2g crashes your mill so hard it kills your cat, well, you should have
+seen what it did to my cat.  Stumpy was a good cat.
+
+That said, p2g makes it pleasant to write code to manipulate
+the translations on work pieces so that complex fixtures aren't needed.
+
+
+*** Cool example
+#+name: cool
+#+begin_src python -i :results output :exports both :python poetry run p2g     -
+
+from p2g import *
+class X:
+    def __init__(self, a, b):
+        self.thisone = a
+        self.b = b
+
+    def adjust(self, tof):
+        self.thisone += tof.x
+        self.b += tof.y
+
+class Y:
+    def __init__(self, a):
+        self.val = a
+
+    def adjust(self, tof):
+        self.val += tof
+
+    # an example of overloading.
+    # I'm not recommending replacing add with
+    # multiply, but it would work. Don't do this
+    # if you're sending a probe to mars.
+    def __add__(self, other):
+        return self.val * other + 3
+
+def cool():
+    com("You can do surprising things.")
+
+    avariable_scalar = Var(100)
+    x_instance = X(avariable_scalar, 34)
+    another_xandy = Var(7, 8)
+
+    x_instance.adjust(haas.TOOL_OFFSET)
+
+    q = Y(another_xandy) + (x_instance.thisone, x_instance.b)
+    sys.print(f"{q[0]}{q[1]}")
+
+
+#+end_src
+⇨ =p2g cool.py= ⇨
+#+results: cool
+#+begin_example
+O0001 (cool: 0.3.6)
+( You can do surprising things. )
+  #100= 100.                      ( avariable_scalar = Var[100]   )
+  #101= 7.                        ( another_xandy = Var[7, 8]     )
+  #102= 8.
+  #103= #101 * [#100 + #5081] + 3.( sys.print[f"{q[0]}{q[1]}"]    )
+  #104= #102 * [#5082 + 34.] + 3.
+DPRNT[#103[42]#104[42]]
+  M30
+%
+#+end_example
+
+*** Beware
+Unexpected (to Python users) assignment semantics.
+
+#+name: beware0
+#+begin_src python -i :results output :exports both :python poetry run p2g     -
+
+import p2g
+
+def beware0():
+    a = p2g.Fixed(addr=100)
+    b = p2g.Fixed(addr=200)
+    c = p2g.Fixed[3](addr=100)
+    p2g.com("this moves contents of macro var 200 into 100",
+            "it doesn't rewrite a.")
+    a =  b[0]
+    p2g.com("again, this copies the referees.")
+    a =  b
+    p2g.com("and this")
+    a[0] =  b
+    p2g.com("this moves three from 200 into 100")
+    c =  b
+    p2g.com("anything can be the source")
+    c[0:2] = c[1:3] + 2 * b
+    p2g.com("anything can be the source")
+    c.xyz = 1,2,3
+
+    p2g.com("but p2g is too dumb to do it in the ",
+            "right order to avoid overwiting the source")
+    c[1:3] = c[0:2] + 2 * b
+
+#+end_src
+⇨ =p2g beware0.py= ⇨
+#+results: beware0
+#+begin_example
+O0001 (beware0: 0.3.6)
+( this moves contents of macro var 200 into 100 )
+( it doesn't rewrite a.                         )
+  #100= #200                      ( a =  b[0]                     )
+( again, this copies the referees. )
+  #100= #200                      ( a =  b                        )
+( and this )
+  #100= #200                      ( a[0] =  b                     )
+( this moves three from 200 into 100 )
+  #100= #200                      ( c =  b                        )
+  #101= #200
+  #102= #200
+( anything can be the source )
+  #100= #101 + #200 * 2.          ( c[0:2] = c[1:3] + 2 * b       )
+  #101= #102 + #200 * 2.
+( anything can be the source )
+  #100= 1.                        ( c.xyz = 1,2,3                 )
+  #101= 2.
+  #102= 3.
+( but p2g is too dumb to do it in the        )
+( right order to avoid overwiting the source )
+  #101= #100 + #200 * 2.          ( c[1:3] = c[0:2] + 2 * b       )
+  #102= #101 + #200 * 2.
+  M30
+%
+#+end_example

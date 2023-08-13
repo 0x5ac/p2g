@@ -27,6 +27,10 @@ def low_names(idx):
     return NAMES[idx]
 
 
+def hi_names(idx):
+    return NAMES[idx].upper()
+
+
 def axis_name_to_index(axis_char):
     return NAMES.index(axis_char)
 

@@ -1,0 +1,22 @@
+* Introduction
+:PROPERTIES:
+:CUSTOM_ID: introduction
+:END:
+
+** Version 0.3.6
+
+P2G makes it simple to ensure that parts are in fixtures
+correctly, coordinate systems are adjusted to deal with stock
+placement and cope with movement and rotation of workpieces through
+multiple operations.
+
+P2G is a compiler; it takes Python code, some definitions of machine
+specific variables, a little glue and makes G-code, so far, Haas
+ideomatic.
+
+Thanks to magic it can do surprising things with python data
+structures, anything reasonably calculated statically during
+compilation can be used in the source, classes, dicts, and so on.
+
+It comes with a set of macro variable definitions for a Haas mill with
+NCD.  And a few example settings for my own VF-3SSYT.

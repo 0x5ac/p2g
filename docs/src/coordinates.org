@@ -1,0 +1,91 @@
+* Coordinates
+:PROPERTIES:
+:CUSTOM_ID: coordinates
+:END:
+
+Describe position, with axis by location, in sequence or by name.
+
+
+#+name: coordinates1
+#+begin_src python -i  :results output :exports both  :python poetry run p2g   -
+from p2g import *  # this is the common header
+from p2g.haas import *  # to all the examples
+
+
+def coordinates():
+    com("Describe 3 variables at 3000")
+    dst = Fixed[3](addr=3000)
+    com("Fill with 1,2,31")
+    dst.var = (1, 2, 31)
+
+    com("Set by parts")
+    dst.y = 7
+    dst.z = 71
+    dst.x = 19
+
+    offset = Const(0.101, 0.102, 0.103)
+    com("Arithmetic")
+    dst.var += (1, 2, 3)
+    dst.var -= offset
+    dst.var %= sin(asin(offset) + 7)
+
+    com("When describing a location:")
+    com("Coords by order.")
+    p1 = Fixed[3](1, 2, 3, addr=100)
+
+    com("Coords by axis name.")
+    p2 = Fixed[3](z=333, y=222, x=111, addr=200)
+    p2.x = 17
+
+    com("Coords by index.")
+    p1.xyz = p2[2]
+    p2[1:3] = 7
+
+    com("Mix them up.")
+    p1.yz = p2.yz[1]
+#+end_src
+⇨ ~p2g coordinates.py~ ⇨
+#+results: coordinates1
+#+begin_example
+O0001 (coordinates: 0.3.6)
+( Describe 3 variables at 3000 )
+( Fill with 1,2,31 )
+  #3000= 1.                       ( dst.var = [1, 2, 31]          )
+  #3001= 2.
+  #3002= 31.
+( Set by parts )
+  #3001= 7.                       ( dst.y = 7                     )
+  #3002= 71.                      ( dst.z = 71                    )
+  #3000= 19.                      ( dst.x = 19                    )
+( Arithmetic )
+  #3000= #3000 + 1.               ( dst.var += [1, 2, 3]          )
+  #3001= #3001 + 2.
+  #3002= #3002 + 3.
+  #3000= #3000 - 0.101            ( dst.var -= offset             )
+  #3001= #3001 - 0.102
+  #3002= #3002 - 0.103
+  #3000= #3000 MOD 0.2215         ( dst.var %= sin[asin[offset] + 7])
+  #3001= #3001 MOD 0.2225
+  #3002= #3002 MOD 0.2235
+( When describing a location: )
+( Coords by order. )
+  #100= 1.                        ( p1 = Fixed[3][1, 2, 3, addr=100])
+  #101= 2.
+  #102= 3.
+( Coords by axis name. )
+  #200= 111.                      ( p2 = Fixed[3][z=333, y=222, x=111, addr=200])
+  #201= 222.
+  #202= 333.
+  #200= 17.                       ( p2.x = 17                     )
+( Coords by index. )
+  #100= #202                      ( p1.xyz = p2[2]                )
+  #101= #202
+  #102= #202
+  #201= 7.                        ( p2[1:3] = 7                   )
+  #202= 7.
+( Mix them up. )
+  #101= #202                      ( p1.yz = p2.yz[1]              )
+  #102= #202
+  M30
+%
+#+end_example

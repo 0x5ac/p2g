@@ -1,3 +1,6 @@
+from p2g import haas
+from p2g import sys
+
 from .axis import NAMES
 from .builtin import abs  # pylint: disable=redefined-builtin
 from .builtin import acos
@@ -24,16 +27,7 @@ from .stat import code
 from .stat import codenl
 from .stat import com
 from .stat import comment
-from .stat import dprint
 from .symbol import Table
-from .usrlib import address
-from .usrlib import base_addr
-from .usrlib import BSS
-from .usrlib import load_tool
-from .usrlib import message
-from .usrlib import no_lookahead
-from .usrlib import Optional
-from .usrlib import WCS
 from .vector import TupleV
 from .vector import Vec
 
@@ -41,42 +35,35 @@ from .vector import Vec
 __all__ = [
     "CoType",
     "Const",
+    "Control",
     "Fixed",
     "NAMES",
-    "TupleV",
     "Scalar",
     "Table",
+    "TupleV",
+    "VERSION",
     "Var",
     "Vec",
-    "WCS",
     "abs",
     "acos",
-    "address",
     "asin",
     "atan",
-    "base_addr",
     "code",
     "codenl",
     "com",
     "comment",
     "cos",
-    "dprint",
     "exists",
     "exp",
     "fix",
     "fup",
     "goto",
     "ground",
+    "haas",
+    "sys",
     "ln",
-    "message",
-    "no_lookahead",
     "sin",
     "sqrt",
     "tan",
-    "BSS",
-    "Optional",
-    "VERSION",
-    "load_tool",
-    "Control",
 ]
-VERSION = "0.2.222+4"
+VERSION = "0.3.6"

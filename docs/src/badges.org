@@ -1,0 +1,4 @@
+#+BEGIN_EXPORT html
+<img src="/docs/pytest.svg"><img src="/docs/mit.svg"><img src="/docs/coverage.svg">
+
+#+END_EXPORT

@@ -1,21 +1,34 @@
-(defun to-org (dstfile)
-  (org-mode)  
+;; convert org to something else in a batch file.
+;; emacs opened with src in current buffer, dst as
+;; command line argument
+(require 'ox-gfm)
+(setq dstfile (elt argv 2))
 
-  (setq org-confirm-babel-evaluate nil)  
+
+(defun sc/execute ()
   (require 'ob-python)
-  (org-babel-execute-buffer)  
-  (write-region (point-min) (point-max) dstfile)
-  )
+  (org-babel-execute-buffer))
 
-(defun to-markdown (dstfile)
-  (org-mode)  
-  (require 'ox-gfm)    
-  (org-gfm-export-as-markdown)
+(defun sc/tomd ()
+  (org-gfm-export-as-markdown))
+
+(defun sc/fnfromext (ext)
+  (cdr (assoc ext
+              '(("org" . sc/execute)
+                ("md" . sc/tomd)
+                ("txt" . org-ascii-export-as-ascii)
+                ("html" . org-html-export-as-html)))))
+
+(defun org-to-any1 (dstfile)
+  (org-mode)
+  (message "building %s" dstfile)
+  (setq org-ascii-charset 'utf-8)
+  (setq org-confirm-babel-evaluate nil)
+  (funcall (sc/fnfromext (downcase (file-name-extension dstfile))))
+  (delete-file (concat dstfile ".tmp"))
   (write-region (point-min) (point-max) dstfile))
 
 
-(defun to-txt ( dstfile)
-  (org-mode)  
-  (org-ascii-export-as-ascii   )
-  (write-region (point-min) (point-max) dstfile))
 
+(defun org-to-any ()
+  (org-to-any1 dstfile))

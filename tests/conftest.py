@@ -1,11 +1,14 @@
+import pytest
 import contextlib
 import difflib
 import inspect
 import pathlib
+import itertools
 import sys
 
 import p2g
 import p2g.gbl
+import p2g.err
 import p2g.walkfunc
 
 
@@ -17,45 +20,48 @@ def pytest_addoption(parser):
 
 # the assert here will get rewritten by pytest.
 def checkit(gold_txts, gold_errs, got):
-    assert gold_txts == got[0]
-    assert gold_errs == got[1]
-
-
-# makes output for failing pytests.
-def sdiff(want, got):
-
-    differ = difflib.Differ()
-    yield ""
-    yield ""
-    WIDTH = 20
-
-    def pad(txt):
-        return txt.ljust(WIDTH)
-
-    want = list(want)
-
-    for lhs in want:
-        if len(lhs) > WIDTH:
-            WIDTH = len(lhs)
-
-    yield pad("WANT") + "*  GOT"
-    for line in differ.compare(want, got):
-        marker = line[0]
-        rest = pad(line[2:])
-
-        if marker == " ":
-            yield rest + "|  " + rest
-        elif marker == "-":
-            yield rest + "<  "
-        elif marker == "+":
-            yield pad("") + ">  " + rest
+    assert got[0] == gold_txts
+    assert got[1] == gold_errs
 
 
 def pytest_assertrepr_compare(op, left, right):
+    return list(_pytest_assertrepr_compare_(op, left, right))
+
+
+def _pytest_assertrepr_compare_(op, left, right):
     if op != "==":
         return None
 
-    yield from sdiff(left, right)
+    assert isinstance(left, list)
+    assert isinstance(right, list)
+
+    def prepend(txt, this, other):
+        prev_was_blank = False
+        for thisel, otherel in itertools.zip_longest(this, other, fillvalue=""):
+            if not thisel:
+                if prev_was_blank:
+                    continue
+                prev_was_blank = True
+            else:
+                prev_was_blank = False
+
+            echar = "*" if thisel != otherel else "|"
+            yield txt + echar + thisel
+
+    if left != right:
+        yield ""
+        yield "====+" + "=" * 60
+        yield from prepend("WANT", left, right)
+        yield "----+" + "-" * 60
+        yield from prepend("GOT ", right, left)
+        yield "====+" + "=" * 60
+
+    if False and left:
+        yield "AND FOR OTHER"
+        yield "want=["
+        for line in left:
+            yield quotecommastr(line)
+        yield "]"
 
 
 # takes fn, works out where it lives, where to find golden output and
@@ -63,53 +69,37 @@ def pytest_assertrepr_compare(op, left, right):
 # test_foo.py (test_zap) will make a tests/golden/test_foo_test_zap.nc file.
 
 
-def make_file_path(func, new_suffix) -> pathlib.Path:
-    # this_file_path <- <somewhere>/ptest.py
-    this_file_path = pathlib.Path(__file__)
-    # this_file_directory <- <somewhere>/p2g
-    this_file_directory = this_file_path.parent
+def make_file_path(func) -> pathlib.Path:
 
-    # file_part <- function's filename
-    file_part = str(pathlib.Path(func.__code__.co_filename).stem)
-    #    file_part = file_part.replace("test_", "")
-
-    # can be in <srcdir>/tests or ../tests depending upon
-    # if run installed or not. Look for testdir.
-
-    for tests_dir in [
-        this_file_directory / "tests",
-        this_file_directory.parent / "tests",
-    ]:
-        if (tests_dir / "golden").exists():
-            break
-    else:  # pragma: no cover
-        p2g.err.compiler("can't find tests")
-
-    # generated_dir <- <somewhere>/tests/golden
-    generated_dir = tests_dir / "golden"
-    generated_dir.mkdir(exist_ok=True)
-    #  <somewhere>/tests/golden/foo_zap.nc
-
-    #    new_filename = func.__name__.replace("test", file_part)
-    new_filename = file_part + "_" + func.__name__
-    return (generated_dir / new_filename).with_suffix(new_suffix)
+    first_part = pathlib.Path(func.__code__.co_filename)
+    second_part = first_part.stem + func.__name__.replace("test_", "_")
+    return pathlib.Path(first_part).with_name(second_part).with_suffix(".got")
 
 
+#    return pathlib.Path(func.__code__.co_filename).stem + func.__name__).with_suffix(".got")
+
+
+#
 # find differences between two str lists
 # line where error found, and a list of *s assocaited with
 # broken lines.
 
 
-def writelines(fn, suffix, txt):
-    if "--gif" in sys.argv:
-        path = make_file_path(fn, suffix)
-        p2g.gbl.log(f"Ptest output {path}")
-        path.write_text("\n".join(txt))
+def writelines(fn, txt):
+
+    path = make_file_path(fn)
+    p2g.gbl.log(f"Ptest output {path}")
+    path.write_text("\n".join(txt))
 
 
 # compile fn, return generated errors or text.
 @p2g.gbl.g2l
 def get_all_comp_outputs(fn):
+    from _pytest.assertion import truncate
+
+    truncate.DEFAULT_MAX_LINES = 9999
+    truncate.DEFAULT_MAX_CHARS = 9999
+
     try:
         outlines = p2g.walkfunc.compile2g(
             fn.__name__, inspect.getsourcefile(fn), job_name="O00001"
@@ -117,24 +107,15 @@ def get_all_comp_outputs(fn):
         return outlines, []
     except p2g.err.CompilerError as exn:
 
-        errlines = exn.error_lines(absolute_lines=False, topfn=fn)
+        errlines = exn.get_report_lines()
         return [], errlines
 
 
 @p2g.gbl.g2l
 def read_and_trim(path):
-    lines = p2g.gbl.splitnl(path.read_text())
+    lines = path.read_text().split("\n")
     for line in lines:
         yield line
-
-
-def check_golden_worker(fn):
-    callow = list(get_all_comp_outputs(fn))
-
-    gold_path = make_file_path(fn, ".nc")
-    gold_data = list(read_and_trim(gold_path))
-    writelines(fn, ".got", callow[0])
-    return (gold_data, []), callow
 
 
 @contextlib.contextmanager
@@ -148,16 +129,15 @@ def save_config(**kwargs):
 # check golden file of fn,.
 def check_golden_nodec(fn):
     def check_golden__():
-        with save_config(
-            tin_test=True, force_no_tintest=True, narrow_output=True, with_id=False
-        ):
-            callow_data = list(get_all_comp_outputs(fn))
-            gold_path = make_file_path(fn, ".nc")
+        with save_config(narrow_output=False, no_id=True):
+
+            got_std, _got_err = list(get_all_comp_outputs(fn))
+            gold_path = pathlib.Path(fn.__code__.co_filename).with_suffix(".nc")
             gold_data = list(read_and_trim(gold_path))
 
-            writelines(fn, ".got", callow_data[0])
-
-            checkit(gold_data, [], callow_data)
+            if "--gif" in sys.argv or got_std != gold_data:
+                writelines(fn, got_std)
+            assert gold_data == got_std
 
     return check_golden__
 
@@ -166,57 +146,73 @@ def check_golden_nodec(fn):
 # have passed.
 
 
-def quotestr(txt):
-    txt = txt.replace('"', '\\"')
-    return '"' + txt + '"'
+def quotecommastr(txt):
+    quote = "'" if '"' in txt else '"'
+    return quote + txt.ljust(50) + quote + ","
 
 
-def make_decorated_source_seed(fn, callow_data):
-    gcode = callow_data[0]
-    errors = callow_data[1]
+def make_decorated_source_seed(fn, stdgot, errgot):
 
-    tofix = ["@want("]
-    for line in gcode:
-        tofix.append(quotestr(line).ljust(50) + ",")
+    tofix = ["#" * 40, "@want("]
+    for line in stdgot:
+        tofix.append(quotecommastr(line))
     if p2g.gbl.config.narrow_output == False:
         tofix.append(f"narrow_output={p2g.gbl.config.narrow_output},")
-    if errors:
+    if errgot:
         tofix.append("errors=[")
-        for l in errors:
-            tofix.append(quotestr(l.ljust(50)) + ",")
+        for l in errgot:
+            tofix.append(quotecommastr(l))
         tofix.append("]")
 
     tofix.append(")\n")
 
-    lines = p2g.gbl.splitnl(inspect.getsource(fn))
+    lines = inspect.getsource(fn).split("\n")
 
     while lines and not lines[0].startswith("def"):
         lines = lines[1:]
 
-    writelines(fn, ".decorator", tofix + lines)
+    return tofix + lines
 
 
 # check inline gold of fn.
-def want(*text, narrow_output=True, errors=[], with_id=False, emit_rtl=False):
+def want(*text, narrow_output=True, errors=[], no_id=True):
+    assert isinstance(text, tuple)
+
+    text = list(text)
+
     def must_be_(fn):
         def must_be__():
+            _, first_line = inspect.getsourcelines(fn)
             with save_config(
-                tin_test=True,
+                short_filenames=True,
                 narrow_output=narrow_output,
-                with_id=with_id,
-                emit_rtl=emit_rtl,
+                no_id=no_id,
+                in_pytestwant=True,
+                first_line=first_line,
             ):
+                for el in text:
+                    assert isinstance(el, str)
 
-                callow_data = list(get_all_comp_outputs(fn))
+                gotstd, goterr = get_all_comp_outputs(fn)
 
-                make_decorated_source_seed(fn, callow_data)
+                wantstd = list((line.rstrip() for line in text))
+                wanterr = list((line.rstrip() for line in errors))
 
-                checkit(
-                    list((line.rstrip() for line in text)),
-                    list((line.rstrip() for line in errors)),
-                    callow_data,
-                )
+                if "--gif" in sys.argv or wantstd != gotstd:
+                    got = make_decorated_source_seed(fn, gotstd, goterr)
+                    writelines(fn, got)
+
+                assert wanterr == goterr
+                assert wantstd == gotstd
 
         return must_be__
 
     return must_be_
+
+
+# for the badge.
+def pytest_sessionfinish(session, exitstatus):
+    print()
+    print()
+    print(f"{100 - (100.0 *session.testsfailed /  session.testscollected):0.1f}")
+    print()

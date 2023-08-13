@@ -1,9 +1,9 @@
 [tool.poetry]
-version = "0.2.222+4"
+version = "0.3.6"
 name = "p2g"
 description = "Transpile python into cnc gcode."
 authors = ["sac <sac@0x5ac.com>"]
-readme = "readme.md" 
+readme = "README.MD"
 license = "MIT"
 keywords = ["cnc", "gcode", "mill", "haas", "g-code", "probe", "vf"]
 classifiers = [
@@ -16,11 +16,11 @@ classifiers = [
 repository = 'https://github.com/0x5ac/p2g'
 homepage = 'https://github.com/0x5ac/p2g'
 packages = [
-    { include = "p2g",    format = "sdist"},
+    { include = "p2g", format = "sdist"},
 
 ]
-include = [ "p2g/doc/*"]
-exclude = [ ".*stamp*" ] 
+include = [ "p2g/docs/*"]
+exclude = [ ".*got" ]
 [tool.poetry.scripts]
 p2g = "p2g.main:main"
 
@@ -35,9 +35,8 @@ docopt = "^0.6.2"
 typeguard = "^3.0.2"
 docopt = "^0.6.2"
 rich = "^13.3.4"
-vulture = "^2.7"
 pylint = "^2.17.4"
-pytest = {version = "^7.3.1"}
+pytest= {version = "^7.3.1"}
 mypy = "^1.4.1"
 deptry = "^0.12.0"
 ssort = "^0.11.6"
@@ -50,6 +49,7 @@ tox = "^4.6.4"
 pytest-cov = "^4.1.0"
 wrapt = "^1.15.0"
 dill = "^0.3.6"
+
 
 [tool.deptry]
 exclude = ['(examples|tests)/*']
@@ -73,7 +73,7 @@ max_line_length= 90
 aggresive=10
 in-place=true
 
-[tool.mypy] 
+[tool.mypy]
 ignore_missing_imports = true
 check_untyped_defs = true
 explicit_package_bases = true
@@ -83,42 +83,48 @@ explicit_package_bases = true
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.vulture]
-ignore_names = ['_visit*','[A-Z]*' ]
-
 [tool.pylint]
 init-import = false
 disable = [
+"too-few-public-methods",
 "unnecessary-dunder-call",
 "import-outside-toplevel",
 "abstract-method",
+"forgotten-debug-statement",
 "missing-module-docstring",
 "missing-function-docstring",
 "missing-class-docstring"]
 
-good-names = "_,fn,el,ns"
+good-names = "_,fn,el,ns,on"
 
 [tool.pytest.ini_options]
-python_files = [ 'tests/*.py' ]
+#python_files = [ 'tests/*.py' , 'tools/*.py']
+python_files = [ 'tests/*.py']
 console_output_style="classic"
-addopts=["--cov" , "--no-header", "-vv" ] 
+addopts=["--cov" , "--no-header",  '--cov-report=', '--tb=short']
 
+#assert="plain"
 [tool.coverage.report]
 exclude_lines = [       "NotImplemented",
                         "AssertionError",
-                        "for debug",
                         "no cover",
                         "@(abc\\.)?abstractmethod" ]
 
 omit = ["tests/*.py",
-        "examples/*.py"] 
+        "examples/*.py"]
 
 [tool.flake8]
-ignore="E203"
-
+ignore="E203,W503"
+color="no"
 max-line-length = 90
 [tool.ruff]
+
+exclude=['tests']
+
 line-length = 90
+[tool.pytype]
+inputs = ['p2g']
+jobs = 3
 
 ################################################################################
 
@@ -131,11 +137,11 @@ legacy_tox_ini = """
     env_list =
         py310
         py311
-        py312        
+        py312
 
 
     [testenv]
-    allowlist_externals = make            
+    allowlist_externals = make
     deps = pytest
             pytest-cov
             rich
@@ -147,7 +153,6 @@ legacy_tox_ini = """
             mypy
             pytype
             pylint
-            vulture
             ruff
             flake8
             rich

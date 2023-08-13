@@ -46,7 +46,7 @@ class GotoWorker:
 
     def accumulate_coords(self, cos):
         for aname, value in cos:
-            yield f"{aname}{value.to_gcode(nd.NodeModifier.EMPTY)}"
+            yield f"{aname}{value.to_gcode(nd.NodeModifier.ARGUMENT)}"
 
     def accumulate_probe(self):
         if self._probe:
@@ -152,8 +152,10 @@ class GotoWorker:
     def do_goto_worker(self, fter, args, kwargs):
         # split out arguments we understand from
         # ones for coordinates.
+
         def get_coords():
             values = coords.unpack(args, kwargs)
+
             for aname, value in zip(axis.low_names_v(), values):
                 # skip non mentioned coords
                 if fter != "*" and aname not in fter:
@@ -164,13 +166,11 @@ class GotoWorker:
                 yield aname, value
 
         cos = list(get_coords())
-        if not cos:
-            return
-
-        stat.code(
-            self.accumulate_parts1(),
-            self.accumulate_coords(cos),
-        )
+        if cos:
+            stat.code(
+                self.accumulate_parts1(),
+                self.accumulate_coords(cos),
+            )
         if self._delay:
             stat.code(f"G103 P{self._delay}")
 

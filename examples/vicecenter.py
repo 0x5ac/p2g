@@ -1,21 +1,113 @@
-import csearch
-import defs
+from typing import Optional
 import p2g
-from p2g import haas
 
 
-sch = csearch.SearchConstraint(
+import usrlib as usr
+from p2g import sys
+from p2g.sys import print
+
+
+class SearchConstraint:
+    # position roughly center above start of search.
+    above: p2g.Vec
+    # min size of thing to look for.
+
+    amin: p2g.Vec
+    # max size to search in one dimension for the thing
+    # to probe.  p2g.RVALnstains max size of things measured.
+    amax: p2g.Vec
+
+    # when measuring z, how far to
+    # move from an xy edge inwards to work it out.
+    indent: p2g.Vec
+
+    # steps between probes
+
+    delta: p2g.Vec
+    # safe distance above probed z surface to move
+    skim: p2g.Vec
+
+    # how far to backoff before probing slowly
+    backoff: p2g.Vec
+
+    # how far to look down for a surface once we've
+    # already located the rough z0
+    search_depth: p2g.Vec
+    # how far to look down and not found is a not there
+    #
+    found_if_below: p2g.Vec
+
+    def __init__(
+        self,
+        amin: p2g.Vec,
+        amax: p2g.Vec,
+        above: p2g.Vec,
+        delta: p2g.Vec,
+        skim=None,
+        indent: Optional[p2g.Vec] = None,
+        backoff: Optional[p2g.Vec] = None,
+        search_depth=None,
+        zslack=None,
+        found_if_below=None,
+    ):
+
+        if zslack is None:
+            zslack = p2g.Const(-1.0)
+
+        if search_depth is None:
+            search_depth = p2g.Const(-0.1)
+
+        if found_if_below is None:
+            found_if_below = search_depth * 0.8
+
+        if backoff is None:
+            backoff = p2g.Const(x=0.05, y=0.05, z=0.05)
+
+        if indent is None:
+            indent = round(amax * 0.1, 1)
+
+        if skim is None:
+            skim = p2g.Const(0.15)
+
+        self.delta = delta
+
+        self.amin = amin
+        self.indent = indent
+        self.amax = amax
+        self.above = above
+        self.skim = skim
+        self.backoff = backoff
+        self.search_depth = search_depth
+        self.zslack = zslack
+        self.found_if_below = found_if_below
+        self.edge_search_depth = -0.1
+
+    def comment(self):
+        return [
+            "Search Constraints:",
+            "start:",
+            f"  {self.above}",
+            "boundary:",
+            f"  x= (-{(self.amax[0] * 0.5)}..-{(self.amin[0] * 0.5)})"
+            f"..({(self.amin[0] * 0.5)}..{(self.amax[0] * 0.5)})",
+            f"  y= (-{(self.amax[1] * 0.5)}..-{(self.amin[1] * 0.5)})"
+            f"..({(self.amin[1] * 0.5)}..{(self.amax[1] * 0.5)})",
+            f"  z= ({(-self.amax[2])}..{(-self.amin[2])})",
+            "indent:",
+            f"  {self.indent}",
+            "delta:",
+            f"  {self.delta}",
+        ]
+
+
+sch = SearchConstraint(
     # minimum size expected
     amin=p2g.Const(x=8.0, y=4.0, z=1.0),
     # maximum size expected
-    amax=p2g.Const(x=16.0, y=9.0, z=3.0),
+    amax=p2g.Const(x=16.0, y=9.0, z=3.2),
     delta=p2g.Const(x=1.0, y=1.0),
-    above=defs.MABS_ABOVE_VICE,
+    above=usr.MABS_ABOVE_VICE,
 )
-
-
-def no_lookahead():
-    p2g.no_lookahead()
 
 
 # describe relationship between x&y and left,right,far,near
@@ -40,25 +132,34 @@ dinfo = {
 }
 
 
+def show3(v):
+    return f"{v:###.####?, }"
+
+
 def find_top(wcs):
     p2g.comment("find top z roughly.")
 
-    defs.goto(z=0)
+    usr.goto(z=0)
 
     p2g.comment("just above workpiece surface.")
-    defs.goto_down(sch.above)
+    usr.goto_down(sch.above)
 
     # fast find move down to min search distance
-    defs.fast_work_probe(z=sch.above.z + sch.zslack)
+    usr.fast_work_probe(z=sch.above.z + sch.zslack)
 
     p2g.com("make wcs become ~0,0,0 at tdc")
-    wcs.xyz = +haas.SKIP_POS
+    wcs.xyz = +p2g.haas.SKIP_POS
 
-    defs.goto(z=sch.skim)
+    usr.goto(z=sch.skim)
     p2g.comment(
         "now work.xyz should be 0, with z at skim",
         "distance, physically roughly tdc",
     )
+    print("first estimate:")
+    print(f"wcs now       {wcs[:2]:###.####?, }")
+
+
+#    {wcs.x:5.2f}{wcs.y:5.2f}{wcs.z:5.2f}")
 
 
 # finds the edge asked for by st and sch using
@@ -90,24 +191,29 @@ def fast_find(edge_name):
         " then done.",
     )
 
-    defs.optional_pause(f"top of {di.name}")
+    usr.optional_pause(f"top of {di.name}")
     # move the interesting dimension to at least the minimum
     # distance for an edge.
-    defs.goto_up(sch.amin.xy * di.dxdy * 0.5, z=sch.skim)
+
+    usr.goto_up(sch.amin.xy * di.dxdy * 0.5, z=sch.skim)
+
     while its > 0:
-        defs.goto_rel(delta.xy)
-        defs.fast_work_probe(z=sch.search_depth)
-        if haas.SKIP_POS.z < sch.found_if_below:
+        usr.goto_rel(delta.xy)
+        usr.fast_work_probe(z=sch.search_depth)
+        if p2g.haas.SKIP_POS.z < sch.found_if_below:
             break
-        defs.goto(z=sch.skim)
+        usr.goto(z=sch.skim)
         its -= 1
     else:
-        defs.alarm(f"search for {di.name} failed")
+        usr.alarm(f"search for {di.name} failed")
 
 
 # backoff from the direction being inspected
-# for a slow approach.
-def backoff_and_slow_probe(edge_name, error):
+# then probe fast towards the edge, backoff and
+# then probe slowly.
+
+
+def backoff_and_fast_then_slow_probe(edge_name, error):
     di = dinfo[edge_name]
     p2g.comment(
         f"Accurately find {di.name} edge: ",
@@ -116,12 +222,21 @@ def backoff_and_slow_probe(edge_name, error):
         f" Slowly probe towards the {di.opposite}",
         " edge.",
     )
-    defs.goto(z=sch.search_depth)
-    defs.goto_rel(sch.backoff.xy * di.dxdy)
-    defs.slow_rel_probe(xy=-sch.indent.xy * di.dxdy)
+    # away from edge.
+    usr.goto_rel(sch.backoff.xy * di.dxdy)
+    # back to nominal search for edge height.
+    usr.goto(z=sch.search_depth)
+    # fast towards edge
+    usr.fast_rel_probe(xy=-sch.indent.xy * di.dxdy)
+    # backoff a little
+    usr.goto_rel(sch.backoff.xy * di.dxdy)
+    # and slowly find edge.
+    usr.slow_rel_probe(xy=-sch.indent.xy * di.dxdy)
+
     # no need to adjust by probe_r, since errors will
     # cancel out.
-    error[di.cur_axis] += haas.SKIP_POS[di.cur_axis]
+    error[di.cur_axis] += p2g.haas.SKIP_POS[di.cur_axis]
+    print(f"at {edge_name.ljust(5)} error {error:###.####?, }")
 
 
 def move_above_and_inwards(edge_name):
@@ -132,16 +247,16 @@ def move_above_and_inwards(edge_name):
         " Move towards center.",
     )
 
-    defs.goto_rel(sch.backoff.xy * di.dxdy)
-    defs.goto(z=sch.skim)
-    defs.goto_rel(-sch.indent.xy * di.dxdy)
+    usr.goto_rel(sch.backoff.xy * di.dxdy)
+    usr.goto(z=sch.skim)
+    usr.goto_rel(-sch.indent.xy * di.dxdy)
 
 
 def find_edge(edge_name, error):
 
-    with p2g.BSS():
+    with sys.BSS():
         fast_find(edge_name)
-        backoff_and_slow_probe(edge_name, error)
+        backoff_and_fast_then_slow_probe(edge_name, error)
         move_above_and_inwards(edge_name)
 
 
@@ -151,7 +266,7 @@ def find_edges(error):
     find_edge("left", error)
     find_edge("near", error)
     find_edge("far", error)
-    defs.goto(0, 0)
+    usr.goto(0, 0)
     find_edge("right", error)
 
 
@@ -172,32 +287,30 @@ def calc_center(wcs, error):
     )
 
     wcs.xy += error.xy / 2.0
-    defs.goto(0, 0)
-
+    usr.goto(0, 0)
     p2g.comment(" final slow probe to find the surface z")
-    defs.slow_rel_probe(z=sch.search_depth)
-    wcs.z += haas.SKIP_POS.z
-    defs.goto(z=1)
-    defs.pause(" what changed")
+    usr.slow_work_probe(z=sch.search_depth)
+    wcs.z += p2g.haas.SKIP_POS.z
+    print(f"wcs done      {wcs[:3]:###.####?, }")
+    usr.goto(z=1)
 
 
 def vicecenter():
+    p2g.Control.emacsclient = True
+    p2g.Control.symbol_table = True
     p2g.comment(
         "Find center of plate in vice,",
-        *sch.comment,
+        *sch.comment(),
     )
-    p2g.Control.symbol_table = True
+
     with (
-        p2g.WCS(haas.G55) as wcs,
-        defs.Probe(),
+        sys.WCS(p2g.haas.G55) as wcs,
+        usr.Probe(),
+        p2g.sys.Lookahead(False),
     ):
         # start with g55 same as machine coords.
-        haas.G55.xyz = (0, 0, 0)
+        p2g.haas.G55.xyz = (0, 0, 0)
         error = p2g.Var[2](0, 0)
-
-        find_top(wcs)
-        find_edges(error)
-        calc_center(wcs, error)
 
         find_top(wcs)
         find_edges(error)

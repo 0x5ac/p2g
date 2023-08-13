@@ -8,6 +8,7 @@ from p2g import err
 from p2g import gbl
 from p2g import nd
 from p2g import scalar
+from p2g import stat
 from p2g import symbol
 from p2g import vector
 
@@ -17,6 +18,12 @@ ScalarScalar = typing.Union[scalar.Scalar, int, float, bool]
 
 op_byclass: typing.Dict[typing.Any, nd.Opinfo] = {}
 allops: typing.Dict[str, nd.Opinfo] = {}
+
+
+def get_constant(node):
+    if isinstance(node, scalar.Constant):
+        return node
+    return None
 
 
 def parensif(cond, thing):
@@ -29,22 +36,86 @@ def get_prec(thing):
     return getattr(thing, "prec", 20)
 
 
+class Unop(scalar.Scalar):
+    def __init__(self, opfo, child):
+        super().__init__(opfo)
+        self.child = child
+
+    def get_address(self):
+        return self.child
+
+    def same(self, other):
+        return self.opfo == other.opfo and gbl.same(self.child, other.child)
+
+    def to_gcode(self, modifier=nd.NodeModifier.EMPTY):
+        res = []
+        if self.opfo.pyn == "#":
+            try:
+                addr = int(self.child)
+                symbol.Table.add_varref(addr, gbl.iface.last_node)
+            except TypeError:
+                pass
+
+        outer_prec = self.opfo.prec
+
+        res.append(self.opfo.gname)
+        # at least # is left right associative.
+        inside_prec = get_prec(self.child)
+
+        if self.opfo.pyn == "#":
+            modifier |= nd.NodeModifier.ADDRESS
+
+        res.append(
+            parensif(
+                outer_prec >= inside_prec,
+                nd.to_gcode(self.child, modifier),
+            )
+        )
+
+        return "".join(res)
+
+    def __repr__(self):
+        return f"[{self.opfo.pyn} {self.child}]"
+
+
+def get_unop(node):
+    if isinstance(node, Unop):
+        return node
+    return None
+
+
+def get_nelements(node):
+    if isinstance(node, vector.Vec):
+        return node.nelements()
+
+    return 1
+
+
+def hashop(arg):
+    return Unop(allops["#"], arg)
+
+
+# make sure that whatever expression is in node
+# ends up in a macro variable on
+
+
+def reload(node: scalar.Scalar):
+    unop = get_unop(node)
+    if unop and unop.opfo.pyn == "#":
+        if get_constant(unop.child):
+            return node
+    tmpaddr = gbl.iface.next_bss(1)
+    tmpreg = hashop(tmpaddr)
+    stat.append_set(tmpreg, node)
+    return tmpreg
+
+
 class Binop(scalar.Scalar):
     def __init__(self, opfo, lhs, rhs):
         super().__init__(opfo)
         assert opfo.pyn != "-rev"
         self.lhs = lhs
         self.rhs = rhs
-
-    def rtl_get_arg_(self, idx):
-        if idx == 0:
-            return self.opfo
-        if idx == 1:
-            return self.lhs
-        return self.rhs
-
-    def rtl_arg_info_(self):
-        return ["opfo", "exp", "exp"]
 
     def same(self, other):
         return (
@@ -54,6 +125,11 @@ class Binop(scalar.Scalar):
         )
 
     def to_gcode(self, modi: nd.NodeModifier) -> str:
+
+        if modi == nd.NodeModifier.ARGUMENT:
+
+            return parensif(True, self.to_gcode(nd.NodeModifier.EMPTY))
+
         if self.opfo.g_func:
             res = [
                 nd.to_gcode(self.lhs, modi),
@@ -75,8 +151,6 @@ class Binop(scalar.Scalar):
         res.append(self.opfo.gname)
         res.append(handle_term(self.rhs))
 
-        if modi & nd.NodeModifier.NOSPACE:
-            return "".join(res)
         return " ".join(res)
 
     def __repr__(self):
@@ -128,56 +202,6 @@ def opt_func(opfo, arg) -> OptRes:
     return scalar.wrap_scalar(opfo.lam(arg.to_float()))
 
 
-class Unop(scalar.Scalar):
-    def __init__(self, opfo, child):
-        super().__init__(opfo)
-        self.child = child
-
-    def get_address(self):
-        return self.child
-
-    def rtl_get_arg_(self, idx):
-        if idx == 0:
-            return self.opfo
-        return self.child
-
-    def rtl_arg_info_(self):
-        return ["opfo", "exp"]
-
-    def same(self, other):
-        return self.opfo == other.opfo and gbl.same(self.child, other.child)
-
-    def to_gcode(self, modifier=nd.NodeModifier.EMPTY):
-        res = []
-        if self.opfo.pyn == "#":
-            try:
-                addr = int(self.child)
-                symbol.Table.add_varref(addr, err.state.last_pos)
-            except TypeError:
-                pass
-
-        outer_prec = self.opfo.prec
-
-        res.append(self.opfo.gname)
-        # at least # is left right associative.
-        inside_prec = get_prec(self.child)
-
-        if self.opfo.pyn == "#":
-            modifier |= nd.NodeModifier.ADDRESS
-
-        res.append(
-            parensif(
-                outer_prec >= inside_prec,
-                nd.to_gcode(self.child, modifier),
-            )
-        )
-
-        return "".join(res)
-
-    def __repr__(self):
-        return f"[{self.opfo.pyn} {self.child}]"
-
-
 def make_scalar_unop(opfo, child: ScalarScalar):
     child = scalar.wrap_scalar(child)
     if opfo.opt and (res := opfo.opt(opfo, child)) is not None:
@@ -190,6 +214,10 @@ def make_scalar_unop(opfo, child: ScalarScalar):
 
 
 def make_vec_binop(opfo, lhs, rhs=None, force_ourtype=False):
+
+    # is doesn't have dunder method.
+    if opfo.pyn == "is":
+        return lhs is rhs
 
     if not force_ourtype and not isinstance(lhs, (int, float, nd.EBase)):
         return getattr(lhs, opfo.mth)(rhs)
@@ -330,7 +358,7 @@ def opt_eq(opfo, lhs: scalar.Scalar, rhs: scalar.Scalar) -> OptRes:
     return None
 
 
-def opt_matmul(_opfo, _lhs, _rhs) -> OptRes:  # for debug
+def opt_matmul(_opfo, _lhs, _rhs) -> OptRes:  # no cover
     return None
 
 
@@ -348,21 +376,6 @@ def opt_add(opfo, lhs, rhs) -> OptRes:
             return lhs
 
     return None
-
-
-def make_fmt(val, fmt):
-    if isinstance(val, str):
-        return val
-    val = scalar.wrap_scalar(val)
-    if isinstance(val, scalar.Constant):
-        if fmt and fmt[-1] == "x":
-            return format(val.to_int(), fmt)
-        if fmt and fmt[-1] == "i":
-            return format(val.to_int(), fmt[:-1])
-        return format(val.to_float(), fmt)
-    gfmt = f"[{fmt[0]}{fmt[2]}]" if fmt else ""
-
-    return "[" + nd.to_gcode(val, nd.NodeModifier.NOSPACE) + "]" + gfmt
 
 
 def opt_sub(opfo, lhs, rhs) -> OptRes:
@@ -394,10 +407,6 @@ def make_slice(low, high, step):
         unwrap_int(high),
         unwrap_int(step),
     )
-
-
-def hashop(arg):
-    return Unop(allops["#"], arg)
 
 
 # breakpoint()
@@ -458,6 +467,7 @@ regfunc("sqrt", math.sqrt)
 regfunc("exists", id)
 regfunc("fup", math.ceil)
 regfunc("fix", math.floor)
+regfunc("max", max)
 regfunc("ground", round)
 
 
@@ -488,7 +498,6 @@ reg(astc=ast.Invert, pyn="un~" , mth="__invert__", gname="un~", prec=14, nargs=1
 reg(astc=ast.Not   , pyn="unot", mth=""       , gname="unot"  , prec=14, nargs=1, opt=opt_not)
 reg(astc=None      , pyn="abs" , mth="__abs__", gname="ABS"   , prec=15, nargs=1, g_func=True)
 reg(astc=None      , pyn="#"   , mth=""       , gname="#"     , prec=19, nargs=1)
-
-
+reg(astc=ast.Is    , pyn="is"  , mth=""       , gname="IS"    , prec=19, nargs=2)
 # fmt:on
 vector.local_hashop = lambda x, y: hashop(make_scalar_add(x, y))

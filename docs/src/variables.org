@@ -1,0 +1,59 @@
+
+* Variables
+:PROPERTIES:
+:CUSTOM_ID: variables
+:END:
+
+ + Give names to macro variables at a known address:
+
+   =Fixed= ❰ =[= /size/ =]= ❱_{opt} (=addr== /addr/ ❰ =,= /init/ ... ❱_{opt} =)=
+
+ + Give names to macro variables automatically per function.
+
+   =Var= ❰ =[= /size/ =]= ❱_{opt} (❰ =,= /init/ ... ❱_{opt} =)=
+
+ + Not actually a variable, but same syntax.
+
+   =Const= ❰ =[= /size/ =]= ❱_{opt} (❰ =,= /init/ ... ❱_{opt} =)=
+
+Example:
+#+name: variables1
+#+begin_src python -i  :results output :exports both :python poetry run p2g   -
+
+from p2g import *  # this is the common header
+
+def variables():
+    # On my machine, Renishaw skip positions are
+    # in 5061, 5062, 5063.  Look in p2g.haas.py
+    # for : SKIP_POS = p2g.Fixed[20](addr=5061)
+    skip0 = haas.SKIP_POS
+
+    # can be done manualy too.
+    skip1 = Fixed[3](addr=5061)
+
+    # grab 5041.. from globals oto.
+    workpos = haas.WORK_POS
+    tmp0 = Var(skip0.xyz * 2.0 + workpos + skip1)
+
+    com("Define a constant ")
+    above_tdc = Const(111, 222, 3331)
+
+    com("Use it. ")
+    tmp0 += above_tdc  + 3
+
+#+end_src
+⇨ =p2g variables.py= ⇨
+#+results: variables1
+#+begin_example
+O0001 (variables: 0.3.6)
+  #100= #5061 * 2. + #5041 + #5061( tmp0 = Var[skip0.xyz * 2.0 + workpos + skip1])
+  #101= #5062 * 2. + #5042 + #5062
+  #102= #5063 * 2. + #5043 + #5063
+( Define a constant  )
+( Use it.  )
+  #100= #100 + 114.               ( tmp0 += above_tdc  + 3        )
+  #101= #101 + 225.
+  #102= #102 + 3334.
+  M30
+%
+#+end_example

@@ -14,6 +14,12 @@ class Vec(nd.EBase, nd.FakeOps):
     def __init__(self):
         pass
 
+    def __div__(self, other):
+        pass  # no cover
+
+    def __mult__(self, other):
+        pass  # no cover
+
     @abc.abstractmethod
     def nelements(self) -> int:
         ...
@@ -110,7 +116,7 @@ class TupleV(Vec):
     def __iter__(self):
         yield from self._guts
 
-    def __str__(self):
+    def __str__(self):  # no cover
         return ", ".join(map(str, self._guts))
 
 
@@ -141,10 +147,11 @@ class MemVec(Vec):
 
     def to_symtab_entry(self, varrefs) -> typing.Tuple[symbol.Group, str]:
         fwidth = 7
-        hit_indexes = {}
+        hit_indexes: dict[int, bool] = {}
         for el, addr in enumerate(scalar.urange(self._addr, self._addr + self._size)):
             if addr in varrefs:
                 hit_indexes[el] = True
+
         if hit_indexes and max(hit_indexes) >= len(axis.NAMES):
             return symbol.Group.VECTOR, f"#{self._addr}[{self._size}]".rjust(fwidth)
         res = []
@@ -216,7 +223,8 @@ def wrap(thing) -> typing.Union[Vec, scalar.Scalar]:
 def wrap_mustbe_vector(src):
     if isinstance(src, Vec):
         return src
-    err.compiler("Only vectors have addresses.")
+
+    raise err.CompilerError("Only vectors have addresses.")
 
 
 symbol.HasToSymTabEntry.register(MemVec)

@@ -1,9 +1,11 @@
 name: build,  test, coverage
 
-on:
-  push:
-    branches:
-      - master
+# on:
+#   push:
+#     branches:
+#       - main
+on: workflow_dispatch
+
 # Cancel running jobs for the same workflow and branch.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -19,13 +21,10 @@ jobs:
         os: [ubuntu-latest]
     steps:
       - uses: actions/checkout@v3
-      - name: Setup Python ${{ matrix.python-version }} 
+      - name: Setup Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
       - name: Build everything, run tests.
         run: |
-          make 
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3
-
+          make

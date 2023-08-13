@@ -1,0 +1,58 @@
+* Usage
+:PROPERTIES:
+:CUSTOM_ID: usage
+:END:
+
+#+name: usage
+#+begin_src python -i  :results output :exports both  :python poetry run p2g help
+
+#+end_src
+
+#+RESULTS: usage
+#+begin_example
+p2g - Turn Python into G-Code.
+
+Usage:
+  p2g [options]  <srcfile> [<dstfile>]
+  p2g help [ all | topics | maint | version | location | <topic> ]
+  p2g examples <dstdir>
+
+   For bare p2g:
+       p2g tram-rotary.py ~/_nc_/O{countdown}tr.nc
+        Makes an output of the form ~/_nc_/O1234tr.nc
+
+       p2g --func=thisone -
+        Read from stdin, look for the 'thisone' function and write to
+        to stdout.
+
+
+Arguments:
+  <srcfile>   Source python file. [default: stdin]
+  <dstfile>   Destination G-Code file. [default: stdout]
+               {countdown} in file name creates a decrementing prefix
+               for the output file which makes looking for the .nc in
+               a crowded directory less painful - it's at the top.
+               (It's the number of seconds until midnight, so clear
+               the directory once a day.)
+  <topic>      [ all | topics | maint | version | location | <topic> ]
+         all      Print all readme.
+         topics   List all topics.
+         maint    Print maintenance options.
+         version  Show version
+         location Show absdir of main
+         <topic>  Print from readme starting at topic.
+
+
+
+
+Options:
+     --job=<jobname>      Olabel for output code.
+     --function=<fname>   Function to be compiled,
+                           default is last one in source file.
+     --narrow             Emit comments on their own line,
+                           makes text fit more easily into
+                           a narrow program window.
+     --short-filenames    Emit just the lsb of filenames.
+#+end_example
+
+

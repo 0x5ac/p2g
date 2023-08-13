@@ -1,0 +1,84 @@
+* Axes
+:PROPERTIES:
+:CUSTOM_ID: axes
+:END:  
+
+Any number of axes are supported, default just being xy and z.
+# 
+A rotary on ac can be set with p2g.axis.NAMES="xyza*c".
+The axis letters should be the same order as your machine expects
+coordinates to turn up in work offset registers.
+
+#+name: axes1
+#+begin_src python -i  :results output :exports both  :python poetry run p2g   -
+import p2g
+from p2g.haas import *
+
+
+def a5():
+    p2g.axis.NAMES = "xyza*c"
+    p2g.com("rhs of vector ops get expanded as needed")
+    G55.var = [0, 1]
+    p2g.com("fill yz and c with some stuff")
+    tmp1 = p2g.Const(y=3, z=9, c=p2g.asin(0.5))
+    p2g.com(
+        "Unmentioned axes values are assumed", "to be 0, so adding them makes no code."
+    )
+    G55.var += tmp1
+    p2g.com("")
+    G55.ac *= 2.0
+
+    p2g.com("Rotaries.")
+    p4 = p2g.Fixed[6](addr=200)
+    p4.a = 180
+    p4.c = p2g.asin(0.5)
+
+
+def a3():
+    # xyz is the default.
+    # but overridden because a5 called first, so
+    p2g.axis.NAMES = "xyz"
+    p2g.com("Filling to number of axes.")
+    G55.var = [0]
+    tmp = p2g.Var(G55 * 34)
+
+
+def axes():
+    a5()
+    a3()
+#+end_src     
+⇨ ~p2g axes.py~ ⇨
+#+results: axes1
+#+begin_example
+O0001 (axes: 0.3.6)
+( rhs of vector ops get expanded as needed )
+  #5241= 0.                       ( G55.var = [0, 1]              )
+  #5242= 1.
+  #5243= 0.
+  #5244= 1.
+  #5245= 0.
+  #5246= 1.
+( fill yz and c with some stuff )
+( Unmentioned axes values are assumed    )
+( to be 0, so adding them makes no code. )
+  #5242= #5242 + 3.               ( G55.var += tmp1               )
+  #5243= #5243 + 9.
+  #5246= #5246 + 30.
+
+  #5244= #5244 * 2.               ( G55.ac *= 2.0                 )
+  #5246= #5246 * 2.
+( Rotaries. )
+  #203= 180.                      ( p4.a = 180                    )
+  #205= 30.                       ( p4.c = asin[0.5]              )
+( Filling to number of axes. )
+  #5241= 0.                       ( G55.var = [0]                 )
+  #5242= 0.
+  #5243= 0.
+  #100= #5241 * 34.               ( tmp = Var[G55 * 34]           )
+  #101= #5242 * 34.
+  #102= #5243 * 34.
+  M30
+%
+#+end_example
+
+

@@ -35,6 +35,12 @@ def write_func(tmpdir: pathlib.Path, src):
     return tmpfile
 
 
+def check_version_str(vstr):
+    parts = vstr.split(".")
+    assert len(parts) > 2
+    assert parts[0].isdigit()
+
+
 def test_bad_syntax(capfd, tmpdir):
     tmpfile = write_func(tmpdir, bad)
 
@@ -55,14 +61,8 @@ def test_native_job_capfd_tmpdir_stdout(capfd, tmpdir):
     assert "O123" in tmpdata.out
 
 
-def check_version_str(vstr):
-    parts = vstr.split(".")
-    assert len(parts) > 2
-    assert parts[0].isdigit()
-
-
 def test_native_version_capfd(capfd):
-    sys.argv = ["p2g", "--version"]
+    sys.argv = ["p2g", "help", "version"]
 
     main()
     got = capfd.readouterr()
@@ -96,7 +96,7 @@ def make_inout(tmpdir):
 
 
 def test_native_cli_tmpdir_examples(tmpdir):
-    main(["--examples", str(tmpdir)])
+    main(["examples", str(tmpdir)])
     assert (tmpdir / "vicecenter.py").exists()
 
 
@@ -173,13 +173,13 @@ def test_native_capfd_tmpdir_stdout0(capfd, tmpdir):
 
 
 def test_native_logger_capfd_setup(capfd):
-    main(["--version"])
+    main(["help", "version"])
     got = capfd.readouterr()
     check_version_str(got.out)
 
 
 def test_native_capfd_location(capfd):
-    main(["--location"])
+    main(["help", "location"])
     got = capfd.readouterr()
     assert "p2g" in got.out
 
@@ -192,41 +192,41 @@ def test_native_capfd_location(capfd):
 def test_native_capfd_nf(capfd):
     assert main(["nothere.py"]) != 0
     got = capfd.readouterr()
-    assert "File 'nothere.py' not found." in got.err
+    assert "No such file or directory: 'nothere.py'" in got.err
 
 
 def test_native_capfd_help(capfd):
-    main(["--help"])
+    main(["help"])
     got = capfd.readouterr()
     assert "Usage" in got.out
 
 
 def test_native_capfd_doc0(capfd):
-    main(["--help", "all"])
+    main(["help", "all"])
     got = capfd.readouterr()
-    assert "Many styli" in got.out
+    assert "Stumpy" in got.out
 
 
 def test_native_capfd_doc1(capfd):
-    main(["--help", "maint"])
+    main(["help", "maint"])
     got = capfd.readouterr()
     assert "--break" in got.out
 
 
 def test_native_doc_no_where(capfd):
-    main(["--help"])
+    main(["help"])
     got = capfd.readouterr()
     assert "Usage:" in got.out
 
 
 def test_native_doc_no_where1(capfd):
-    main(["--help", "bad"])
+    main(["help", "bad"])
     got = capfd.readouterr()
     assert "bad not found" in got.out and "coordinates" in got.out
 
 
 def test_native_doc_no_where2(capfd):
-    main(["--help", "topics"])
+    main(["help", "topics"])
     got = capfd.readouterr()
     assert "not found" not in got.out and "coordinates" in got.out
 

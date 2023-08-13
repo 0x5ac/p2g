@@ -1,0 +1,52 @@
+* Symbol Tables
+:PROPERTIES:
+:CUSTOM_ID: symboltables
+:END:
+
+Set the global ~p2g.Control.symbol_table~ to get a symbol
+table in the output file.
+
+#+name: symbol_table_demo
+#+begin_src python -i :results output :exports both :python poetry run p2g     -
+import p2g
+x1 = -7
+MACHINE_ABS_ABOVE_OTS = p2g.Const(x=x1, y=8, z=9)
+MACHINE_ABS_ABOVE_SEARCH_ROTARY_LHS_5X8 = p2g.Const(100, 101, 102)
+MACHINE_ABS_ABOVE_VICE = p2g.Const(x=17, y=18, z=19)
+RAW_ANALOG = p2g.Fixed[10](addr=1080)
+fish = 10
+not_used = 12
+
+def symbol_table_demo():
+      p2g.Control.symbol_table = True    
+      p2g.comment("Only used symbols are in output table.")
+      p2g.Var(MACHINE_ABS_ABOVE_OTS)
+      p2g.Var(MACHINE_ABS_ABOVE_VICE * fish)
+      v1 = p2g.Var()
+      v1 += RAW_ANALOG[7]
+#+end_src  
+⇨ =p2g symbol_table_demo.py= ⇨
+#+results: symbol_table_demo
+#+begin_example
+O0001 (symbol_table_demo: 0.3.6)
+( Symbol Table )
+
+ ( MACHINE_ABS_ABOVE_OTS                   :  -7.000,  8.000,  9.000 )
+ ( MACHINE_ABS_ABOVE_SEARCH_ROTARY_LHS_5X8 : 100.000,101.000,102.000 )
+ ( MACHINE_ABS_ABOVE_VICE                  :  17.000, 18.000, 19.000 )
+
+ ( RAW_ANALOG                              : #1080[10]               )
+ ( v1                                      :  #106.x                 )
+
+
+( Only used symbols are in output table. )
+  #100= -7.                       (   Var[MACHINE_ABS_ABOVE_OTS]  )
+  #101= 8.
+  #102= 9.
+  #103= 170.                      (   Var[MACHINE_ABS_ABOVE_VICE * fish])
+  #104= 180.
+  #105= 190.
+  #106= #106 + #1087              (   v1 += RAW_ANALOG[7]         )
+  M30
+%
+#+end_example

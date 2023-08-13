@@ -1,0 +1,111 @@
+* When
+:PROPERTIES:
+:CUSTOM_ID: when
+:END:
+
+'when' works as in python, save there are no exceptions;
+useful for turning on probing and magically getting it turned
+off,.  Or setting and restoring the wcs etc etc (look in p2g/sys.py)
+
+
+** Setting and resetting lookahead.
+
+#+name: when_lookahead
+#+begin_src python -i  :results output :exports both  :python poetry run p2g   -
+import p2g
+
+def start():
+    p2g.comment ("turn  off lookahead before the probe")
+    with p2g.sys.Lookahead(lookahead = False) :
+         p2g.goto.probe.work.feed(20).z_first(z = -10)
+
+    p2g.comment("back here.")
+    p2g.goto.work.feed(200).z_first(z = 10)
+
+    p2g.comment ("ask to turn it on, it's already on,",
+                 "so doesn't emit the code again.")
+
+    with p2g.sys.Lookahead(lookahead = True) :
+         p2g.goto.machine.feed(20).xyz(1,32,3)
+
+
+#+end_src
+⇨ ~p2g when_lookahead.py~ ⇨
+#+RESULTS: when_lookahead
+#+begin_example
+O0001 (start: 0.3.6)
+
+( turn  off lookahead before the probe )
+  M97 P123                        ( with sys.Lookahead[lookahead = False] :)
+  G90 G31 G55 F20. z-10.          (      goto.probe.work.feed[20].z_first[z = -10])
+  G103
+
+( back here. )
+  G90 G01 G55 F200. z10.          ( goto.work.feed[200].z_first[z = 10])
+
+( ask to turn it on, it's already on, )
+( so doesn't emit the code again.     )
+(      goto.machine.feed[20].xyz[1,32,3])
+  G90 G53 G01 G55 F20. x1. y32. z3.
+  M30
+N123
+  G103 P1
+  G04 P1
+  G04 P1
+  G04 P1
+  G04 P1
+  M99
+%
+#+end_example
+
+Here's setting and resetting block delete, the code 'when' code is already
+in p2g.sys.Optional
+
+#+name: when_demo_block_delete
+#+begin_src python -i  :results output :exports both  :python poetry run p2g   -
+import p2g
+from p2g import haas
+
+PROBE = 1
+
+class Optional:
+    prev: str
+    def __init__(self):
+        self.prev = p2g.gbl.Control.code_prefix
+        p2g.gbl.Control.code_prefix = "/"
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, *_):
+       p2g.gbl.Control.code_prefix = self.prev
+
+class Probe:
+    def __enter__(self):
+        p2g.sys.load_tool(PROBE)
+        p2g.codenl(haas.SPINDLE_PROBE_ON, comment_txt="Probe on.")
+
+    def __exit__(self, *_):
+        p2g.codenl(haas.SPINDLE_PROBE_OFF, comment_txt="Probe off.")
+
+
+def when_demo_block_delete():
+    with Probe():
+        tmp = p2g.Var(9)
+        with Optional():
+            tmp.var += 91
+        p2g.sys.print(f"tmp is {tmp}")
+
+
+#+end_src
+
+#+RESULTS: when_demo_block_delete
+: O0001 (when_demo_block_delete: 0.3.6)
+:   T01 M06                         (     sys.load_tool[PROBE]      )
+:   G65 P9832                       ( Probe on.                     )
+:   #100= 9.                        (     tmp = Var[9]              )
+: /  #100= #100 + 91.               (         tmp.var += 91         )
+: DPRNT[tmp*is*#100[42]]
+:   G65 P9833                       ( Probe off.                    )
+:   M30
+: %

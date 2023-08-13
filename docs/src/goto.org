@@ -1,0 +1,114 @@
+
+* Goto
+:PROPERTIES:
+:CUSTOM_ID: goto
+:END:
+
+Goto functions are constructed from parts, and make
+building  blocks when partially applied.
+
+*goto* [ . «modifier» ]⋆   *(* «coordinates» *)*
+
+  «modifier» :
+    - =r9810=
+         Use Renishaw macro 9810 to do a protected positioning cycle.
+    - =work=
+         Use current work coordinate system. - whatever set with set_wcs
+    - =machine=
+         Use the machine coordinate system - G53
+    - =relative=
+         Use relative coordinate system - G91
+    - =absolute=
+         Use absolute coordinate system - G90
+    - =z_first=
+         move Z axis first.
+    - =z_last=
+         move the other axes bef1ore the Z.
+    - =probe=
+         Emit probe code using G31.
+    - =xyz=
+         Move all axes at once.
+    - =feed(= /expr/ =)=
+         Set feed rate.
+    - =mcode(= /string/ =)=
+         Apply an mcode.
+     
+
+#+name: goto_demo
+#+begin_src python -i :results output :exports both :python poetry run p2g     -
+from p2g import *
+
+def goto_demo():
+    g1 = goto.work.feed(20).all
+
+    comment("in work cosys, goto x=1, y=2, z=3 at 20ips")
+    g1(1, 2, 3)
+
+    comment("make a variable, 2,3,4")
+    v1 = Var(x=2, y=3, z=4)
+
+    absslow = goto.machine.feed(10)
+
+    comment("In the machine cosys, move to v1.z then v1.xy, slowly")
+
+    absslow.z_first(v1)
+
+    comment("p1 is whatever absslow was, with feed adjusted to 100.")
+    p1 = absslow.feed(100)
+    p1.z_last(v1)
+
+    comment("p2 is whatever p1 was, with changed to a probe.")
+    p2 = p1.probe
+    p2.z_last(v1)
+
+    comment("move a and c axes ")
+    axis.NAMES = "xyza*c"
+    goto.feed(20).all.relative(a=9, c=90)
+
+    comment("probe with a hass MUST_SKIP mcode.")
+    goto.probe.feed(10).mcode("M79").relative.all(3, 4, 5)
+
+    comment("Define shortcut for safe_goto and use.")
+    safe_goto = goto.feed(27).r9810
+
+    safe_goto.z_first(1, 2, 3)
+#+end_src  
+⇨ =p2g goto_demo.py= ⇨
+#+results: goto_demo
+#+begin_example
+O0001 (goto_demo: 0.3.6)
+
+( in work cosys, goto x=1, y=2, z=3 at 20ips )
+  G90 G01 G55 F20. x1. y2. z3.    ( g1[1, 2, 3]                   )
+
+( make a variable, 2,3,4 )
+  #100= 2.                        ( v1 = Var[x=2, y=3, z=4]       )
+  #101= 3.
+  #102= 4.
+
+( In the machine cosys, move to v1.z then v1.xy, slowly )
+  G90 G53 G01 G55 F10. z#102      ( absslow.z_first[v1]           )
+  G90 G53 G01 G55 F10. x#100 y#101
+
+( p1 is whatever absslow was, with feed adjusted to 100. )
+( p1.z_last[v1]                 )
+  G90 G53 G01 G55 F100. x#100 y#101
+  G90 G53 G01 G55 F100. z#102
+
+( p2 is whatever p1 was, with changed to a probe. )
+( p2.z_last[v1]                 )
+  G90 G53 G31 G55 F100. x#100 y#101
+  G90 G53 G31 G55 F100. z#102
+
+( move a and c axes  )
+  G91 G01 G55 F20. a9. c90.       ( goto.feed[20].all.relative[a=9, c=90])
+
+( probe with a hass MUST_SKIP mcode. )
+  G91 G31 G55 M79 F10. x3. y4. z5.( goto.probe.feed[10].mcode["M79"].relative.all[3, 4, 5])
+
+( Define shortcut for safe_goto and use. )
+  G65 R9810 F27. z3.              ( safe_goto.z_first[1, 2, 3]    )
+  G65 R9810 F27. x1. y2.
+  M30
+%
+#+end_example

@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 import p2g
-import defs
+import usrlib as defs
 
 
 def probecalibrate():

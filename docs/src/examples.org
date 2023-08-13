@@ -1,0 +1,162 @@
+
+* Examples
+:PROPERTIES:
+:CUSTOM_ID: examples
+:END:
+
+for a show:
+#+begin_example
+$ p2g examples dstdir
+#+end_example
+
+-----
+** Simple demo
+:PROPERTIES:
+:CUSTOM_ID: simple-demo
+:END:
+
+
+echo "
+#+name: simpledem
+#+begin_src python -i  :results output :exports both  :python poetry run p2g -
+
+import p2g
+def simple_demo():
+  x = p2g.Var(199)
+  for y in range(10):
+    x += y
+
+#+end_src
+"
+  ⇨ =directly= ⇨
+
+#+results: simpledem
+#+begin_example
+O0001 (simple_demo: 0.3.6)
+  #100= 199.                      (   x = Var[199]                )
+  #102= 0.                        (   for y in range[10]:         )
+N1000
+  IF [#102 GE 10.] GOTO 1002      (   for y in range[10]:         )
+  #100= #100 + #102               ( x += y                        )
+  #102= #102 + 1.
+  GOTO 1000
+N1002
+  M30
+%
+#+end_example
+
+-----
+** Find largest number of flutes in tool table
+:PROPERTIES:
+:CUSTOM_ID: maxflutes
+:END:
+#+name: maxfluts1
+#+begin_src python -i  :results output :exports both  :python poetry run p2g -
+
+import p2g
+
+# stop with alarm code showing largest
+# flute count in table.
+def maxflutes():
+
+    mx_flutes = p2g.Var(p2g.haas.TOOL_TBL_FLUTES[0])
+    for n_flutes in p2g.haas.TOOL_TBL_FLUTES:
+        if n_flutes > mx_flutes:
+            mx_flutes = n_flutes
+
+    p2g.haas.MESSAGE.var = mx_flutes
+
+#+end_src
+  ⇨ =p2g maxflutes.py= ⇨
+#+RESULTS: maxfluts1
+#+begin_example
+O0001 (maxflutes: 0.3.6)
+  #100= #1601                     ( mx_flutes = Var[haas.TOOL_TBL_FLUTES[0]])
+  #101= 1601.                     ( for n_flutes in haas.TOOL_TBL_FLUTES:)
+N1000
+  IF [#101 GE 1801.] GOTO 1002    ( for n_flutes in haas.TOOL_TBL_FLUTES:)
+  IF [#[#101] LE #100] GOTO 1003  (     if n_flutes > mx_flutes:  )
+  #100= #[#101]                   (         mx_flutes = n_flutes  )
+  GOTO 1004
+N1003
+N1004
+  #101= #101 + 1.
+  GOTO 1000
+N1002
+  #3006= #100                     ( haas.MESSAGE.var = mx_flutes  )
+  M30
+%
+#+end_example
+
+-----
+** Less trivial example
+:PROPERTIES:
+:CUSTOM_ID: lesstrival
+:END:
+#+name: lesstrivial1
+#+begin_src python -i  :results output :exports both  :python poetry run p2g -
+from p2g import *
+from p2g.haas import *
+class SearchParams:
+    def __init__(self, name, search_depth, iota, delta):
+        self.name = name
+        self.its = 10
+        self.search_depth = search_depth
+        self.iota = iota
+        self.delta = delta
+        self.probe = goto.probe.work.feed(30).all
+        self.go = goto.feed(640).work.all
+
+
+def search(cursor, sch):
+    # stick from class SearchParams  iterations into macro var
+    its = Var(sch.its)
+    while its > 0:
+        # goto start point
+        sch.go(cursor)
+        # down until hit - or not.
+        sch.probe(z=sch.search_depth)
+        # if probe is below (+some slack) hit
+        # point, then done.
+        if SKIP_POS.z < sch.search_depth + sch.iota:
+            break
+        # otherwise move to next point
+        cursor.xy += sch.delta
+        its -= 1
+    else:
+        sys.message(ALARM[0], f"too far {sch.name}.")
+
+
+def less_trivial():
+    cursor = Var[3](2, 3, 4)
+    # searching right, look down 0.4", move
+    # 1.5" right if nothing hit.
+    sch1 = SearchParams(name="right", search_depth=-0.4, iota=-0.1, delta=(1.5, 0))
+    search(cursor, sch1)
+
+#+end_src
+  ⇨ =p2g less_trival.py= ⇨
+
+#+results: lesstrivial1
+#+begin_example
+O0001 (less_trivial: 0.3.6)
+  #100= 2.                        ( cursor = Var[3][2, 3, 4]      )
+  #101= 3.
+  #102= 4.
+  #103= 10.                       ( its = Var[sch.its]            )
+N1000
+  IF [#103 LE 0.] GOTO 1002       ( while its > 0:                )
+(     sch.go[cursor]            )
+  G90 G01 G55 F640. x#100 y#101 z#102
+  G90 G31 G55 F30. z-0.4          (     sch.probe[z=sch.search_depth])
+  IF [#5063 LT -0.5] GOTO 1001    (     if SKIP_POS.z < sch.search_depth + sch.iota:)
+  #100= #100 + 1.5                (     cursor.xy += sch.delta    )
+  #103= #103 - 1.                 (     its -= 1                  )
+  GOTO 1000
+N1002
+  #3000 = 101 (too far right.)
+N1001
+  M30
+%
+#+end_example
+

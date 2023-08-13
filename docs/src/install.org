@@ -1,0 +1,30 @@
+* Install
+:PROPERTIES:
+:CUSTOM_ID: install
+:END:
+
+
+** From pypi
+
+#+begin_example
+
+$ pip install p2g
+
+#+end_example
+
+** From github
+
+*** fetch dependencies, rebuild and install with pip
+
+#+begin_example
+$ git clone https://github.com/0x5ac/attempt1 p2g
+$ cd p2g
+$ make install
+#+end_example
+
+*** fetch dependencies and rebuild
+#+begin_example
+$ git clone https://github.com/0x5ac/attempt1 p2g
+$ cd p2g
+$ make
+#+end_example

@@ -10,6 +10,10 @@ def abs(_v) -> scalar.Scalar:  # no cover
     return scalar.ConstantNone()
 
 
+# def print(_v) -> scalar.ConstantNone:  # no cover
+#     return scalar.ConstantNone()
+
+
 def acos(_v) -> scalar.Scalar:  # no cover
     return scalar.ConstantNone()
 

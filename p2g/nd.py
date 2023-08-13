@@ -73,32 +73,6 @@ class FakeOps:
         return self  # no cover
 
 
-def to_rtl(self):
-    name = self.__class__.__name__
-
-    ainfo = self.rtl_arg_info_()
-    yield "(" + name + " "
-    assert isinstance(ainfo, list)
-    for idx, info in enumerate(ainfo):
-        yield info
-        arg = self.rtl_get_arg_(idx)
-        match info:
-            case "constant":
-                yield str(arg)
-            case "?string":
-                yield str(arg)
-            case "labeldef":
-                yield str(arg)
-            case "labelref":
-                yield str(arg)
-
-            case "opfo":
-                yield str(arg.pyn)
-            case _:
-                yield from to_rtl(arg)
-    yield ")"
-
-
 # common base class for scalar and vector.
 class EBase(abc.ABC, FakeOps):
     @abc.abstractmethod
@@ -111,23 +85,12 @@ class EBase(abc.ABC, FakeOps):
     def set_at(self, _idx, _src):
         raise NotImplementedError
 
-    # def rtl_arg_info_(self):
-    #     return [f"-exp-null-{self.__class__.__name__}"]
+    # just for typing sanity.
+    def __div__(self, other):
+        pass  # no cover
 
-    # def rtl_get_arg_(self, _idx):
-    #     return Null()
-
-
-# class Null(EBase):
-#     def everything(self) -> typing.Generator[typing.Any, None, None]:
-#         raise IndexError
-
-#     def rtl_arg_info_(self):
-
-#         return []
-
-#     def rtl_get_arg_(self, idx):
-#         raise IndexError
+    def __mult__(self, other):
+        pass  # no cover
 
 
 DECIMALS = 4
@@ -147,4 +110,5 @@ def to_gcode_from_float(thing, modifier=NodeModifier.EMPTY):
 def to_gcode(thing, modifier=NodeModifier.EMPTY) -> str:
     if isinstance(thing, (float, int)):
         return to_gcode_from_float(thing, modifier)
+
     return thing.to_gcode(modifier)

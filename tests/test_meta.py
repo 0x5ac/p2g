@@ -25,10 +25,11 @@ def tolist_worker():
 
 
 # TESTS BELOW
+########################################
 @want(
-    "O00001 (test_simple_ok)",
-    "  M30",
-    "%",
+    "O00001 (test_simple_ok)                           ",
+    "  M30                                             ",
+    "%                                                 ",
 )
 def test_simple_ok():
     print("WORKING")

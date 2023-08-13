@@ -35,8 +35,8 @@ def handle_assign(self, target, val):
                 src_gen = iter(src_togo[break_i:])
             else:
                 self.visit_store(dst_el, next(src_gen))
-    except StopIteration as exc:
-        err.compiler("Not enough values to unpack.", exc)
+    except StopIteration:
+        err.compiler("Not enough values to unpack.")
     ensure_no_more(src_gen)
 
 
@@ -77,6 +77,7 @@ class ItrRange:
             stat.Set(
                 scalar.wrap_scalar(self.var),
                 op.make_scalar_add(scalar.wrap_scalar(self.var), self.rang.step),
+                comment_txt=stat.CommentGen.NONE,
             )
         )
 
@@ -120,6 +121,7 @@ class ItrSlice:
             stat.Set(
                 scalar.wrap_scalar(self.ptr),
                 op.make_scalar_add(scalar.wrap_scalar(self.ptr), self.step),
+                comment_txt=stat.CommentGen.NONE,
             )
         )
 
@@ -129,7 +131,7 @@ def make_itr(itr, interp, target):
         return ItrSlice(itr, interp, target)
     if isinstance(itr, range):
         return ItrRange(itr, interp, target)
-    err.compiler("Illegal iterator.")
+    raise err.CompilerError("Illegal iterator.")
 
 
 def geniter(
@@ -147,7 +149,11 @@ def geniter(
         test = op.make_scalar_unop(op.a2opfo(ast.Not), self.visit(whileexp))
         stat.add_stat(stat.If(test, self.loop.lorelse))
         self.visit_slist(body)
-        stat.add_stat(stat.Goto(self.loop.lcontinue))
+        stat.add_stat(
+            stat.Goto(
+                self.loop.lcontinue,
+            ),
+        )
     else:
         assert itr
         itr = make_itr(itr, self, target)
@@ -166,8 +172,13 @@ def geniter(
         )
         itr.load_target()
         self.visit_slist(body)
+
         itr.next_index()
-        stat.add_stat(stat.Goto(self.loop.lcontinue))
+        stat.add_stat(
+            stat.Goto(
+                self.loop.lcontinue,
+            ),
+        )
     if orelse:
         stat.add_stat(stat.LabelDef(self.loop.lorelse))
         self.visit_slist(orelse)
@@ -252,10 +263,22 @@ class WalkStatement(walkbase.WalkBase):
             exp1 = op.make_scalar_unop(op.a2opfo(ast.Not), cond)
             stat.add_stat(stat.If(exp1, on_t=elsepart))
             self.visit_slist(node.body)
-            stat.add_stat(stat.Goto(donepart))
-            stat.add_stat(stat.LabelDef(elsepart))
+            stat.add_stat(
+                stat.Goto(
+                    donepart,
+                ),
+            )
+            stat.add_stat(
+                stat.LabelDef(
+                    elsepart,
+                ),
+            )
             self.visit_slist(node.orelse)
-            stat.add_stat(stat.LabelDef(donepart))
+            stat.add_stat(
+                stat.LabelDef(
+                    donepart,
+                ),
+            )
 
     def _visit_import(self, node):
         for name in node.names:

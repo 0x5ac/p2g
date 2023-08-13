@@ -1,0 +1,6 @@
+* Authors
+:PROPERTIES:
+:CUSTOM_ID: authors
+:END:
+
+sac@pobox.com

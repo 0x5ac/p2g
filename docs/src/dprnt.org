@@ -1,0 +1,147 @@
+* DPRNT
+:PROPERTIES:
+:CUSTOM_ID: dprnt
+:END:
+
+P2G turns Python f string into runes that DPRNT can digest.
+
+The conversion makes print operation on vectors easy.
+
+** DPRNT examples
+
+*** Constants
+#+name: dprnt_constants
+#+begin_src python -i :results output :exports both :python poetry run p2g     -
+import p2g
+def dprint_constants():
+    src = p2g.Const(12.34,2,3)
+    p2g.sys.print (f"A {src}")
+    p2g.sys.print (f"B {src:6.2}")
+    p2g.sys.print (f"C {src:a###.###b}")
+    p2g.sys.print (f"D {src:a###.###b?, }")
+#+end_src
+⇨ ~p2g dprnt_constants.py~ ⇨
+#+RESULTS: dprnt_constants
+: O0001 (dprint_constants: 0.3.6)
+: DPRNT[A***12.34***2.00***3.00]
+: DPRNT[B**12.34**2.00**3.00]
+: DPRNT[C*a*12.340ba**2.000ba**3.000b]
+: DPRNT[D*a*12.340b,*a**2.000b,*a**3.000b]
+:   M30
+: %
+
+*** Vectors
+#+name: dprnt_vectors
+#+begin_src python -i :results output :exports both :python poetry run p2g     -
+import p2g
+def dprint_vectors():
+    src = p2g.Fixed[2](addr=100)
+    p2g.sys.print (f"A {src}")
+    p2g.sys.print (f"B {src:6.2}")
+    p2g.sys.print (f"C {src:a###.###b}")
+    p2g.sys.print (f"D {src:a###.###b?, }")
+#+end_src
+⇨ ~p2g dprnt_vectors.py~ ⇨
+#+RESULTS: dprnt_vectors
+: O0001 (dprint_vectors: 0.3.6)
+: DPRNT[A*#100[42]#101[42]]
+: DPRNT[B*#100[32]#101[32]]
+: DPRNT[C*a#100[33]ba#101[33]b]
+: DPRNT[D*a#100[33]b,*a#101[33]b]
+:   M30
+: %
+*** In subroutines.
+#+name: dprnt_subs
+#+begin_src python -i :results output :exports both :python poetry run p2g     -
+import p2g
+
+def dprint_something(src):
+    p2g.sys.print (f"results: {src:j!###.#?, }")
+
+def dprnt_subs():
+    dprint_something(p2g.Fixed[2](addr=100))
+    dprint_something(p2g.Const[2](7.34,8.12))
+
+#+end_src
+⇨ ~p2g dprnt_subs.py~ ⇨
+#+RESULTS: dprnt_subs
+: O0001 (dprnt_subs: 0.3.6)
+: DPRNT[results:*j0#100[31],*j1#101[31]]
+: DPRNT[results:*j0**7.3,*j1**8.1]
+:   M30
+: %
+
+*** So painless.
+#+name: dprnt_painless
+#+begin_src python -i :results output :exports both :python poetry run p2g     -
+import p2g
+
+def dprnt_painless():
+    n = p2g.Fixed[10](addr=200)
+    for idx in range(10):
+        p2g.sys.print (f"this is row {idx:##}, el is {n[idx]:###.#}")
+
+#+end_src
+⇨ ~p2g dprnt_painless.py~ ⇨
+#+RESULTS: dprnt_painless
+#+begin_example
+O0001 (dprnt_painless: 0.3.6)
+  #101= 0.                        ( for idx in range[10]:         )
+N1000
+  IF [#101 GE 10.] GOTO 1002      ( for idx in range[10]:         )
+  #102= #[#101 + 200]             (     sys.print [f"this is row {idx:##}, el is {n[idx]:###.#}"])
+DPRNT[this*is*row*#101[20],*el*is*#102[31]]
+  #101= #101 + 1.
+  GOTO 1000
+N1002
+  M30
+%
+#+end_example
+*** Can use Python f-strings too.
+#+name: dprnt_std_python
+#+begin_src python -i :results output :exports both :python poetry run p2g     -
+from p2g import *
+from p2g.haas import *
+
+def dprnt_std_python():
+    x = Var(32)
+    y = Var(27)
+
+    for q in range(10):
+        sys.print(f"X is {x:3.1f}, Y+Q is {y+q:5.2f}")
+
+#+end_src
+⇨ ~p2g dprnt_std_python.py~ ⇨
+#+results: dprnt_std_python
+#+begin_example
+O0001 (dprnt_std_python: 0.3.6)
+  #100= 32.                       ( x = Var[32]                   )
+  #101= 27.                       ( y = Var[27]                   )
+  #103= 0.                        ( for q in range[10]:           )
+N1000
+  IF [#103 GE 10.] GOTO 1002      ( for q in range[10]:           )
+  #104= #101 + #103               (     sys.print[f"X is {x:3.1f}, Y+Q is {y+q:5.2f}"])
+DPRNT[X*is*#100[11],*Y+Q*is*#104[22]]
+  #103= #103 + 1.
+  GOTO 1000
+N1002
+  M30
+%
+#+end_example
+
+
+** Extended f-string syntax
+ - [  «digit» [ .«digit» ]﹖] *f* ::
+   standard Python floating point format.
+ - «e-string» [ «number-spec» ] «e-string» [ *?*  «separator-string» ]﹖]
+
+   - «e-string» ::
+     Text, with some characters substituted on output.
+       -   =!=      Index of element.
+       -   =@=      Axis name of element.
+
+   - «number-spec» ::
+     A picture describing the layout of the number to be printed using =#= signs.
+
+   - «separator-string» ::
+     As an «e-string», but only expanded between items.

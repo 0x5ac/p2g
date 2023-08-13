@@ -1,0 +1,27 @@
+* Maintenance
+:PROPERTIES:
+:CUSTOM_ID: video
+:END:
+
+** How to release.
++ take the red pill
++ modify p2g/VERSION
+ + make
+ + inspect log files for sanity.
+ + make sure youtube files linked correctly
+    in videos.org
+
+** How to make the video, before you forget.
+
+ + vnc to vf3, generic port 5900
+    gets info from vf3 monitor.
+
+ + vlc to cnccam.steveopolis.com
+    video from inside machine
+
+ + telnet to vf3 9192
+    connect to dprnt output from vf3
+
+ + use obs to join app.
+
+ + profit.

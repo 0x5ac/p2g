@@ -1,0 +1,12 @@
+* Why
+:PROPERTIES:
+:CUSTOM_ID: why1
+:END:
+Many styli died to bring us this information.
+
+Waiting for a replacement stylus *and* tool setter to arrive, I
+wondered if were possible to replace the hundreds of inscrutible lines
+of Hass WIPS Renishaw G-code with just a few lines of Python?
+
+Just got the last %90 to go.
+

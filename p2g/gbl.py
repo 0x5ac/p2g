@@ -1,3 +1,4 @@
+import ast
 import contextlib
 import functools
 import pathlib
@@ -9,10 +10,10 @@ class Config(typing.NamedTuple):
     narrow_output: bool = False
     bp_on_error: bool = False
     verbose: int = 0
-    with_id: bool = True
-    emit_rtl: bool = False
-    tin_test: bool = False
-    force_no_tintest: bool = False  # noqa
+    no_id: bool = False
+    short_filenames: bool = False
+    in_pytestwant: bool = False
+    first_line: int = -1
 
 
 config = Config()
@@ -21,28 +22,9 @@ config = Config()
 
 
 class Control:
-    block_delete = False
+    code_prefix = ""
     symbol_table = False
-
-
-class PerTranslation:
-    ebss: int
-    varrefs: typing.Dict
-
-    def __init__(self):
-        self.reset()
-
-    def next_bss(self, size):
-        addr = self.ebss
-        self.ebss += size
-        return addr
-
-    def reset(self):
-        self.varrefs = {}
-        self.ebss = 100
-
-
-iface = PerTranslation()
+    emacsclient = False
 
 
 def log(*args):
@@ -69,30 +51,35 @@ def eprint(*args):
     print(*args, file=sys.stderr)
 
 
-@functools.cache
-def logread(handle):
-    res = handle.read()
-    if config.verbose > 2:
-        print(res)  # no cover
-    return res
-
-
-def splitnl(line):
-    return line.split("\n")
-
-
 ######################################################################
-# i/o redirection
-@contextlib.contextmanager
-def openr(name):
+
+
+# needs to be cacheable cause stdin is possible.
+# needs to be clearable because get called with stdin
+# with different contents
+
+
+@functools.cache
+def get_lines(name):
+    # pylint: disable=consider-using-with
     if str(name) == "-":
-        yield sys.stdin, None
+        file = sys.stdin
     else:
-        try:
-            with open(name, "r", encoding="utf-8") as rfile:
-                yield rfile, None
-        except FileNotFoundError as err:
-            yield None, err
+        file = open(name, encoding="utf-8")
+
+    return file.read().split("\n")
+
+    # print("IN GETLINES ", name)
+    # # parse command line
+    # if str(name) != "-":
+    #     inf = open(name, encoding="utf-8")
+    #     guts = inf.read().split("\n")
+
+    # else:
+    #     guts = sys.stdin.read().split("\n")
+    #     print("READ", guts)
+
+    # return guts
 
 
 def g2l(generator):
@@ -100,6 +87,14 @@ def g2l(generator):
         return list(generator(*args, **kwargs))
 
     return g2l_
+
+
+# generator returning one string from a yield of many
+def g2s(generator):
+    def g2s_(*args, **kwargs):
+        return "".join(generator(*args, **kwargs))
+
+    return g2s_
 
 
 def sentinel():
@@ -150,7 +145,7 @@ def unwind(args):
 # find the file if in dist or just checkout out.
 def find_ours(filename):
     for topdir in [".", ".."]:
-        for subdir in ["tests", "doc", "examples"]:
+        for subdir in ["docs", "examples"]:
             look_here = pathlib.Path(__file__).parent / topdir / subdir / filename
             if look_here.exists():
                 return look_here.resolve()
@@ -158,3 +153,52 @@ def find_ours(filename):
 
 
 on_exit: typing.List[typing.Callable] = []
+
+
+def set_ast_file_name(node: ast.AST, name):
+
+    setattr(node, "file_name", name)
+
+
+def ast_file_name(node: ast.AST):
+    return getattr(node, "file_name")
+
+
+def make_fake_node(filename, lineno, offset, end_offset):
+    fake_node = ast.AST()
+    set_ast_file_name(fake_node, filename)
+    fake_node.lineno = lineno
+    fake_node.col_offset = offset
+    fake_node.end_col_offset = end_offset
+    return fake_node
+
+
+astnone = make_fake_node("empty", 1, 0, 0)
+
+
+class PerTranslation:
+    ebss: int
+    varrefs: typing.Dict
+    last_node: ast.AST
+
+    def __init__(self):
+        self.ebss = 100
+
+        self.varrefs = {}
+        self.last_node = astnone
+
+    def next_bss(self, size):
+        addr = self.ebss
+        self.ebss += size
+        return addr
+
+
+iface: "PerTranslation" = PerTranslation()
+
+
+def reset():
+    #
+    # pylint: disable=global-statement
+    global iface
+    get_lines.cache_clear()
+    iface = PerTranslation()

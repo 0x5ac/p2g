@@ -1,5 +1,6 @@
 import ast
 
+from p2g import fstring
 from p2g import op
 from p2g import symbol
 from p2g import walkbase
@@ -65,21 +66,7 @@ class WalkExpr(walkbase.WalkBase):
         return res
 
     def _visit_joinedstr(self, node):
-        res = []
-        for value in node.values:
-            match value:
-                case ast.Constant():
-                    res.append(value.value)
-                case ast.FormattedValue():
-                    val = self.visit(value.value)
-                    if value.format_spec is not None:
-                        # turn python format into g-code
-                        fmt = self.visit(value.format_spec)
-                        el = op.make_fmt(val, fmt)
-                    else:
-                        el = op.make_fmt(val, "")
-                    res.append(el)
-        return "".join(res)
+        return fstring.joinedstr(self, node)
 
     def _visit_binop(self, node):
         return op.make_vec_binop(

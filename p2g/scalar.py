@@ -23,6 +23,9 @@ class Scalar(nd.EBase):
     def everything(self):
         yield self
 
+    def __div__(self, _other):  # no cover
+        pass
+
     # placeholder to east typechecking,
     # overwitten by op install machines.
     def __add__(self, _other):  # no cover
@@ -45,12 +48,6 @@ class Constant(ConstantBase):
     def __init__(self, value: int | float):
         super().__init__(nd.const_nd)
         self._value = value
-
-    def rtl_arg_info_(self):
-        return ["constant"]
-
-    def rtl_get_arg_(self, _idx):
-        return self._value
 
     # def get_address(self):
     #     err.compiler("Can't take address of constant.")

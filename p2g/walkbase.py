@@ -81,7 +81,7 @@ def resolve_nonlocal(name, ns):
                 break
             return ns
         ns = ns.parent
-    err.compiler(f"No binding for nonlocal '{name}'.")
+    raise err.CompilerError(f"No binding for nonlocal '{name}'.")
 
 
 def lookup_to_ns(res, self, nid):
@@ -108,8 +108,8 @@ def _handle_visit_name_load(self, node):
     if ns is None:
         try:
             return getattr(builtins, node.id)
-        except AttributeError:
-            err.compiler(f"Name '{node.id}' is not defined.")
+        except AttributeError as exn:
+            raise err.CompilerError(f"Name '{node.id}' is not defined.") from exn
     if res is GLOBAL:
         res = self.module_ns.get(node.id)
     elif res is NONLOCAL:
@@ -190,13 +190,8 @@ class WalkBase:
         return res
 
     def update_lastplace(self, node):
-        pos = err.NodePlace(
-            node.col_offset,
-            node.end_col_offset,
-            node.lineno,
-            self.file_name,
-        )
-        err.mark_pos(pos)
+        gbl.iface.last_node = node
+        node.file_name = self.file_name
 
     def visit_fail(self, node, *_):
         name = node.__class__.__name__
@@ -213,6 +208,7 @@ class WalkBase:
         self.update_lastplace(node)
         method = "_visit_" + node.__class__.__name__.lower()
         visitor: typing.Callable[[ast.AST], Any] = getattr(self, method, self.visit_fail)
+
         return visitor(node)
 
     def visit_store(self, node, store_val) -> None:

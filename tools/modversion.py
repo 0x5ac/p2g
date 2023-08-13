@@ -7,7 +7,9 @@ import typing
 
 
 # yet another grab version from project and update tool.
-# takes from the known truth and puts it everywhere else.
+# takes from the known truth and puts it everywhere else by string
+# replace.  If that changes something you don't want, well, you
+# shouldn't have made it look like the previous version number.
 
 
 def dig_out_semver(txt) -> typing.Optional[str]:
@@ -56,27 +58,35 @@ def main():
         prog="version",
         description="yet another way for single point pyproject.toml etc version mods.",
     )
-    parser.add_argument("files", type=str, nargs="+", help="files to check")
-    parser.add_argument(
-        "--list",
-        action="store_true",
-        required=False,
-        help="show current versions in source",
-    )
 
     parser.add_argument(
         "--truth",
-        action="store",
         required=False,
         help="source file for truth",
     )
 
     parser.add_argument(
         "--force",
-        action="store",
         required=False,
-        help="force patch version",
+        help="force truth version",
     )
+
+    parser.add_argument("--top", help="directory to start searching.", default="")
+    parser.add_argument(
+        "--out",
+        help="relative directory to place        modified files. Default - in place",
+        default="",
+    )
+    parser.add_argument(
+        "--stdout",
+        action="store_true",
+        help="emit version directly to stdout.",
+    )
+
+    parser.add_argument(
+        "--names", nargs="*", help="file names to modify", metavar="FILENAME", type=str
+    )
+
     args = parser.parse_args()
 
     new_truth = None
@@ -87,18 +97,20 @@ def main():
     if args.force:
         new_truth = args.force
 
-    if new_truth:
-        for filename in args.files:
-            path = pathlib.Path(filename)
-            before_text, semver, after_text = find_before_version_after(path)
-            path.write_text(before_text + new_truth + after_text, encoding="utf-8")
+    before_text = ""
+    after_text = ""
 
-    if args.list:
-        maxlen = max(len(filename) for filename in args.files)
-        for filename in args.files:
-            path = pathlib.Path(filename)
-            before_text, semver, after_text = find_before_version_after(path)
-            print(f"{filename.rjust(maxlen)} {semver.rjust(6)}")
+    if args.stdout:
+        print(new_truth)
+
+    if not args.names:
+        return
+    for src_name in args.names:
+        src_path = pathlib.Path(args.top) / src_name
+        before_text, _, after_text = find_before_version_after(src_path)
+        dst_path = pathlib.Path(args.out) / src_name
+        dst_path.parent.mkdir(parents=True, exist_ok=True)
+        dst_path.write_text(before_text + new_truth + after_text, encoding="utf-8")
 
     sys.exit(0)
 

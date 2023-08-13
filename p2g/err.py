@@ -1,97 +1,88 @@
-import dataclasses
+import ast
 import pathlib
-import pdb
-import typing
 
 from p2g import gbl
 
 
-@dataclasses.dataclass
-class NodePlace:
-    col_offset_first: int
-    col_offset_past: int
-    lineno: int
-    filename: str
+def code_context_node(node: ast.AST):
 
+    file_name = gbl.ast_file_name(node)
+    file_path = pathlib.Path(file_name).absolute()
+    reportable_line = node.lineno
 
-@dataclasses.dataclass
-class State:
-    last_pos: NodePlace
+    # if testing try and shrink filename and make
+    # line numbers relative to start of function.
 
-    def __init__(self):
-        self.last_pos = NodePlace(0, 0, 0, "")
+    if gbl.config.first_line >= 0:
+        reportable_line -= gbl.config.first_line
+    if gbl.config.short_filenames:
+        file_name = str(file_path.name)
+    else:
+        file_name = str(file_path)
 
+    col_offset = node.col_offset
+    assert isinstance(node.end_col_offset, int)
+    assert isinstance(node.col_offset, int)
+    assert node.end_col_offset is not None
 
-state = State()
-
-
-def mark_pos(last_pos):
-    state.last_pos = last_pos
-
-
-def src_code_from_line_near(pos, lineno):
-    with gbl.openr(pos.filename) as (inf, etrace):
-        if etrace:
-            return ""
-        src = gbl.logread(inf)
-        lines = gbl.splitnl(src)
-        return lines[lineno - 1]
-
-
-def src_code_from_node_place(pos):
-    return src_code_from_line_near(pos, pos.lineno)
-
-
-def note_from_node_place(pos, absolute_lines, topfn=None):
-    relfixer = 1
-    if (gbl.config.tin_test or (not absolute_lines)) and topfn is not None:
-        relfixer = topfn.__code__.co_firstlineno
-    filename = pathlib.Path(pos.filename)
-    try:
-        filename = filename.relative_to(pathlib.Path.cwd())
-    except ValueError:
-        pass
-    # #    if gbl.config.tin_test:
-    #     orig = pathlib.Path(filename)
-    #     filename = "/".join(orig.parts[-2:])
-    reportable_line = pos.lineno - relfixer + 1
-    col_offset = pos.col_offset_first
-    col_width = pos.col_offset_past - col_offset
+    col_width = node.end_col_offset - col_offset
     pfx = ":".join(
         [
-            str(filename),
+            file_name,
             str(reportable_line),
-            str(pos.col_offset_first),
-            str(pos.col_offset_past),
+            str(node.col_offset),
+            str(node.end_col_offset),
             " ",
         ]
     )
     return pfx, " " * (len(pfx) + col_offset) + "^" * col_width
 
 
+def source_from_node(node: ast.AST):
+    source_lines = gbl.get_lines(gbl.ast_file_name(node))
+    return source_lines[node.lineno - 1]
+
+
 class CompilerError(Exception):
-    pos: NodePlace
+
+    node: ast.AST
     message: str
+    report_line: bool
 
-    def __init__(self, pos, message: str):
+    def __init__(self, message, report_line=True, node=gbl.astnone):
         super().__init__()
-        self.pos = pos
+
+        if gbl.config.bp_on_error:
+            breakpoint()  # no cover
+
+        self.report_line = report_line
         self.message = message
+        self.node = gbl.iface.last_node if node is gbl.astnone else node
 
-    def error_lines(self, absolute_lines, topfn):
-        sourceline = src_code_from_node_place(self.pos)
-        pfx, carat = note_from_node_place(self.pos, absolute_lines, topfn)
-        return [self.message, pfx + sourceline, carat]
+    def get_report_lines(self):
 
-    def report_error(self, absolute_lines=True, topfn=None):
-        for line in self.error_lines(absolute_lines, topfn):
-            gbl.eprint(line)
+        node = self.node
+        message = self.message
+
+        line_prefix, source_context = code_context_node(node)
+
+        if not self.report_line:
+            return [source_context, message]
+
+        source_line = source_from_node(node)
+        # if error messaeg text will fit into context
+        # line without trashing anything then put it there.
+        message_len = len(message)
+        gap_to_start = len(source_context) - len(source_context.lstrip())
+
+        space_between = gap_to_start - message_len
+        if space_between > 1:
+            source_context = message + " " * space_between + source_context[gap_to_start:]
+            return [line_prefix + source_line, source_context]
+
+        return [line_prefix + source_line, source_context, message]
 
 
-def compiler(message, exc=None, err_pos=None) -> typing.NoReturn:
-    if not err_pos:
-        err_pos = state.last_pos
+def compiler(message: str = "", node=gbl.astnone, exn=None):
 
-    if gbl.config.bp_on_error:  # for debug
-        pdb.set_trace()  # pylint: disable=forgotten-debug-statement
-    raise CompilerError(err_pos, str(message)) from exc
+    raise CompilerError(message, node=node) from exn

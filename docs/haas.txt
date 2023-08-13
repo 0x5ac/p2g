@@ -1,0 +1,205 @@
+                           HAAS Macro Variables                            
+┏━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃      Range      ┃      N ┃  K ┃    Type     ┃ Name                      ┃
+┡━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━╇━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│       #0        │      1 │ v< │    float    │ NULL                      │
+│    #1 … #33     │     33 │  V │    float    │ MACRO_ARGUMENTS           │
+│    #34 … #99    │     66 │  _ │    float    │ an error                  │
+│   #100 … #149   │     50 │  V │    float    │ GP_SAVED1                 │
+│   #150 … #199   │     50 │  V │    float    │ PROBE_VALUES              │
+│   #200 … #499   │    300 │  _ │    float    │ GAP02                     │
+│   #500 … #549   │     50 │  V │    float    │ GP_SAVED2                 │
+│   #550 … #555   │      6 │  V │    float    │ PROBE_CALIB1              │
+│   #556 … #558   │      3 │  V │    float    │ PROBE_R                   │
+│   #559 … #580   │     22 │  V │    float    │ PROBE_CALIB2              │
+│   #581 … #699   │    119 │  V │    float    │ GP_SAVED3                 │
+│   #700 … #799   │    100 │  _ │    float    │ GAP03                     │
+│   #800 … #999   │    200 │  V │    float    │ GP_SAVED4                 │
+│  #1000 … #1063  │     64 │  V │    float    │ INPUTS                    │
+│  #1064 … #1068  │      5 │  V │    float    │ MAX_LOADS_XYZAB           │
+│  #1069 … #1079  │     11 │  _ │    float    │ GAP04                     │
+│  #1080 … #1089  │     10 │  V │    float    │ RAW_ANALOG                │
+│  #1090 … #1097  │      8 │  V │    float    │ FILTERED_ANALOG           │
+│      #1098      │      1 │ v< │    float    │ SPINDLE_LOAD              │
+│  #1099 … #1263  │    165 │  _ │    float    │ GAP05                     │
+│  #1264 … #1268  │      5 │  V │    float    │ MAX_LOADS_CTUVW           │
+│  #1269 … #1600  │    332 │  _ │    float    │ GAP06                     │
+│  #1601 … #1800  │    200 │  T │     int     │ TOOL_TBL_FLUTES           │
+│  #1801 … #2000  │    200 │  T │    float    │ TOOL_TBL_VIBRATION        │
+│  #2001 … #2200  │    200 │  T │    float    │ TOOL_TBL_OFFSETS          │
+│  #2201 … #2400  │    200 │  T │    float    │ TOOL_TBL_WEAR             │
+│  #2401 … #2600  │    200 │  T │    float    │ TOOL_TBL_DROFFSET         │
+│  #2601 … #2800  │    200 │  T │    float    │ TOOL_TBL_DRWEAR           │
+│  #2801 … #2999  │    199 │  _ │    float    │ GAP07                     │
+│      #3000      │      1 │ v< │     int     │ ALARM                     │
+│      #3001      │      1 │ v< │    Time     │ T_MS                      │
+│      #3002      │      1 │ v< │    Time     │ T_HR                      │
+│      #3003      │      1 │ v< │     int     │ SINGLE_BLOCK_OFF          │
+│      #3004      │      1 │ v< │     int     │ FEED_HOLD_OFF             │
+│      #3005      │      1 │  _ │    float    │ GAP08                     │
+│      #3006      │      1 │ v< │     int     │ MESSAGE                   │
+│  #3007 … #3010  │      4 │  _ │    float    │ GAP09                     │
+│      #3011      │      1 │ v< │    Time     │ YEAR_MONTH_DAY            │
+│      #3012      │      1 │ v< │    Time     │ HOUR_MINUTE_SECOND        │
+│  #3013 … #3019  │      7 │  _ │    float    │ GAP10                     │
+│      #3020      │      1 │ v< │    Time     │ POWER_ON_TIME             │
+│      #3021      │      1 │ v< │    Time     │ CYCLE_START_TIME          │
+│      #3022      │      1 │ v< │    Time     │ FEED_TIMER                │
+│      #3023      │      1 │ v< │    Time     │ CUR_PART_TIMER            │
+│      #3024      │      1 │ v< │    Time     │ LAST_COMPLETE_PART_TIMER  │
+│      #3025      │      1 │ v< │    Time     │ LAST_PART_TIMER           │
+│      #3026      │      1 │ v< │     int     │ TOOL_IN_SPIDLE            │
+│      #3027      │      1 │ v< │     int     │ SPINDLE_RPM               │
+│      #3028      │      1 │ v< │     int     │ PALLET_LOADED             │
+│      #3029      │      1 │  _ │    float    │ GAP11                     │
+│      #3030      │      1 │ v< │     int     │ SINGLE_BLOCK              │
+│      #3031      │      1 │ v< │    float    │ AGAP                      │
+│      #3032      │      1 │ v< │     int     │ BLOCK_DELETE              │
+│      #3033      │      1 │ v< │     int     │ OPT_STOP                  │
+│  #3034 … #3195  │    162 │  _ │    float    │ GAP12                     │
+│      #3196      │      1 │ v< │    Time     │ TIMER_CELL_SAFE           │
+│  #3197 … #3200  │      4 │  _ │    float    │ GAP13                     │
+│  #3201 … #3400  │    200 │  T │    float    │ TOOL_TBL_DIAMETER         │
+│  #3401 … #3600  │    200 │  T │    float    │ TOOL_TBL_COOLANT_POSITION │
+│  #3601 … #3900  │    300 │  _ │    float    │ GAP14                     │
+│      #3901      │      1 │ v< │     int     │ M30_COUNT1                │
+│      #3902      │      1 │ v< │     int     │ M30_COUNT2                │
+│  #3903 … #4000  │     98 │  _ │    float    │ GAP15                     │
+│  #4001 … #4013  │     13 │  V │    float    │ PREV_BLOCK                │
+│      #4014      │      1 │  V │    float    │ PREV_WCS                  │
+│  #4015 … #4021  │      7 │  _ │    float    │ PREV_BLOCK_B              │
+│  #4022 … #4100  │     79 │  _ │    float    │ GAP122                    │
+│  #4101 … #4126  │     26 │  V │    float    │ PREV_BLOCK_ADDRESS        │
+│  #4127 … #5000  │    874 │  _ │    float    │ an error                  │
+│  #5001 … #5020  │  naxes │  m │    float    │ LAST_TARGET_POS           │
+│  #5021 … #5040  │  naxes │  m │    float    │ MACHINE_POS               │
+│  #5021 … #5040  │     20 │  A │    float    │  also MACHINE             │
+│  #5021 … #5040  │     20 │  A │    float    │  also G53                 │
+│  #5041 … #5060  │  naxes │  m │    float    │ WORK_POS                  │
+│  #5041 … #5060  │     20 │  A │    float    │  also WORK                │
+│      #5041      │    -20 │  _ │    float    │ an error                  │
+│  #5061 … #5080  │  naxes │  m │    float    │ SKIP_POS                  │
+│  #5061 … #5080  │     20 │  A │    float    │  also PROBE               │
+│      #5061      │    -40 │  _ │    float    │ an error                  │
+│  #5081 … #5100  │  naxes │  V │    float    │ TOOL_OFFSET               │
+│      #5081      │    -40 │  _ │    float    │ an error                  │
+│  #5101 … #5200  │    100 │  _ │    float    │ GAP18                     │
+│  #5201 … #5220  │  naxes │  m │    float    │ G52                       │
+│  #5221 … #5240  │  naxes │  m │    float    │ G54                       │
+│  #5241 … #5260  │  naxes │  m │    float    │ G55                       │
+│  #5261 … #5280  │  naxes │  m │    float    │ G56                       │
+│  #5281 … #5300  │  naxes │  m │    float    │ G57                       │
+│  #5301 … #5320  │  naxes │  m │    float    │ G58                       │
+│  #5321 … #5340  │  naxes │  m │    float    │ G59                       │
+│  #5341 … #5400  │     60 │  _ │    float    │ GAP19                     │
+│  #5401 … #5500  │    100 │  T │    Secs     │ TOOL_TBL_FEED_TIMERS      │
+│  #5501 … #5600  │    100 │  T │    Secs     │ TOOL_TBL_TOTAL_TIMERS     │
+│  #5601 … #5700  │    100 │  T │     int     │ TOOL_TBL_LIFE_LIMITS      │
+│  #5701 … #5800  │    100 │  T │     int     │ TOOL_TBL_LIFE_COUNTERS    │
+│  #5801 … #5900  │    100 │  T │    float    │ TOOL_TBL_LIFE_MAX_LOADS   │
+│  #5901 … #6000  │    100 │  T │    float    │ TOOL_TBL_LIFE_LOAD_LIMITS │
+│  #6001 … #6197  │    197 │  _ │    float    │ GAP20                     │
+│      #6198      │      1 │ v< │     int     │ NGC_CF                    │
+│  #6199 … #7000  │    802 │  _ │    float    │ GAP21                     │
+│  #7001 … #7020  │  naxes │  m │    float    │ G154_P1                   │
+│  #7021 … #7040  │  naxes │  m │    float    │ G154_P2                   │
+│  #7041 … #7060  │  naxes │  m │    float    │ G154_P3                   │
+│  #7061 … #7080  │  naxes │  m │    float    │ G154_P4                   │
+│  #7081 … #7100  │  naxes │  m │    float    │ G154_P5                   │
+│  #7101 … #7120  │  naxes │  m │    float    │ G154_P6                   │
+│  #7121 … #7140  │  naxes │  m │    float    │ G154_P7                   │
+│  #7141 … #7160  │  naxes │  m │    float    │ G154_P8                   │
+│  #7161 … #7180  │  naxes │  m │    float    │ G154_P9                   │
+│  #7181 … #7200  │  naxes │  m │    float    │ G154_P10                  │
+│  #7201 … #7220  │  naxes │  m │    float    │ G154_P11                  │
+│  #7221 … #7240  │  naxes │  m │    float    │ G154_P12                  │
+│  #7241 … #7260  │  naxes │  m │    float    │ G154_P13                  │
+│  #7261 … #7280  │  naxes │  m │    float    │ G154_P14                  │
+│  #7281 … #7300  │  naxes │  m │    float    │ G154_P15                  │
+│  #7301 … #7320  │  naxes │  m │    float    │ G154_P16                  │
+│  #7321 … #7340  │  naxes │  m │    float    │ G154_P17                  │
+│  #7341 … #7360  │  naxes │  m │    float    │ G154_P18                  │
+│  #7361 … #7380  │  naxes │  m │    float    │ G154_P19                  │
+│  #7381 … #7400  │  naxes │  m │    float    │ G154_P20                  │
+│  #7401 … #7500  │    100 │  _ │    float    │ GAP22                     │
+│  #7501 … #7600  │    100 │  L │ PalletTable │ PALLET_PRIORITY           │
+│  #7601 … #7700  │    100 │  L │ PalletTable │ PALLET_STATUS             │
+│  #7701 … #7800  │    100 │  L │ PalletTable │ PALLET_PROGRAM            │
+│  #7801 … #7900  │    100 │  L │ PalletTable │ PALLET_USAGE              │
+│  #7901 … #8499  │    599 │  _ │    float    │ GAP23                     │
+│      #8500      │      1 │ v< │     int     │ ATM_ID                    │
+│      #8501      │      1 │ v< │   Percent   │ ATM_PERCENT               │
+│      #8502      │      1 │ v< │     int     │ ATM_TOTAL_AVL_USAGE       │
+│      #8503      │      1 │ v< │     int     │ ATM_TOTAL_AVL_HOLE_COUNT  │
+│      #8504      │      1 │ v< │    Secs     │ ATM_TOTAL_AVL_FEED_TIME   │
+│      #8505      │      1 │ v< │    Secs     │ ATM_TOTAL_AVL_TOTAL_TIME  │
+│  #8506 … #8509  │      4 │  _ │    float    │ GAP24                     │
+│      #8510      │      1 │ v< │     int     │ ATM_NEXT_TOOL_NUMBER      │
+│      #8511      │      1 │ v< │   Percent   │ ATM_NEXT_TOOL_LIFE        │
+│      #8512      │      1 │ v< │     int     │ ATM_NEXT_TOOL_AVL_USAGE   │
+│      #8513      │      1 │ v< │     int     │ ATM_NEXT_TOOL_HOLE_COUNT  │
+│      #8514      │      1 │ v< │    Secs     │ ATM_NEXT_TOOL_FEED_TIME   │
+│      #8515      │      1 │ v< │    Secs     │ ATM_NEXT_TOOL_TOTAL_TIME  │
+│  #8516 … #8549  │     34 │  _ │    float    │ GAP25                     │
+│      #8550      │      1 │ v< │     int     │ TOOL_ID                   │
+│      #8551      │      1 │ v< │     int     │ TOOL_FLUTES               │
+│      #8552      │      1 │ v< │    float    │ TOOL_MAX_VIBRATION        │
+│      #8553      │      1 │ v< │    float    │ TOOL_LENGTH_OFFSETS       │
+│      #8554      │      1 │ v< │    float    │ TOOL_LENGTH_WEAR          │
+│      #8555      │      1 │ v< │    float    │ TOOL_DIAMETER_OFFSETS     │
+│      #8556      │      1 │ v< │    float    │ TOOL_DIAMETER_WEAR        │
+│      #8557      │      1 │ v< │    float    │ TOOL_ACTUAL_DIAMETER      │
+│      #8558      │      1 │ v< │     int     │ TOOL_COOLANT_POSITION     │
+│      #8559      │      1 │ v< │    Secs     │ TOOL_FEED_TIMER           │
+│      #8560      │      1 │ v< │    Secs     │ TOOL_TOTAL_TIMER          │
+│      #8561      │      1 │ v< │    float    │ TOOL_LIFE_LIMIT           │
+│      #8562      │      1 │ v< │    float    │ TOOL_LIFE_COUNTER         │
+│      #8563      │      1 │ v< │    float    │ TOOL_LIFE_MAX_LOAD        │
+│      #8564      │      1 │ v< │    float    │ TOOL_LIFE_LOAD_LIMIT      │
+│  #8565 … #8999  │    435 │  _ │    float    │ GAP26                     │
+│      #9000      │      1 │ v< │    float    │ THERMAL_COMP_ACC          │
+│  #9001 … #9015  │     15 │  _ │    float    │ GAP27                     │
+│      #9016      │      1 │ v< │    float    │ THERMAL_SPINDLE_COMP_ACC  │
+│  #9017 … #9999  │    983 │  _ │    float    │ an error                  │
+│ #10000 … #10999 │   1000 │  V │    float    │ GVARIABLES3               │
+│ #10150 … #10199 │     50 │  V │    float    │ PROBE_VALUES_             │
+│ #10200 … #10399 │    200 │  V │    float    │ GPS1                      │
+│ #10400 … #10499 │    100 │  V │    float    │ GPNS1                     │
+│ #10500 … #10549 │     50 │  V │    float    │ GPS2                      │
+│ #10550 … #10599 │     50 │  V │    float    │ PROBE_CALIB_              │
+│ #10600 … #10699 │    100 │  V │    float    │ GPS3                      │
+│ #10700 … #10799 │    100 │  V │    float    │ GPNS3                     │
+│ #10800 … #10999 │    200 │  V │    float    │ GPS4                      │
+│     #11000      │   -850 │  _ │    float    │ an error                  │
+│ #11000 … #11255 │    256 │  V │    float    │ INPUTS1                   │
+│ #11256 … #11999 │    744 │  _ │    float    │ GAP29                     │
+│ #12000 … #12255 │    256 │  V │    float    │ OUTPUT1                   │
+│ #12256 … #12999 │    744 │  _ │    float    │ GAP30                     │
+│ #13000 … #13012 │     13 │  V │    float    │ FILTERED_ANALOG1          │
+│     #13013      │      1 │ v< │    float    │ COOLANT_LEVEL             │
+│ #13014 … #13063 │     50 │  V │    float    │ FILTERED_ANALOG2          │
+│ #13064 … #13999 │    936 │  _ │    float    │ GAP31                     │
+│ #14000 … #19999 │   6000 │  _ │    float    │ an error                  │
+│ #20000 … #29999 │  10000 │  V │    float    │ SETTING                   │
+│ #30000 … #39999 │  10000 │  V │    float    │ PARAMETER                 │
+│ #40000 … #50000 │  10001 │  _ │    float    │ an error                  │
+│ #50001 … #50200 │    200 │  V │    float    │ TOOL_TYP                  │
+│ #50201 … #50400 │    200 │  V │    float    │ TOOL_MATERIAL             │
+│ #50401 … #50600 │    200 │  _ │    float    │ GAP32                     │
+│ #50601 … #50800 │    200 │  V │    float    │ CURRENT_OFFSET            │
+│ #50801 … #51000 │    200 │  _ │    float    │ an error                  │
+│ #50801 … #51000 │    200 │  V │    float    │ CURRENT_OFFSET2           │
+│ #51001 … #51300 │    300 │  _ │    float    │ GAP33                     │
+│ #51001 … #51300 │    300 │  _ │    float    │ an error                  │
+│     #51301      │   -500 │  _ │    float    │ an error                  │
+│ #51301 … #51400 │    100 │  V │    float    │ VPS_TEMPLATE_OFFSET       │
+│ #51401 … #51600 │    200 │  V │    float    │ WORK_MATERIAL             │
+│ #51601 … #51800 │    200 │  V │    float    │ VPS_FEEDRATE              │
+│ #51801 … #52000 │    200 │  V │    float    │ APPROX_LENGTH             │
+│ #52001 … #52200 │    200 │  V │    float    │ APPROX_DIAMETER           │
+│ #52201 … #52400 │    200 │  V │    float    │ EDGE_MEASURE_HEIGHT       │
+│ #52401 … #52600 │    200 │  V │    float    │ TOOL_TOLERANCE            │
+│ #52601 … #52800 │    200 │  V │    float    │ PROBE_TYPE                │
+│     #52801      │ -47740 │  _ │    float    │ an error                  │
+└─────────────────┴────────┴────┴─────────────┴───────────────────────────┘
+         Generated by /home/sac/vf3/progs/p2g/tools/makestdvars.py         

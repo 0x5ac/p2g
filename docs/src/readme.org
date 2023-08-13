@@ -1,0 +1,22 @@
+#+OPTIONS: broken-links:t
+#+OPTIONS: toc:nil
+#+OPTIONS: ^:nil
+#+TITLE: p2g - Python 2 G-code
+#+AUTHOR: sac@0x5ac.com
+#+PROPERTY: header-args  :exports both     :python poetry run p2g   -
+
+* P2G
+#+INCLUDE: "badges.org"
+#+INCLUDE: "video.org"
+#+INCLUDE: "introduction.org"
+#+INCLUDE: "install.org"
+#+INCLUDE: "usage.org"
+#+INCLUDE: "examples.org"
+* Table of contents
+#+INCLUDE: "toc.org"
+
+**** Copyright © 2023 Steve Chamberlain
+# Local Variables:
+# org-confirm-babel-evaluate: nil
+# org-export-babel-evaluate: nil
+# End:

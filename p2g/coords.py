@@ -68,7 +68,9 @@ class CoType:
 
     def check_size_sanity(self, size, initialized_size):
         if initialized_size > 0 and initialized_size != size:
-            err.compiler(f"Conflicting sizes {self.size} and {initialized_size}.")
+            raise err.CompilerError(
+                f"Conflicting sizes {self.size} and {initialized_size}."
+            )
         if size == 0 and initialized_size == 0:
             err.compiler("Zero sized vector.")
 
@@ -86,15 +88,17 @@ class CoType:
         match self.cot:
             case CoNum.CONST:
                 if addr is not None:
-                    err.compiler("Const can't have an address.")
+                    raise err.CompilerError("Const can't have an address.")
                 return values
             case CoNum.FIXED:
                 if addr is None:
-                    err.compiler("Fixed needs an address.")
+                    raise err.CompilerError("Fixed needs an address.")
             case CoNum.VAR:
                 if addr is not None:
-                    err.compiler("Var can't have an address.")
+                    raise err.CompilerError("Var can't have an address.")
                 addr = gbl.iface.next_bss(size)
+            case _:  # no cover
+                raise NotImplementedError
         res = vector.MemVec(addr, size)
         if initialized_size:
             for lhs, rhs in zip(res.everything(), values.forever()):

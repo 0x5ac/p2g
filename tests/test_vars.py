@@ -1,4 +1,5 @@
 # mypy: disable-error-code="name-defined"
+DOC = "PYTEST_DONT_REWRITE"
 import p2g
 
 from conftest import want
@@ -23,13 +24,12 @@ q = 87
 j = 32
 
 # TESTS BELOW
-
-
+########################################
 @want(
     errors=[
+        "test_vars.py:11:4:13:     undefined()  # noqa: F821",
+        "                          ^^^^^^^^^               ",
         "Name 'undefined' is not defined.                  ",
-        "tests/test_vars.py:12:4:13:     undefined()  # noqa: F821",
-        "                                ^^^^^^^^^         ",
     ]
 )
 def test_cerror_nonlocal2():
@@ -39,55 +39,59 @@ def test_cerror_nonlocal2():
     undefined()  # noqa: F821
 
 
+########################################
 @want(
     errors=[
+        "test_vars.py:8:8:17:     del undefined  # noqa: F821",
+        "                             ^^^^^^^^^            ",
         "Name 'undefined' is not defined.                  ",
-        "tests/test_vars.py:9:8:17:     del undefined  # noqa: F821",
-        "                                   ^^^^^^^^^      ",
     ]
 )
 def test_cerror_novar0():
     del undefined  # noqa: F821
 
 
+########################################
 @want(
-    "O00001 (test_global0)",
-    "( PR = Fixed[191, 200 + 3, addr=402])",
-    "  #402= 191.",
-    "  #403= 203.",
-    "( dst[0] = num                  )",
-    "  #302= 123.",
-    "  M30",
-    "%",
+    "O00001 (test_global0)                             ",
+    "( PR = Fixed[191, 200 + 3, addr=402])             ",
+    "  #402= 191.                                      ",
+    "  #403= 203.                                      ",
+    "( dst[0] = num                  )                 ",
+    "  #302= 123.                                      ",
+    "  M30                                             ",
+    "%                                                 ",
 )
 def test_global0():
     dst = p2g.Fixed(addr=302)
     dst[0] = num
 
 
+########################################
 @want(
-    "O00001 (test_global1)",
-    "( PR = Fixed[191, 200 + 3, addr=402])",
-    "  #402= 191.",
-    "  #403= 203.",
-    "( PR[0] = num                   )",
-    "  #402= 123.",
-    "  M30",
-    "%",
+    "O00001 (test_global1)                             ",
+    "( PR = Fixed[191, 200 + 3, addr=402])             ",
+    "  #402= 191.                                      ",
+    "  #403= 203.                                      ",
+    "( PR[0] = num                   )                 ",
+    "  #402= 123.                                      ",
+    "  M30                                             ",
+    "%                                                 ",
 )
 def test_global1():
     PR[0] = num
 
 
+########################################
 @want(
-    "O00001 (test_global2)",
-    "( PR = Fixed[191, 200 + 3, addr=402])",
-    "  #402= 191.",
-    "  #403= 203.",
-    "( PR[0] = num                   )",
-    "  #402= 17.",
-    "  M30",
-    "%",
+    "O00001 (test_global2)                             ",
+    "( PR = Fixed[191, 200 + 3, addr=402])             ",
+    "  #402= 191.                                      ",
+    "  #403= 203.                                      ",
+    "( PR[0] = num                   )                 ",
+    "  #402= 17.                                       ",
+    "  M30                                             ",
+    "%                                                 ",
 )
 def test_global2():
     global num
@@ -95,30 +99,32 @@ def test_global2():
     PR[0] = num
 
 
+########################################
 @want(
-    "O00001 (test_global3)",
-    "( PR = Fixed[191, 200 + 3, addr=402])",
-    "  #402= 191.",
-    "  #403= 203.",
-    "  M30",
-    "%",
+    "O00001 (test_global3)                             ",
+    "( PR = Fixed[191, 200 + 3, addr=402])             ",
+    "  #402= 191.                                      ",
+    "  #403= 203.                                      ",
+    "  M30                                             ",
+    "%                                                 ",
 )
 def test_global3():
     global num
     del num
 
 
+########################################
 @want(
-    "O00001 (test_local)",
-    "( PR = Fixed[191, 200 + 3, addr=402])",
-    "  #402= 191.",
-    "  #403= 203.",
-    "( dst[0] = 123                  )",
-    "  #300= 123.",
-    "(     dst[0] = 456              )",
-    "  #301= 456.",
-    "  M30",
-    "%",
+    "O00001 (test_local)                               ",
+    "( PR = Fixed[191, 200 + 3, addr=402])             ",
+    "  #402= 191.                                      ",
+    "  #403= 203.                                      ",
+    "( dst[0] = 123                  )                 ",
+    "  #300= 123.                                      ",
+    "(     dst[0] = 456              )                 ",
+    "  #301= 456.                                      ",
+    "  M30                                             ",
+    "%                                                 ",
 )
 def test_local():
     dst = p2g.Fixed(addr=300)
@@ -131,17 +137,18 @@ def test_local():
     inner()
 
 
+########################################
 @want(
-    "O00001 (test_nonlocal)",
-    "( PR = Fixed[191, 200 + 3, addr=402])",
-    "  #402= 191.",
-    "  #403= 203.",
-    "( dst[0] = 123                  )",
-    "  #300= 123.",
-    "(     dst[0] = 456              )",
-    "  #300= 456.",
-    "  M30",
-    "%",
+    "O00001 (test_nonlocal)                            ",
+    "( PR = Fixed[191, 200 + 3, addr=402])             ",
+    "  #402= 191.                                      ",
+    "  #403= 203.                                      ",
+    "( dst[0] = 123                  )                 ",
+    "  #300= 123.                                      ",
+    "(     dst[0] = 456              )                 ",
+    "  #300= 456.                                      ",
+    "  M30                                             ",
+    "%                                                 ",
 )
 def test_nonlocal():
     dst = p2g.Fixed(addr=300)
@@ -154,17 +161,18 @@ def test_nonlocal():
     inner()
 
 
+########################################
 @want(
-    "O00001 (test_nonlocal1)",
-    "( PR = Fixed[191, 200 + 3, addr=402])",
-    "  #402= 191.",
-    "  #403= 203.",
-    "( dst[0] = 123                  )",
-    "  #300= 123.",
-    "(     dst[0] = 456              )",
-    "  #300= 456.",
-    "  M30",
-    "%",
+    "O00001 (test_nonlocal1)                           ",
+    "( PR = Fixed[191, 200 + 3, addr=402])             ",
+    "  #402= 191.                                      ",
+    "  #403= 203.                                      ",
+    "( dst[0] = 123                  )                 ",
+    "  #300= 123.                                      ",
+    "(     dst[0] = 456              )                 ",
+    "  #300= 456.                                      ",
+    "  M30                                             ",
+    "%                                                 ",
 )
 def test_nonlocal1():
     dst = p2g.Fixed(addr=300)
@@ -178,13 +186,14 @@ def test_nonlocal1():
     inner()
 
 
+########################################
 @want(
-    "O00001 (test_nonlocal3)",
-    "( PR = Fixed[191, 200 + 3, addr=402])",
-    "  #402= 191.",
-    "  #403= 203.",
-    "  M30",
-    "%",
+    "O00001 (test_nonlocal3)                           ",
+    "( PR = Fixed[191, 200 + 3, addr=402])             ",
+    "  #402= 191.                                      ",
+    "  #403= 203.                                      ",
+    "  M30                                             ",
+    "%                                                 ",
 )
 def test_nonlocal3():
     global j
@@ -205,15 +214,16 @@ def test_nonlocal3():
     in1()
 
 
+########################################
 @want(
-    "O00001 (test_nonlocal5)",
-    "( PR = Fixed[191, 200 + 3, addr=402])",
-    "  #402= 191.",
-    "  #403= 203.",
-    "( x.var = zap[]                 )",
-    "  #100= 33.",
-    "  M30",
-    "%",
+    "O00001 (test_nonlocal5)                           ",
+    "( PR = Fixed[191, 200 + 3, addr=402])             ",
+    "  #402= 191.                                      ",
+    "  #403= 203.                                      ",
+    "( x.var = zap[]                 )                 ",
+    "  #100= 33.                                       ",
+    "  M30                                             ",
+    "%                                                 ",
 )
 def test_nonlocal5():
     q = 9
@@ -233,15 +243,16 @@ def test_nonlocal5():
     x.var = zap()
 
 
+########################################
 @want(
-    "O00001 (test_nonlocal6)",
-    "( PR = Fixed[191, 200 + 3, addr=402])",
-    "  #402= 191.",
-    "  #403= 203.",
-    "(     x.var = q                 )",
-    "  #100= 2.",
-    "  M30",
-    "%",
+    "O00001 (test_nonlocal6)                           ",
+    "( PR = Fixed[191, 200 + 3, addr=402])             ",
+    "  #402= 191.                                      ",
+    "  #403= 203.                                      ",
+    "(     x.var = q                 )                 ",
+    "  #100= 2.                                        ",
+    "  M30                                             ",
+    "%                                                 ",
 )
 def test_nonlocal6():
     q = 2
@@ -259,13 +270,14 @@ def test_nonlocal6():
     zap()
 
 
+########################################
 @want(
-    "O00001 (test_nonlocal7)",
-    "( PR = Fixed[191, 200 + 3, addr=402])",
-    "  #402= 191.",
-    "  #403= 203.",
-    "  M30",
-    "%",
+    "O00001 (test_nonlocal7)                           ",
+    "( PR = Fixed[191, 200 + 3, addr=402])             ",
+    "  #402= 191.                                      ",
+    "  #403= 203.                                      ",
+    "  M30                                             ",
+    "%                                                 ",
 )
 def test_nonlocal7():
     __name__ = 3

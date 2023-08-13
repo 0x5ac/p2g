@@ -1,0 +1,7 @@
+* Haas macro variables
+:PROPERTIES:
+:CUSTOM_ID: haas
+:END:
+
+# when this is built, haas.txt is in same directory.
+#+INCLUDE: "../haas.txt" example

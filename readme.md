@@ -266,8 +266,7 @@ N1001
 
 # Table of contents
 
-
-## TOC
+\*
 
 -   [Introduction](https://github.com/0x5ac/p2g/blob/main/docs/howto.md#introduction)
 -   [Variables](https://github.com/0x5ac/p2g/blob/main/docs/howto.md#variables)

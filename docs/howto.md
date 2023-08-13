@@ -30,10 +30,10 @@ It comes with a set of macro variable definitions for a Haas mill with NCD. And 
 11. [DPRNT](#dprnt)
 12. [Symbol Tables](#symboltables)
 13. [Notes](#notes)
-14. [MIT License](#mit)
+14. [MIT License](#mit-license)
 15. [Authors](#authors)
 16. [Thanks](#thanks)
-17. [Haas macro variables](#haas)
+17. [Haas macro variables](#haas-macro-variables)
 
 
 # Install

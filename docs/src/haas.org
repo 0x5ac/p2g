@@ -1,6 +1,6 @@
 * Haas macro variables
 :PROPERTIES:
-:CUSTOM_ID: haas
+:CUSTOM_ID: haas-macro-variables
 :END:
 
 # when this is built, haas.txt is in same directory.

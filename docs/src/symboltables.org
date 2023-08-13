@@ -28,7 +28,7 @@ def symbol_table_demo():
 ⇨ =p2g symbol_table_demo.py= ⇨
 #+results: symbol_table_demo
 #+begin_example
-O0001 (symbol_table_demo: 0.3.6)
+O0001 (symbol_table_demo: 0.3.7)
 ( Symbol Table )
 
  ( MACHINE_ABS_ABOVE_OTS                   :  -7.000,  8.000,  9.000 )

@@ -50,7 +50,7 @@ def axes():
 ⇨ ~p2g axes.py~ ⇨
 #+results: axes1
 #+begin_example
-O0001 (axes: 0.3.6)
+O0001 (axes: 0.3.7)
 ( rhs of vector ops get expanded as needed )
   #5241= 0.                       ( G55.var = [0, 1]              )
   #5242= 1.

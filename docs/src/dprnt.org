@@ -22,7 +22,7 @@ def dprint_constants():
 #+end_src
 ⇨ ~p2g dprnt_constants.py~ ⇨
 #+RESULTS: dprnt_constants
-: O0001 (dprint_constants: 0.3.6)
+: O0001 (dprint_constants: 0.3.7)
 : DPRNT[A***12.34***2.00***3.00]
 : DPRNT[B**12.34**2.00**3.00]
 : DPRNT[C*a*12.340ba**2.000ba**3.000b]
@@ -43,7 +43,7 @@ def dprint_vectors():
 #+end_src
 ⇨ ~p2g dprnt_vectors.py~ ⇨
 #+RESULTS: dprnt_vectors
-: O0001 (dprint_vectors: 0.3.6)
+: O0001 (dprint_vectors: 0.3.7)
 : DPRNT[A*#100[42]#101[42]]
 : DPRNT[B*#100[32]#101[32]]
 : DPRNT[C*a#100[33]ba#101[33]b]
@@ -65,7 +65,7 @@ def dprnt_subs():
 #+end_src
 ⇨ ~p2g dprnt_subs.py~ ⇨
 #+RESULTS: dprnt_subs
-: O0001 (dprnt_subs: 0.3.6)
+: O0001 (dprnt_subs: 0.3.7)
 : DPRNT[results:*j0#100[31],*j1#101[31]]
 : DPRNT[results:*j0**7.3,*j1**8.1]
 :   M30
@@ -85,7 +85,7 @@ def dprnt_painless():
 ⇨ ~p2g dprnt_painless.py~ ⇨
 #+RESULTS: dprnt_painless
 #+begin_example
-O0001 (dprnt_painless: 0.3.6)
+O0001 (dprnt_painless: 0.3.7)
   #101= 0.                        ( for idx in range[10]:         )
 N1000
   IF [#101 GE 10.] GOTO 1002      ( for idx in range[10]:         )
@@ -114,7 +114,7 @@ def dprnt_std_python():
 ⇨ ~p2g dprnt_std_python.py~ ⇨
 #+results: dprnt_std_python
 #+begin_example
-O0001 (dprnt_std_python: 0.3.6)
+O0001 (dprnt_std_python: 0.3.7)
   #100= 32.                       ( x = Var[32]                   )
   #101= 27.                       ( y = Var[27]                   )
   #103= 0.                        ( for q in range[10]:           )

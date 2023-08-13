@@ -8,7 +8,7 @@
 1 Introduction
 ══════════════
 
-Version 0.3.6
+Version 0.3.7
 ─────────────
 
   P2G makes it simple to ensure that parts are in fixtures correctly,
@@ -169,7 +169,7 @@ Simple demo
   " ⇨ `directly' ⇨
 
   ┌────
-  │ O0001 (simple_demo: 0.3.6)
+  │ O0001 (simple_demo: 0.3.7)
   │   #100= 199.                      (   x = Var[199]                )
   │   #102= 0.                        (   for y in range[10]:         )
   │ N1000
@@ -206,7 +206,7 @@ Find largest number of flutes in tool table
   └────
   ⇨ `p2g maxflutes.py' ⇨
   ┌────
-  │ O0001 (maxflutes: 0.3.6)
+  │ O0001 (maxflutes: 0.3.7)
   │   #100= #1601                     ( mx_flutes = Var[haas.TOOL_TBL_FLUTES[0]])
   │   #101= 1601.                     ( for n_flutes in haas.TOOL_TBL_FLUTES:)
   │ N1000
@@ -274,7 +274,7 @@ Less trivial example
   ⇨ `p2g less_trival.py' ⇨
 
   ┌────
-  │ O0001 (less_trivial: 0.3.6)
+  │ O0001 (less_trivial: 0.3.7)
   │   #100= 2.                        ( cursor = Var[3][2, 3, 4]      )
   │   #101= 3.
   │   #102= 4.
@@ -339,7 +339,7 @@ Less trivial example
   └────
   ⇨ `p2g variables.py' ⇨
   ┌────
-  │ O0001 (variables: 0.3.6)
+  │ O0001 (variables: 0.3.7)
   │   #100= #5061 * 2. + #5041 + #5061( tmp0 = Var[skip0.xyz * 2.0 + workpos + skip1])
   │   #101= #5062 * 2. + #5042 + #5062
   │   #102= #5063 * 2. + #5043 + #5063
@@ -398,7 +398,7 @@ Less trivial example
   └────
   ⇨ `p2g coordinates.py' ⇨
   ┌────
-  │ O0001 (coordinates: 0.3.6)
+  │ O0001 (coordinates: 0.3.7)
   │ ( Describe 3 variables at 3000 )
   │ ( Fill with 1,2,31 )
   │   #3000= 1.                       ( dst.var = [1, 2, 31]          )
@@ -505,7 +505,7 @@ Less trivial example
   └────
   ⇨ `p2g goto_demo.py' ⇨
   ┌────
-  │ O0001 (goto_demo: 0.3.6)
+  │ O0001 (goto_demo: 0.3.7)
   │ 
   │ ( in work cosys, goto x=1, y=2, z=3 at 20ips )
   │   G90 G01 G55 F20. x1. y2. z3.    ( g1[1, 2, 3]                   )
@@ -591,7 +591,7 @@ Less trivial example
   └────
   ⇨ `p2g axes.py' ⇨
   ┌────
-  │ O0001 (axes: 0.3.6)
+  │ O0001 (axes: 0.3.7)
   │ ( rhs of vector ops get expanded as needed )
   │   #5241= 0.                       ( G55.var = [0, 1]              )
   │   #5242= 1.
@@ -655,7 +655,7 @@ Setting and resetting lookahead.
   └────
   ⇨ `p2g when_lookahead.py' ⇨
   ┌────
-  │ O0001 (start: 0.3.6)
+  │ O0001 (start: 0.3.7)
   │ 
   │ ( turn  off lookahead before the probe )
   │   M97 P123                        ( with sys.Lookahead[lookahead = False] :)
@@ -721,7 +721,7 @@ Setting and resetting lookahead.
   └────
 
   ┌────
-  │ O0001 (when_demo_block_delete: 0.3.6)
+  │ O0001 (when_demo_block_delete: 0.3.7)
   │   T01 M06                         (     sys.load_tool[PROBE]      )
   │   G65 P9832                       ( Probe on.                     )
   │   #100= 9.                        (     tmp = Var[9]              )
@@ -758,7 +758,7 @@ Constants
   └────
   ⇨ `p2g dprnt_constants.py' ⇨
   ┌────
-  │ O0001 (dprint_constants: 0.3.6)
+  │ O0001 (dprint_constants: 0.3.7)
   │ DPRNT[A***12.34***2.00***3.00]
   │ DPRNT[B**12.34**2.00**3.00]
   │ DPRNT[C*a*12.340ba**2.000ba**3.000b]
@@ -782,7 +782,7 @@ Vectors
   └────
   ⇨ `p2g dprnt_vectors.py' ⇨
   ┌────
-  │ O0001 (dprint_vectors: 0.3.6)
+  │ O0001 (dprint_vectors: 0.3.7)
   │ DPRNT[A*#100[42]#101[42]]
   │ DPRNT[B*#100[32]#101[32]]
   │ DPRNT[C*a#100[33]ba#101[33]b]
@@ -808,7 +808,7 @@ In subroutines.
   └────
   ⇨ `p2g dprnt_subs.py' ⇨
   ┌────
-  │ O0001 (dprnt_subs: 0.3.6)
+  │ O0001 (dprnt_subs: 0.3.7)
   │ DPRNT[results:*j0#100[31],*j1#101[31]]
   │ DPRNT[results:*j0**7.3,*j1**8.1]
   │   M30
@@ -830,7 +830,7 @@ So painless.
   └────
   ⇨ `p2g dprnt_painless.py' ⇨
   ┌────
-  │ O0001 (dprnt_painless: 0.3.6)
+  │ O0001 (dprnt_painless: 0.3.7)
   │   #101= 0.                        ( for idx in range[10]:         )
   │ N1000
   │   IF [#101 GE 10.] GOTO 1002      ( for idx in range[10]:         )
@@ -861,7 +861,7 @@ Can use Python f-strings too.
   └────
   ⇨ `p2g dprnt_std_python.py' ⇨
   ┌────
-  │ O0001 (dprnt_std_python: 0.3.6)
+  │ O0001 (dprnt_std_python: 0.3.7)
   │   #100= 32.                       ( x = Var[32]                   )
   │   #101= 27.                       ( y = Var[27]                   )
   │   #103= 0.                        ( for q in range[10]:           )
@@ -925,7 +925,7 @@ Extended f-string syntax
   └────
   ⇨ `p2g symbol_table_demo.py' ⇨
   ┌────
-  │ O0001 (symbol_table_demo: 0.3.6)
+  │ O0001 (symbol_table_demo: 0.3.7)
   │ ( Symbol Table )
   │ 
   │  ( MACHINE_ABS_ABOVE_OTS                   :  -7.000,  8.000,  9.000 )
@@ -1015,7 +1015,7 @@ Cool example
   └────
   ⇨ `p2g cool.py' ⇨
   ┌────
-  │ O0001 (cool: 0.3.6)
+  │ O0001 (cool: 0.3.7)
   │ ( You can do surprising things. )
   │   #100= 100.                      ( avariable_scalar = Var[100]   )
   │   #101= 7.                        ( another_xandy = Var[7, 8]     )
@@ -1062,7 +1062,7 @@ Beware
   └────
   ⇨ `p2g beware0.py' ⇨
   ┌────
-  │ O0001 (beware0: 0.3.6)
+  │ O0001 (beware0: 0.3.7)
   │ ( this moves contents of macro var 200 into 100 )
   │ ( it doesn't rewrite a.                         )
   │   #100= #200                      ( a =  b[0]                     )

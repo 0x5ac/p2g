@@ -47,7 +47,7 @@ def coordinates():
 ⇨ ~p2g coordinates.py~ ⇨
 #+results: coordinates1
 #+begin_example
-O0001 (coordinates: 0.3.6)
+O0001 (coordinates: 0.3.7)
 ( Describe 3 variables at 3000 )
 ( Fill with 1,2,31 )
   #3000= 1.                       ( dst.var = [1, 2, 31]          )

@@ -33,7 +33,7 @@ def start():
 ⇨ ~p2g when_lookahead.py~ ⇨
 #+RESULTS: when_lookahead
 #+begin_example
-O0001 (start: 0.3.6)
+O0001 (start: 0.3.7)
 
 ( turn  off lookahead before the probe )
   M97 P123                        ( with sys.Lookahead[lookahead = False] :)
@@ -100,7 +100,7 @@ def when_demo_block_delete():
 #+end_src
 
 #+RESULTS: when_demo_block_delete
-: O0001 (when_demo_block_delete: 0.3.6)
+: O0001 (when_demo_block_delete: 0.3.7)
 :   T01 M06                         (     sys.load_tool[PROBE]      )
 :   G65 P9832                       ( Probe on.                     )
 :   #100= 9.                        (     tmp = Var[9]              )

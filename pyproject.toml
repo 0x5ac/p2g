@@ -51,6 +51,12 @@ wrapt = "^1.15.0"
 dill = "^0.3.6"
 
 
+
+
+[[tool.poetry.source]]
+name = "PyPI"
+priority = "primary"
+
 [tool.deptry]
 exclude = ['(examples|tests)/*']
 

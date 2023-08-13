@@ -76,7 +76,7 @@ def goto_demo():
 ⇨ =p2g goto_demo.py= ⇨
 #+results: goto_demo
 #+begin_example
-O0001 (goto_demo: 0.3.8)
+O0001 (goto_demo: 0.3.9)
 
 ( in work cosys, goto x=1, y=2, z=3 at 20ips )
   G90 G01 G55 F20. x1. y2. z3.    ( g1[1, 2, 3]                   )

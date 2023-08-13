@@ -125,7 +125,7 @@ Options:
 # Demo.
 
 <a href="https://youtu.be/PX818-iRb1Q">
-<img src="/docs/png/vicecenter1.png" alt="link to youtube.">
+<img src="https://github.com/0x5ac/p2g/blob/main/docs/png/vicecenter1.png" alt="link to youtube.">
 </a>
 
 

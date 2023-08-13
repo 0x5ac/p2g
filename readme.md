@@ -6,7 +6,7 @@
 ## Demo.
 
 <a href="https://youtu.be/PX818-iRb1Q">
-<img src="/docs/png/vicecenter1.png" alt="link to youtube.">
+<img src="https://github.com/0x5ac/p2g/blob/main/docs/png/vicecenter1.png" alt="link to youtube.">
 </a>
 
 
@@ -281,6 +281,5 @@ N1001
 -   [Notes](https://github.com/0x5ac/p2g/blob/main/docs/howto.md#notes)
 -   [Authors](https://github.com/0x5ac/p2g/blob/main/docs/howto.md#authors)
 -   [Thanks](https://github.com/0x5ac/p2g/blob/main/docs/howto.md#thanks)
--   [Video](https://github.com/0x5ac/p2g/blob/main/docs/howto.md#video)
 
-1.  Copyright © 2023 Steve Chamberlain
+-   Copyright © 2023 Steve Chamberlain

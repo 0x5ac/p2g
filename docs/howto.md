@@ -1,4 +1,5 @@
 <img src="/docs/pytest.svg" alt=""><img src="/docs/mit.svg" alt=""><img src="/docs/coverage.svg" alt="">
+<br>
 <img src="https://github.com/0x5ac/p2g/actions/workflows/make.yml/badge.svg" alt="">
 
 

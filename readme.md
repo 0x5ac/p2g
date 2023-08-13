@@ -13,7 +13,7 @@
 ## Introduction
 
 
-### Version 0.3.8
+### Version 0.3.9
 
 P2G makes it simple to ensure that parts are in fixtures correctly, coordinate systems are adjusted to deal with stock placement and cope with movement and rotation of workpieces through multiple operations.
 

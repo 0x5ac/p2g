@@ -1,4 +1,4 @@
 #+BEGIN_EXPORT html
-<img src="/docs/pytest.svg" alt=""><img src="/docs/mit.svg" alt=""><img src="/docs/coverage.svg" alt="">
+<img src="/docs/pytest.svg" alt=""><img src="/docs/mit.svg" alt=""><img src="/docs/coverage.svg" alt=""><img src="https://github.com/0x5ac/p2g/actions/workflows/make.yml/badge.svg" alt="">
 
 #+END_EXPORT

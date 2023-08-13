@@ -45,7 +45,7 @@ def variables():
 ⇨ =p2g variables.py= ⇨
 #+results: variables1
 #+begin_example
-O0001 (variables: 0.3.7+1)
+O0001 (variables: 0.3.8)
   #100= #5061 * 2. + #5041 + #5061( tmp0 = Var[skip0.xyz * 2.0 + workpos + skip1])
   #101= #5062 * 2. + #5042 + #5062
   #102= #5063 * 2. + #5043 + #5063

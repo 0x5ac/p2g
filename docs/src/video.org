@@ -5,7 +5,7 @@
 
 #+BEGIN_EXPORT html
 <a href="https://youtu.be/PX818-iRb1Q">
-<img src="/docs/png/vicecenter1.png">
+<img src="/docs/png/vicecenter1.png" alt="link to youtube.">
 </a>
 
 #+END_EXPORT

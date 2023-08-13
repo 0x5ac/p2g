@@ -1,10 +1,10 @@
-<img src="/docs/pytest.svg"><img src="/docs/mit.svg"><img src="/docs/coverage.svg">
+<img src="/docs/pytest.svg" alt=""><img src="/docs/mit.svg" alt=""><img src="/docs/coverage.svg" alt="">
 
 
 # Introduction
 
 
-## Version 0.3.7+1
+## Version 0.3.8
 
 P2G makes it simple to ensure that parts are in fixtures correctly, coordinate systems are adjusted to deal with stock placement and cope with movement and rotation of workpieces through multiple operations.
 
@@ -125,7 +125,7 @@ Options:
 # Demo.
 
 <a href="https://youtu.be/PX818-iRb1Q">
-<img src="/docs/png/vicecenter1.png">
+<img src="/docs/png/vicecenter1.png" alt="link to youtube.">
 </a>
 
 
@@ -157,7 +157,7 @@ def simple_demo():
 " ⇨ `directly` ⇨
 
 ```
-O0001 (simple_demo: 0.3.7+1)
+O0001 (simple_demo: 0.3.8)
   #100= 199.                      (   x = Var[199]                )
   #102= 0.                        (   for y in range[10]:         )
 N1000
@@ -195,7 +195,7 @@ def maxflutes():
 ⇨ `p2g maxflutes.py` ⇨
 
 ```
-O0001 (maxflutes: 0.3.7+1)
+O0001 (maxflutes: 0.3.8)
   #100= #1601                     ( mx_flutes = Var[haas.TOOL_TBL_FLUTES[0]])
   #101= 1601.                     ( for n_flutes in haas.TOOL_TBL_FLUTES:)
 N1000
@@ -263,7 +263,7 @@ def less_trivial():
 ⇨ `p2g less_trival.py` ⇨
 
 ```
-O0001 (less_trivial: 0.3.7+1)
+O0001 (less_trivial: 0.3.8)
   #100= 2.                        ( cursor = Var[3][2, 3, 4]      )
   #101= 3.
   #102= 4.
@@ -329,7 +329,7 @@ def variables():
 ⇨ `p2g variables.py` ⇨
 
 ```
-O0001 (variables: 0.3.7+1)
+O0001 (variables: 0.3.8)
   #100= #5061 * 2. + #5041 + #5061( tmp0 = Var[skip0.xyz * 2.0 + workpos + skip1])
   #101= #5062 * 2. + #5042 + #5062
   #102= #5063 * 2. + #5043 + #5063
@@ -388,7 +388,7 @@ def coordinates():
 ⇨ `p2g coordinates.py` ⇨
 
 ```
-O0001 (coordinates: 0.3.7+1)
+O0001 (coordinates: 0.3.8)
 ( Describe 3 variables at 3000 )
 ( Fill with 1,2,31 )
   #3000= 1.                       ( dst.var = [1, 2, 31]          )
@@ -494,7 +494,7 @@ def goto_demo():
 ⇨ `p2g goto_demo.py` ⇨
 
 ```
-O0001 (goto_demo: 0.3.7+1)
+O0001 (goto_demo: 0.3.8)
 
 ( in work cosys, goto x=1, y=2, z=3 at 20ips )
   G90 G01 G55 F20. x1. y2. z3.    ( g1[1, 2, 3]                   )
@@ -579,7 +579,7 @@ def axes():
 ⇨ `p2g axes.py` ⇨
 
 ```
-O0001 (axes: 0.3.7+1)
+O0001 (axes: 0.3.8)
 ( rhs of vector ops get expanded as needed )
   #5241= 0.                       ( G55.var = [0, 1]              )
   #5242= 1.
@@ -641,7 +641,7 @@ def start():
 ⇨ `p2g when_lookahead.py` ⇨
 
 ```
-O0001 (start: 0.3.7+1)
+O0001 (start: 0.3.8)
 
 ( turn  off lookahead before the probe )
   M97 P123                        ( with sys.Lookahead[lookahead = False] :)
@@ -705,7 +705,7 @@ def when_demo_block_delete():
 
 ```
 
-    O0001 (when_demo_block_delete: 0.3.7+1)
+    O0001 (when_demo_block_delete: 0.3.8)
       T01 M06                         (     sys.load_tool[PROBE]      )
       G65 P9832                       ( Probe on.                     )
       #100= 9.                        (     tmp = Var[9]              )
@@ -740,7 +740,7 @@ def dprint_constants():
 
 ⇨ `p2g dprnt_constants.py` ⇨
 
-    O0001 (dprint_constants: 0.3.7+1)
+    O0001 (dprint_constants: 0.3.8)
     DPRNT[A***12.34***2.00***3.00]
     DPRNT[B**12.34**2.00**3.00]
     DPRNT[C*a*12.340ba**2.000ba**3.000b]
@@ -763,7 +763,7 @@ def dprint_vectors():
 
 ⇨ `p2g dprnt_vectors.py` ⇨
 
-    O0001 (dprint_vectors: 0.3.7+1)
+    O0001 (dprint_vectors: 0.3.8)
     DPRNT[A*#100[42]#101[42]]
     DPRNT[B*#100[32]#101[32]]
     DPRNT[C*a#100[33]ba#101[33]b]
@@ -788,7 +788,7 @@ def dprnt_subs():
 
 ⇨ `p2g dprnt_subs.py` ⇨
 
-    O0001 (dprnt_subs: 0.3.7+1)
+    O0001 (dprnt_subs: 0.3.8)
     DPRNT[results:*j0#100[31],*j1#101[31]]
     DPRNT[results:*j0**7.3,*j1**8.1]
       M30
@@ -810,7 +810,7 @@ def dprnt_painless():
 ⇨ `p2g dprnt_painless.py` ⇨
 
 ```
-O0001 (dprnt_painless: 0.3.7+1)
+O0001 (dprnt_painless: 0.3.8)
   #101= 0.                        ( for idx in range[10]:         )
 N1000
   IF [#101 GE 10.] GOTO 1002      ( for idx in range[10]:         )
@@ -842,7 +842,7 @@ def dprnt_std_python():
 ⇨ `p2g dprnt_std_python.py` ⇨
 
 ```
-O0001 (dprnt_std_python: 0.3.7+1)
+O0001 (dprnt_std_python: 0.3.8)
   #100= 32.                       ( x = Var[32]                   )
   #101= 27.                       ( y = Var[27]                   )
   #103= 0.                        ( for q in range[10]:           )
@@ -897,7 +897,7 @@ def symbol_table_demo():
 ⇨ `p2g symbol_table_demo.py` ⇨
 
 ```
-O0001 (symbol_table_demo: 0.3.7+1)
+O0001 (symbol_table_demo: 0.3.8)
 ( Symbol Table )
 
  ( MACHINE_ABS_ABOVE_OTS                   :  -7.000,  8.000,  9.000 )
@@ -981,7 +981,7 @@ def cool():
 ⇨ `p2g cool.py` ⇨
 
 ```
-O0001 (cool: 0.3.7+1)
+O0001 (cool: 0.3.8)
 ( You can do surprising things. )
   #100= 100.                      ( avariable_scalar = Var[100]   )
   #101= 7.                        ( another_xandy = Var[7, 8]     )
@@ -1029,7 +1029,7 @@ def beware0():
 ⇨ `p2g beware0.py` ⇨
 
 ```
-O0001 (beware0: 0.3.7+1)
+O0001 (beware0: 0.3.8)
 ( this moves contents of macro var 200 into 100 )
 ( it doesn't rewrite a.                         )
   #100= #200                      ( a =  b[0]                     )

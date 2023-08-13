@@ -1,19 +1,19 @@
 # P2G
 
-<img src="/docs/pytest.svg"><img src="/docs/mit.svg"><img src="/docs/coverage.svg">
+<img src="/docs/pytest.svg" alt=""><img src="/docs/mit.svg" alt=""><img src="/docs/coverage.svg" alt="">
 
 
 ## Demo.
 
 <a href="https://youtu.be/PX818-iRb1Q">
-<img src="/docs/png/vicecenter1.png">
+<img src="/docs/png/vicecenter1.png" alt="link to youtube.">
 </a>
 
 
 ## Introduction
 
 
-### Version 0.3.7+1
+### Version 0.3.8
 
 P2G makes it simple to ensure that parts are in fixtures correctly, coordinate systems are adjusted to deal with stock placement and cope with movement and rotation of workpieces through multiple operations.
 
@@ -136,7 +136,7 @@ def simple_demo():
 " ⇨ `directly` ⇨
 
 ```
-O0001 (simple_demo: 0.3.7+1)
+O0001 (simple_demo: 0.3.8)
   #100= 199.                      (   x = Var[199]                )
   #102= 0.                        (   for y in range[10]:         )
 N1000
@@ -174,7 +174,7 @@ def maxflutes():
 ⇨ `p2g maxflutes.py` ⇨
 
 ```
-O0001 (maxflutes: 0.3.7+1)
+O0001 (maxflutes: 0.3.8)
   #100= #1601                     ( mx_flutes = Var[haas.TOOL_TBL_FLUTES[0]])
   #101= 1601.                     ( for n_flutes in haas.TOOL_TBL_FLUTES:)
 N1000
@@ -242,7 +242,7 @@ def less_trivial():
 ⇨ `p2g less_trival.py` ⇨
 
 ```
-O0001 (less_trivial: 0.3.7+1)
+O0001 (less_trivial: 0.3.8)
   #100= 2.                        ( cursor = Var[3][2, 3, 4]      )
   #101= 3.
   #102= 4.

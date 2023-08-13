@@ -277,6 +277,7 @@ N1001
 -   [Axes](https://github.com/0x5ac/p2g/blob/main/docs/howto.md#axes)
 -   [When](https://github.com/0x5ac/p2g/blob/main/docs/howto.md#when)
 -   [DPRNT](https://github.com/0x5ac/p2g/blob/main/docs/howto.md#dprnt)
+-   [Symbol Tables](https://github.com/0x5ac/p2g/blob/main/docs/howto.md#symbol-table)
 -   [Notes](https://github.com/0x5ac/p2g/blob/main/docs/howto.md#notes)
 -   [Authors](https://github.com/0x5ac/p2g/blob/main/docs/howto.md#authors)
 -   [Thanks](https://github.com/0x5ac/p2g/blob/main/docs/howto.md#thanks)

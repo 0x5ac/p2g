@@ -24,16 +24,17 @@ It comes with a set of macro variable definitions for a Haas mill with NCD. And 
 5.  [Examples](#examples)
 6.  [Variables](#variables)
 7.  [Coordinates](#coordinates)
-8.  [Goto](#goto)
-9.  [Axes](#axes)
-10. [When](#when)
-11. [DPRNT](#dprnt)
-12. [Symbol Tables](#symbol-tables)
-13. [Notes](#notes)
-14. [MIT License](#mit-license)
-15. [Authors](#authors)
-16. [Thanks](#thanks)
-17. [Haas macro variables](#haas-macro-variables)
+8.  [Expressions](#expressions)
+9.  [Goto](#goto)
+10. [Axes](#axes)
+11. [When](#when)
+12. [DPRNT](#dprnt)
+13. [Symbol Tables](#symbol-tables)
+14. [Notes](#notes)
+15. [MIT License](#mit-license)
+16. [Authors](#authors)
+17. [Thanks](#thanks)
+18. [Haas macro variables](#haas-macro-variables)
 
 
 # Install
@@ -427,6 +428,74 @@ O0001 (coordinates: 0.3.10)
 ( Mix them up. )
   #101= #202                      ( p1.yz = p2.yz[1]              )
   #102= #202
+  M30
+%
+```
+
+
+# Expressions
+
+Python expressions turn into G-Code as you may expect, save that native Python uses radians for trig, and G-Code uses degrees, so folding is done in degrees.
+
+```python
+
+from p2g import *  # this is the common header
+from p2g.haas import *  # to all the examples
+
+def expressions():
+    com("Variables go into macro variables.")
+    theta = Var(0.3)
+    angle = Var(sin(theta))
+
+    com("Constants are elided in G-code.")
+    thetak = Const(0.3)
+    anglek = Var(sin(thetak))
+
+    com("Lots of things are folded.")
+    t1 = Var(2 * thetak + 7)
+
+    com("Simple array math:")
+
+    box_size = Const([4, 4, 2])
+    tlhc = Var(-box_size / 2)
+    brhc = Var(box_size / 2)
+    diff = Var(tlhc - brhc)
+
+    a, b, x = Var(), Var(), Var()
+    a = tlhc[0] / tlhc[1]
+    b = tlhc[0] % tlhc[1]
+    x = tlhc[0] & tlhc[1]
+    tlhc.xy = ((a - b + 3) / sin(x), (a + b + 3) / cos(x))
+
+```
+
+⇨ `p2g expressions.py` ⇨
+
+```
+O0001 (expressions: 0.3.10)
+( Variables go into macro variables. )
+  #100= 0.3                       ( theta = Var[0.3]              )
+  #101= SIN[#100]                 ( angle = Var[sin[theta]]       )
+( Constants are elided in G-code. )
+  #102= 0.0052                    ( anglek = Var[sin[thetak]]     )
+( Lots of things are folded. )
+  #103= 7.6                       ( t1 = Var[2 * thetak + 7]      )
+( Simple array math: )
+  #104= -2.                       ( tlhc = Var[-box_size / 2]     )
+  #105= -2.
+  #106= -1.
+  #107= 2.                        ( brhc = Var[box_size / 2]      )
+  #108= 2.
+  #109= 1.
+  #110= #104 - #107               ( diff = Var[tlhc - brhc]       )
+  #111= #105 - #108
+  #112= #106 - #109
+  #113= #104 / #105               ( a = tlhc[0] / tlhc[1]         )
+  #114= #104 MOD #105             ( b = tlhc[0] % tlhc[1]         )
+  #115= #104 AND #105             ( x = tlhc[0] & tlhc[1]         )
+( tlhc.xy = [[a - b + 3] / sin[x], [a + b + 3] / cos[x]])
+  #104= [#113 - #114 + 3.] / SIN[#115]
+  #105= [#113 + #114 + 3.] / COS[#115]
   M30
 %
 ```

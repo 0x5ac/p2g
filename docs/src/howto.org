@@ -16,6 +16,7 @@
 #+INCLUDE: "examples.org"
 #+INCLUDE: "variables.org"
 #+INCLUDE: "coordinates.org"
+#+INCLUDE: "expressions.org"
 #+INCLUDE: "goto.org"
 #+INCLUDE: "axes.org"
 #+INCLUDE: "when.org"

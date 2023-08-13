@@ -36,16 +36,17 @@ Version 0.3.10
   5. Examples
   6. Variables
   7. Coordinates
-  8. Goto
-  9. Axes
-  10. When
-  11. DPRNT
-  12. Symbol Tables
-  13. Notes
-  14. MIT License
-  15. Authors
-  16. Thanks
-  17. Haas macro variables
+  8. Expressions
+  9. Goto
+  10. Axes
+  11. When
+  12. DPRNT
+  13. Symbol Tables
+  14. Notes
+  15. MIT License
+  16. Authors
+  17. Thanks
+  18. Haas macro variables
 
 
 2 Install
@@ -442,7 +443,76 @@ Less trivial example
   └────
 
 
-8 Goto
+8 Expressions
+═════════════
+
+  Python expressions turn into G-Code as you may expect, save that
+  native Python uses radians for trig, and G-Code uses degrees, so
+  folding is done in degrees.
+
+  ┌────
+  │ 
+  │ from p2g import *  # this is the common header
+  │ from p2g.haas import *  # to all the examples
+  │ 
+  │ def expressions():
+  │     com("Variables go into macro variables.")
+  │     theta = Var(0.3)
+  │     angle = Var(sin(theta))
+  │ 
+  │     com("Constants are elided in G-code.")
+  │     thetak = Const(0.3)
+  │     anglek = Var(sin(thetak))
+  │ 
+  │     com("Lots of things are folded.")
+  │     t1 = Var(2 * thetak + 7)
+  │ 
+  │     com("Simple array math:")
+  │ 
+  │     box_size = Const([4, 4, 2])
+  │     tlhc = Var(-box_size / 2)
+  │     brhc = Var(box_size / 2)
+  │     diff = Var(tlhc - brhc)
+  │ 
+  │     a, b, x = Var(), Var(), Var()
+  │     a = tlhc[0] / tlhc[1]
+  │     b = tlhc[0] % tlhc[1]
+  │     x = tlhc[0] & tlhc[1]
+  │     tlhc.xy = ((a - b + 3) / sin(x), (a + b + 3) / cos(x))
+  │ 
+  └────
+  ⇨ `p2g expressions.py' ⇨
+  ┌────
+  │ O0001 (expressions: 0.3.10)
+  │ ( Variables go into macro variables. )
+  │   #100= 0.3                       ( theta = Var[0.3]              )
+  │   #101= SIN[#100]                 ( angle = Var[sin[theta]]       )
+  │ ( Constants are elided in G-code. )
+  │   #102= 0.0052                    ( anglek = Var[sin[thetak]]     )
+  │ ( Lots of things are folded. )
+  │   #103= 7.6                       ( t1 = Var[2 * thetak + 7]      )
+  │ ( Simple array math: )
+  │   #104= -2.                       ( tlhc = Var[-box_size / 2]     )
+  │   #105= -2.
+  │   #106= -1.
+  │   #107= 2.                        ( brhc = Var[box_size / 2]      )
+  │   #108= 2.
+  │   #109= 1.
+  │   #110= #104 - #107               ( diff = Var[tlhc - brhc]       )
+  │   #111= #105 - #108
+  │   #112= #106 - #109
+  │   #113= #104 / #105               ( a = tlhc[0] / tlhc[1]         )
+  │   #114= #104 MOD #105             ( b = tlhc[0] % tlhc[1]         )
+  │   #115= #104 AND #105             ( x = tlhc[0] & tlhc[1]         )
+  │ ( tlhc.xy = [[a - b + 3] / sin[x], [a + b + 3] / cos[x]])
+  │   #104= [#113 - #114 + 3.] / SIN[#115]
+  │   #105= [#113 + #114 + 3.] / COS[#115]
+  │   M30
+  │ %
+  └────
+
+
+9 Goto
 ══════
 
   Goto functions are constructed from parts, and make building blocks
@@ -543,8 +613,8 @@ Less trivial example
   └────
 
 
-9 Axes
-══════
+10 Axes
+═══════
 
   Any number of axes are supported, default just being xy and z.
 
@@ -623,7 +693,7 @@ Less trivial example
   └────
 
 
-10 When
+11 When
 ═══════
 
   'when' works as in python, save there are no exceptions; useful for
@@ -733,7 +803,7 @@ Setting and resetting lookahead.
   └────
 
 
-11 DPRNT
+12 DPRNT
 ════════
 
   P2G turns Python f string into runes that DPRNT can digest.
@@ -899,7 +969,7 @@ Extended f-string syntax
               As an «e-string», but only expanded between items.
 
 
-12 Symbol Tables
+13 Symbol Tables
 ════════════════
 
   Set the global `p2g.Control.symbol_table' to get a symbol table in the
@@ -949,7 +1019,7 @@ Extended f-string syntax
   └────
 
 
-13 Notes
+14 Notes
 ════════
 
 Stuff you already know
@@ -1090,7 +1160,7 @@ Beware
   └────
 
 
-14 MIT License
+15 MIT License
 ══════════════
 
   Copyright © 2023 Steve Chamberlain
@@ -1115,13 +1185,13 @@ Beware
   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-15 Authors
+16 Authors
 ══════════
 
   sac@pobox.com
 
 
-16 Thanks
+17 Thanks
 ═════════
 
   all the good parts of walk*.py are from:
@@ -1156,7 +1226,7 @@ Beware
   └────
 
 
-17 Haas macro variables
+18 Haas macro variables
 ═══════════════════════
 
   ┌────

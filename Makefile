@@ -127,7 +127,7 @@ FUNC_TEST_FILES   :=            \
   tests/test_vars.py            \
   tests/test_vector.py
 
-READMEMD          := README.MD
+READMEMD          := readme.md
 DIST_DOC          :=            \
   docs/howto.md                 \
   docs/howto.txt                \
@@ -335,7 +335,7 @@ docs/obj/%.diff:docs/obj/%.org
 %.md:%.org $(TMP_ORGS)
 > $(EVAL)
 
-README.MD        : readme.org $(TMP_ORGS)
+$(READMEMD)        : readme.org $(TMP_ORGS)
 > $(EVAL)
 
 $(INCLUDED_ORGS) : $(VERSION_STAMP)

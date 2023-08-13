@@ -3,7 +3,7 @@ version = "0.3.7"
 name = "p2g"
 description = "Transpile python into cnc gcode."
 authors = ["sac <sac@0x5ac.com>"]
-readme = "README.MD"
+readme = "readme.md"
 license = "MIT"
 keywords = ["cnc", "gcode", "mill", "haas", "g-code", "probe", "vf"]
 classifiers = [
@@ -20,7 +20,7 @@ packages = [
 
 ]
 include = [ "p2g/docs/*"]
-exclude = [ ".*got" ]
+exclude = [ "p2g/examples/*.got" ]
 [tool.poetry.scripts]
 p2g = "p2g.main:main"
 

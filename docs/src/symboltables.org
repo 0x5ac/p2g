@@ -1,6 +1,6 @@
 * Symbol Tables
 :PROPERTIES:
-:CUSTOM_ID: symboltables
+:CUSTOM_ID: symbol-tables
 :END:
 
 Set the global ~p2g.Control.symbol_table~ to get a symbol
@@ -18,17 +18,17 @@ fish = 10
 not_used = 12
 
 def symbol_table_demo():
-      p2g.Control.symbol_table = True    
+      p2g.Control.symbol_table = True
       p2g.comment("Only used symbols are in output table.")
       p2g.Var(MACHINE_ABS_ABOVE_OTS)
       p2g.Var(MACHINE_ABS_ABOVE_VICE * fish)
       v1 = p2g.Var()
       v1 += RAW_ANALOG[7]
-#+end_src  
+#+end_src
 ⇨ =p2g symbol_table_demo.py= ⇨
 #+results: symbol_table_demo
 #+begin_example
-O0001 (symbol_table_demo: 0.3.7)
+O00001 (symbol_table_demo: 0.3.13)
 ( Symbol Table )
 
  ( MACHINE_ABS_ABOVE_OTS                   :  -7.000,  8.000,  9.000 )

@@ -20,7 +20,7 @@ Example:
 #+name: variables1
 #+begin_src python -i  :results output :exports both :python poetry run p2g   -
 
-from p2g import *  # this is the common header
+from p2g import *
 
 def variables():
     # On my machine, Renishaw skip positions are
@@ -45,7 +45,7 @@ def variables():
 ⇨ =p2g variables.py= ⇨
 #+results: variables1
 #+begin_example
-O0001 (variables: 0.3.7)
+O00001 (variables: 0.3.13)
   #100= #5061 * 2. + #5041 + #5061( tmp0 = Var[skip0.xyz * 2.0 + workpos + skip1])
   #101= #5062 * 2. + #5042 + #5062
   #102= #5063 * 2. + #5043 + #5063

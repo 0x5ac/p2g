@@ -17,14 +17,14 @@ $ pip install p2g
 *** fetch dependencies, rebuild and install with pip
 
 #+begin_example
-$ git clone https://github.com/0x5ac/attempt1 p2g
+$ git clone https://github.com/0x5ac/p2g p2g
 $ cd p2g
 $ make install
 #+end_example
 
 *** fetch dependencies and rebuild
 #+begin_example
-$ git clone https://github.com/0x5ac/attempt1 p2g
+$ git clone https://github.com/0x5ac/p2g p2g
 $ cd p2g
 $ make
 #+end_example

@@ -1,7 +1,7 @@
 import io
 import sys
 import pathlib
-from p2g.main import main
+from p2g.main import main, main
 
 
 # can't be tested by directly pytest becase fail import.
@@ -17,7 +17,6 @@ def must_fail(cap, *, src=[], want=[]):
 
     sys.stdin = io.StringIO("\n".join(src))
     main(["--short-filenames", "-"])
-
     got = gotlines(cap)
 
     assert got == want

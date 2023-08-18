@@ -32,7 +32,7 @@ def simple_demo():
 
 #+results: simpledem
 #+begin_example
-O0001 (simple_demo: 0.3.7)
+O00001 (simple_demo: 0.3.13)
   #100= 199.                      (   x = Var[199]                )
   #102= 0.                        (   for y in range[10]:         )
 N1000
@@ -60,7 +60,7 @@ import p2g
 def maxflutes():
 
     mx_flutes = p2g.Var(p2g.haas.TOOL_TBL_FLUTES[0])
-    for n_flutes in p2g.haas.TOOL_TBL_FLUTES:
+    for n_flutes in p2g.haas.TOOL_TBL_FLUTES[1:]:
         if n_flutes > mx_flutes:
             mx_flutes = n_flutes
 
@@ -70,11 +70,11 @@ def maxflutes():
   ⇨ =p2g maxflutes.py= ⇨
 #+RESULTS: maxfluts1
 #+begin_example
-O0001 (maxflutes: 0.3.7)
+O00001 (maxflutes: 0.3.13)
   #100= #1601                     ( mx_flutes = Var[haas.TOOL_TBL_FLUTES[0]])
-  #101= 1601.                     ( for n_flutes in haas.TOOL_TBL_FLUTES:)
+  #101= 1602.                     ( for n_flutes in haas.TOOL_TBL_FLUTES[1:]:)
 N1000
-  IF [#101 GE 1801.] GOTO 1002    ( for n_flutes in haas.TOOL_TBL_FLUTES:)
+  IF [#101 GE 1801.] GOTO 1002    ( for n_flutes in haas.TOOL_TBL_FLUTES[1:]:)
   IF [#[#101] LE #100] GOTO 1003  (     if n_flutes > mx_flutes:  )
   #100= #[#101]                   (         mx_flutes = n_flutes  )
   GOTO 1004
@@ -139,7 +139,7 @@ def less_trivial():
 
 #+results: lesstrivial1
 #+begin_example
-O0001 (less_trivial: 0.3.7)
+O00001 (less_trivial: 0.3.13)
   #100= 2.                        ( cursor = Var[3][2, 3, 4]      )
   #101= 3.
   #102= 4.
@@ -159,4 +159,3 @@ N1001
   M30
 %
 #+end_example
-

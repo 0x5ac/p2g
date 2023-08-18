@@ -1,11 +1,6 @@
-* Demo.
+* Demo
 :PROPERTIES:
-:CUSTOM_ID: vdemo
+:CUSTOM_ID: demo
 :END:
 
-#+BEGIN_EXPORT html
-<a href="https://youtu.be/PX818-iRb1Q">
-<img src="/docs/png/vicecenter1.png">
-</a>
-
-#+END_EXPORT
+[[https://youtu.be/PX818-iRb1Q][https://github.com/0x5ac/p2g/blob/main/docs/png/vicecenter1.png]]

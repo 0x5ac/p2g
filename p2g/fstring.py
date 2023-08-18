@@ -99,7 +99,7 @@ def format_for_n(val, fmt):
     if not fmt:
         fmt = "7.2f"
     gcode_fmt = py_fmt_to_gcode(fmt)
-    if op.get_nelements(val) > 1:
+    if nd.get_nelements(val) > 1:
         return format_expand(val, gcode_fmt)
     return format_for_one(p2g.scalar.wrap_scalar(val), gcode_fmt, 0)
 

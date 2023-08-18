@@ -49,8 +49,6 @@ class Constant(ConstantBase):
         super().__init__(nd.const_nd)
         self._value = value
 
-    # def get_address(self):
-    #     err.compiler("Can't take address of constant.")
     @property
     def value(self):
         return self._value

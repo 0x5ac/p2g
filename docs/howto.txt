@@ -8,8 +8,8 @@
 1 Introduction
 ══════════════
 
-Version 0.3.7
-─────────────
+Version 0.3.13
+──────────────
 
   P2G makes it simple to ensure that parts are in fixtures correctly,
   coordinate systems are adjusted to deal with stock placement and cope
@@ -32,20 +32,22 @@ Version 0.3.7
   1. Introduction
   2. Install
   3. Usage
-  4. Demo.
+  4. Demo
   5. Examples
   6. Variables
   7. Coordinates
-  8. Goto
-  9. Axes
-  10. When
-  11. DPRNT
-  12. Symbol Tables
-  13. Notes
-  14. MIT License
-  15. Authors
-  16. Thanks
-  17. Haas macro variables
+  8. Expressions
+  9. Goto
+  10. Axes
+  11. When
+  12. DPRNT
+  13. Symbol Tables
+  14. Notes
+  15. Maintenance options
+  16. MIT License
+  17. Authors
+  18. Thanks
+  19. Haas macrovars
 
 
 2 Install
@@ -68,7 +70,7 @@ fetch dependencies, rebuild and install with pip
 ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
 
   ┌────
-  │ $ git clone https://github.com/0x5ac/attempt1 p2g
+  │ $ git clone https://github.com/0x5ac/p2g p2g
   │ $ cd p2g
   │ $ make install
   └────
@@ -78,7 +80,7 @@ fetch dependencies and rebuild
 ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
 
   ┌────
-  │ $ git clone https://github.com/0x5ac/attempt1 p2g
+  │ $ git clone https://github.com/0x5ac/p2g p2g
   │ $ cd p2g
   │ $ make
   └────
@@ -88,18 +90,13 @@ fetch dependencies and rebuild
 ═══════
 
   ┌────
-
-  └────
-
-  ┌────
   │ p2g - Turn Python into G-Code.
   │ 
   │ Usage:
   │   p2g [options]  <srcfile> [<dstfile>]
   │   p2g help [ all | topics | maint | version | location | <topic> ]
-  │   p2g examples <dstdir>
+  │   p2g build-examples <dstdir>
   │ 
-  │    For bare p2g:
   │        p2g tram-rotary.py ~/_nc_/O{countdown}tr.nc
   │         Makes an output of the form ~/_nc_/O1234tr.nc
   │ 
@@ -107,9 +104,8 @@ fetch dependencies and rebuild
   │         Read from stdin, look for the 'thisone' function and write to
   │         to stdout.
   │ 
-  │ 
   │ Arguments:
-  │   <srcfile>   Source python file. [default: stdin]
+  │   <srcfile>   Source python file.
   │   <dstfile>   Destination G-Code file. [default: stdout]
   │                {countdown} in file name creates a decrementing prefix
   │                for the output file which makes looking for the .nc in
@@ -119,13 +115,9 @@ fetch dependencies and rebuild
   │   <topic>      [ all | topics | maint | version | location | <topic> ]
   │          all      Print all readme.
   │          topics   List all topics.
-  │          maint    Print maintenance options.
   │          version  Show version
-  │          location Show absdir of main
+  │          location Show absdir of main module.
   │          <topic>  Print from readme starting at topic.
-  │ 
-  │ 
-  │ 
   │ 
   │ Options:
   │      --job=<jobname>      Olabel for output code.
@@ -135,11 +127,18 @@ fetch dependencies and rebuild
   │                            makes text fit more easily into
   │                            a narrow program window.
   │      --short-filenames    Emit just the lsb of filenames.
+  │ 
   └────
 
 
-4 Demo.
-═══════
+4 Demo
+══════
+
+  [https://github.com/0x5ac/p2g/blob/main/docs/png/vicecenter1.png]
+
+
+[https://github.com/0x5ac/p2g/blob/main/docs/png/vicecenter1.png]
+<https://youtu.be/PX818-iRb1Q>
 
 
 5 Examples
@@ -169,7 +168,7 @@ Simple demo
   " ⇨ `directly' ⇨
 
   ┌────
-  │ O0001 (simple_demo: 0.3.7)
+  │ O00001 (simple_demo: 0.3.13)
   │   #100= 199.                      (   x = Var[199]                )
   │   #102= 0.                        (   for y in range[10]:         )
   │ N1000
@@ -197,7 +196,7 @@ Find largest number of flutes in tool table
   │ def maxflutes():
   │ 
   │     mx_flutes = p2g.Var(p2g.haas.TOOL_TBL_FLUTES[0])
-  │     for n_flutes in p2g.haas.TOOL_TBL_FLUTES:
+  │     for n_flutes in p2g.haas.TOOL_TBL_FLUTES[1:]:
   │         if n_flutes > mx_flutes:
   │             mx_flutes = n_flutes
   │ 
@@ -206,11 +205,11 @@ Find largest number of flutes in tool table
   └────
   ⇨ `p2g maxflutes.py' ⇨
   ┌────
-  │ O0001 (maxflutes: 0.3.7)
+  │ O00001 (maxflutes: 0.3.13)
   │   #100= #1601                     ( mx_flutes = Var[haas.TOOL_TBL_FLUTES[0]])
-  │   #101= 1601.                     ( for n_flutes in haas.TOOL_TBL_FLUTES:)
+  │   #101= 1602.                     ( for n_flutes in haas.TOOL_TBL_FLUTES[1:]:)
   │ N1000
-  │   IF [#101 GE 1801.] GOTO 1002    ( for n_flutes in haas.TOOL_TBL_FLUTES:)
+  │   IF [#101 GE 1801.] GOTO 1002    ( for n_flutes in haas.TOOL_TBL_FLUTES[1:]:)
   │   IF [#[#101] LE #100] GOTO 1003  (     if n_flutes > mx_flutes:  )
   │   #100= #[#101]                   (         mx_flutes = n_flutes  )
   │   GOTO 1004
@@ -274,7 +273,7 @@ Less trivial example
   ⇨ `p2g less_trival.py' ⇨
 
   ┌────
-  │ O0001 (less_trivial: 0.3.7)
+  │ O00001 (less_trivial: 0.3.13)
   │   #100= 2.                        ( cursor = Var[3][2, 3, 4]      )
   │   #101= 3.
   │   #102= 4.
@@ -315,7 +314,7 @@ Less trivial example
   Example:
   ┌────
   │ 
-  │ from p2g import *  # this is the common header
+  │ from p2g import *
   │ 
   │ def variables():
   │     # On my machine, Renishaw skip positions are
@@ -339,7 +338,7 @@ Less trivial example
   └────
   ⇨ `p2g variables.py' ⇨
   ┌────
-  │ O0001 (variables: 0.3.7)
+  │ O00001 (variables: 0.3.13)
   │   #100= #5061 * 2. + #5041 + #5061( tmp0 = Var[skip0.xyz * 2.0 + workpos + skip1])
   │   #101= #5062 * 2. + #5042 + #5062
   │   #102= #5063 * 2. + #5043 + #5063
@@ -398,7 +397,7 @@ Less trivial example
   └────
   ⇨ `p2g coordinates.py' ⇨
   ┌────
-  │ O0001 (coordinates: 0.3.7)
+  │ O00001 (coordinates: 0.3.13)
   │ ( Describe 3 variables at 3000 )
   │ ( Fill with 1,2,31 )
   │   #3000= 1.                       ( dst.var = [1, 2, 31]          )
@@ -442,7 +441,76 @@ Less trivial example
   └────
 
 
-8 Goto
+8 Expressions
+═════════════
+
+  Python expressions turn into G-Code as you may expect, save that
+  native Python uses radians for trig, and G-Code uses degrees, so
+  folding is done in degrees.
+
+  ┌────
+  │ 
+  │ from p2g import *  # this is the common header
+  │ from p2g.haas import *  # to all the examples
+  │ 
+  │ def expressions():
+  │     com("Variables go into macro variables.")
+  │     theta = Var(0.3)
+  │     angle = Var(sin(theta))
+  │ 
+  │     com("Constants are elided in G-code.")
+  │     thetak = Const(0.3)
+  │     anglek = Var(sin(thetak))
+  │ 
+  │     com("Lots of things are folded.")
+  │     t1 = Var(2 * thetak + 7)
+  │ 
+  │     com("Simple array math:")
+  │ 
+  │     box_size = Const([4, 4, 2])
+  │     tlhc = Var(-box_size / 2)
+  │     brhc = Var(box_size / 2)
+  │     diff = Var(tlhc - brhc)
+  │ 
+  │     a, b, x = Var(), Var(), Var()
+  │     a = tlhc[0] / tlhc[1]
+  │     b = tlhc[0] % tlhc[1]
+  │     x = tlhc[0] & tlhc[1]
+  │     tlhc.xy = ((a - b + 3) / sin(x), (a + b + 3) / cos(x))
+  │ 
+  └────
+  ⇨ `p2g expressions.py' ⇨
+  ┌────
+  │ O00001 (expressions: 0.3.13)
+  │ ( Variables go into macro variables. )
+  │   #100= 0.3                       ( theta = Var[0.3]              )
+  │   #101= SIN[#100]                 ( angle = Var[sin[theta]]       )
+  │ ( Constants are elided in G-code. )
+  │   #102= 0.0052                    ( anglek = Var[sin[thetak]]     )
+  │ ( Lots of things are folded. )
+  │   #103= 7.6                       ( t1 = Var[2 * thetak + 7]      )
+  │ ( Simple array math: )
+  │   #104= -2.                       ( tlhc = Var[-box_size / 2]     )
+  │   #105= -2.
+  │   #106= -1.
+  │   #107= 2.                        ( brhc = Var[box_size / 2]      )
+  │   #108= 2.
+  │   #109= 1.
+  │   #110= #104 - #107               ( diff = Var[tlhc - brhc]       )
+  │   #111= #105 - #108
+  │   #112= #106 - #109
+  │   #113= #104 / #105               ( a = tlhc[0] / tlhc[1]         )
+  │   #114= #104 MOD #105             ( b = tlhc[0] % tlhc[1]         )
+  │   #115= #104 AND #105             ( x = tlhc[0] & tlhc[1]         )
+  │ ( tlhc.xy = [[a - b + 3] / sin[x], [a + b + 3] / cos[x]])
+  │   #104= [#113 - #114 + 3.] / SIN[#115]
+  │   #105= [#113 + #114 + 3.] / COS[#115]
+  │   M30
+  │ %
+  └────
+
+
+9 Goto
 ══════
 
   Goto functions are constructed from parts, and make building blocks
@@ -505,7 +573,7 @@ Less trivial example
   └────
   ⇨ `p2g goto_demo.py' ⇨
   ┌────
-  │ O0001 (goto_demo: 0.3.7)
+  │ O00001 (goto_demo: 0.3.13)
   │ 
   │ ( in work cosys, goto x=1, y=2, z=3 at 20ips )
   │   G90 G01 G55 F20. x1. y2. z3.    ( g1[1, 2, 3]                   )
@@ -543,8 +611,8 @@ Less trivial example
   └────
 
 
-9 Axes
-══════
+10 Axes
+═══════
 
   Any number of axes are supported, default just being xy and z.
 
@@ -591,7 +659,7 @@ Less trivial example
   └────
   ⇨ `p2g axes.py' ⇨
   ┌────
-  │ O0001 (axes: 0.3.7)
+  │ O00001 (axes: 0.3.13)
   │ ( rhs of vector ops get expanded as needed )
   │   #5241= 0.                       ( G55.var = [0, 1]              )
   │   #5242= 1.
@@ -623,7 +691,7 @@ Less trivial example
   └────
 
 
-10 When
+11 When
 ═══════
 
   'when' works as in python, save there are no exceptions; useful for
@@ -655,7 +723,7 @@ Setting and resetting lookahead.
   └────
   ⇨ `p2g when_lookahead.py' ⇨
   ┌────
-  │ O0001 (start: 0.3.7)
+  │ O00001 (start: 0.3.13)
   │ 
   │ ( turn  off lookahead before the probe )
   │   M97 P123                        ( with sys.Lookahead[lookahead = False] :)
@@ -721,7 +789,7 @@ Setting and resetting lookahead.
   └────
 
   ┌────
-  │ O0001 (when_demo_block_delete: 0.3.7)
+  │ O0001 (when_demo_block_delete: 0.3.10)
   │   T01 M06                         (     sys.load_tool[PROBE]      )
   │   G65 P9832                       ( Probe on.                     )
   │   #100= 9.                        (     tmp = Var[9]              )
@@ -733,7 +801,7 @@ Setting and resetting lookahead.
   └────
 
 
-11 DPRNT
+12 DPRNT
 ════════
 
   P2G turns Python f string into runes that DPRNT can digest.
@@ -758,7 +826,7 @@ Constants
   └────
   ⇨ `p2g dprnt_constants.py' ⇨
   ┌────
-  │ O0001 (dprint_constants: 0.3.7)
+  │ O0001 (dprint_constants: 0.3.10)
   │ DPRNT[A***12.34***2.00***3.00]
   │ DPRNT[B**12.34**2.00**3.00]
   │ DPRNT[C*a*12.340ba**2.000ba**3.000b]
@@ -782,7 +850,7 @@ Vectors
   └────
   ⇨ `p2g dprnt_vectors.py' ⇨
   ┌────
-  │ O0001 (dprint_vectors: 0.3.7)
+  │ O0001 (dprint_vectors: 0.3.10)
   │ DPRNT[A*#100[42]#101[42]]
   │ DPRNT[B*#100[32]#101[32]]
   │ DPRNT[C*a#100[33]ba#101[33]b]
@@ -808,7 +876,7 @@ In subroutines.
   └────
   ⇨ `p2g dprnt_subs.py' ⇨
   ┌────
-  │ O0001 (dprnt_subs: 0.3.7)
+  │ O0001 (dprnt_subs: 0.3.10)
   │ DPRNT[results:*j0#100[31],*j1#101[31]]
   │ DPRNT[results:*j0**7.3,*j1**8.1]
   │   M30
@@ -830,7 +898,7 @@ So painless.
   └────
   ⇨ `p2g dprnt_painless.py' ⇨
   ┌────
-  │ O0001 (dprnt_painless: 0.3.7)
+  │ O00001 (dprnt_painless: 0.3.13)
   │   #101= 0.                        ( for idx in range[10]:         )
   │ N1000
   │   IF [#101 GE 10.] GOTO 1002      ( for idx in range[10]:         )
@@ -861,7 +929,7 @@ Can use Python f-strings too.
   └────
   ⇨ `p2g dprnt_std_python.py' ⇨
   ┌────
-  │ O0001 (dprnt_std_python: 0.3.7)
+  │ O00001 (dprnt_std_python: 0.3.13)
   │   #100= 32.                       ( x = Var[32]                   )
   │   #101= 27.                       ( y = Var[27]                   )
   │   #103= 0.                        ( for q in range[10]:           )
@@ -899,7 +967,7 @@ Extended f-string syntax
               As an «e-string», but only expanded between items.
 
 
-12 Symbol Tables
+13 Symbol Tables
 ════════════════
 
   Set the global `p2g.Control.symbol_table' to get a symbol table in the
@@ -916,7 +984,7 @@ Extended f-string syntax
   │ not_used = 12
   │ 
   │ def symbol_table_demo():
-  │       p2g.Control.symbol_table = True    
+  │       p2g.Control.symbol_table = True
   │       p2g.comment("Only used symbols are in output table.")
   │       p2g.Var(MACHINE_ABS_ABOVE_OTS)
   │       p2g.Var(MACHINE_ABS_ABOVE_VICE * fish)
@@ -925,7 +993,7 @@ Extended f-string syntax
   └────
   ⇨ `p2g symbol_table_demo.py' ⇨
   ┌────
-  │ O0001 (symbol_table_demo: 0.3.7)
+  │ O00001 (symbol_table_demo: 0.3.13)
   │ ( Symbol Table )
   │ 
   │  ( MACHINE_ABS_ABOVE_OTS                   :  -7.000,  8.000,  9.000 )
@@ -949,7 +1017,7 @@ Extended f-string syntax
   └────
 
 
-13 Notes
+14 Notes
 ════════
 
 Stuff you already know
@@ -1015,7 +1083,7 @@ Cool example
   └────
   ⇨ `p2g cool.py' ⇨
   ┌────
-  │ O0001 (cool: 0.3.7)
+  │ O00001 (cool: 0.3.13)
   │ ( You can do surprising things. )
   │   #100= 100.                      ( avariable_scalar = Var[100]   )
   │   #101= 7.                        ( another_xandy = Var[7, 8]     )
@@ -1062,7 +1130,7 @@ Beware
   └────
   ⇨ `p2g beware0.py' ⇨
   ┌────
-  │ O0001 (beware0: 0.3.7)
+  │ O00001 (beware0: 0.3.13)
   │ ( this moves contents of macro var 200 into 100 )
   │ ( it doesn't rewrite a.                         )
   │   #100= #200                      ( a =  b[0]                     )
@@ -1090,7 +1158,15 @@ Beware
   └────
 
 
-14 MIT License
+15 Maintenance options
+══════════════════════
+
+  ‣ `--bp' call pdb.set_trace() on error
+
+  ‣ `-verbose=<level>' changes loquacity.
+
+
+16 MIT License
 ══════════════
 
   Copyright © 2023 Steve Chamberlain
@@ -1115,13 +1191,13 @@ Beware
   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-15 Authors
+17 Authors
 ══════════
 
   sac@pobox.com
 
 
-16 Thanks
+18 Thanks
 ═════════
 
   all the good parts of walk*.py are from:
@@ -1156,8 +1232,8 @@ Beware
   └────
 
 
-17 Haas macro variables
-═══════════════════════
+19 Haas macrovars
+═════════════════
 
   ┌────
   │                            HAAS Macro Variables                            
@@ -1364,5 +1440,6 @@ Beware
   │ │ #52601 … #52800 │    200 │  V │    float    │ PROBE_TYPE                │
   │ │     #52801      │ -47740 │  _ │    float    │ an error                  │
   │ └─────────────────┴────────┴────┴─────────────┴───────────────────────────┘
-  │          Generated by /home/sac/vf3/progs/p2g/tools/makestdvars.py         
+  │             Generated by /home/sac/vf3/p2g/tools/makestdvars.py            
   └────
+  o x

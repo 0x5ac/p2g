@@ -7,7 +7,12 @@
 
 (defun sc/execute ()
   (require 'ob-python)
-  (org-babel-execute-buffer))
+  (message "ERRRORRR")
+
+  ;; do the executing in fakeorg.py now
+  ;;
+  ;;  (org-babel-execute-buffer)
+  )
 
 (defun sc/tomd ()
   (org-gfm-export-as-markdown))
@@ -15,6 +20,7 @@
 (defun sc/fnfromext (ext)
   (cdr (assoc ext
               '(("org" . sc/execute)
+                ("torg" . sc/execute)
                 ("md" . sc/tomd)
                 ("txt" . org-ascii-export-as-ascii)
                 ("html" . org-html-export-as-html)))))
@@ -26,7 +32,11 @@
   (setq org-confirm-babel-evaluate nil)
   (funcall (sc/fnfromext (downcase (file-name-extension dstfile))))
   (delete-file (concat dstfile ".tmp"))
-  (write-region (point-min) (point-max) dstfile))
+  (delete-file (concat dstfile ".md"))
+  (delete-file (concat dstfile ".md.tmp"))
+  (write-region (point-min) (point-max) dstfile)
+
+  )
 
 
 

@@ -1,0 +1,10 @@
+* Maintenance options
+:PROPERTIES:
+:CUSTOM_ID: maintenance-options
+:END:
+
+   *  ~--bp~
+       call pdb.set_trace() on error
+
+   *  ~-verbose=<level>~
+       changes loquacity.

@@ -10,6 +10,7 @@ import p2g
 import p2g.gbl
 import p2g.err
 import p2g.walkfunc
+import p2g.abandon
 
 
 def pytest_addoption(parser):
@@ -49,6 +50,7 @@ def _pytest_assertrepr_compare_(op, left, right):
             yield txt + echar + thisel
 
     if left != right:
+
         yield ""
         yield "====+" + "=" * 60
         yield from prepend("WANT", left, right)
@@ -89,7 +91,7 @@ def writelines(fn, txt):
 
     path = make_file_path(fn)
     p2g.gbl.log(f"Ptest output {path}")
-    path.write_text("\n".join(txt))
+    path.write_text("\n".join(txt) + "\n")
 
 
 # compile fn, return generated errors or text.
@@ -101,7 +103,8 @@ def get_all_comp_outputs(fn):
     truncate.DEFAULT_MAX_CHARS = 9999
 
     try:
-        outlines = p2g.walkfunc.compile2g(
+
+        outlines = p2g.abandon.compile2g(
             fn.__name__, inspect.getsourcefile(fn), job_name="O00001"
         )
         return outlines, []
@@ -111,11 +114,8 @@ def get_all_comp_outputs(fn):
         return [], errlines
 
 
-@p2g.gbl.g2l
 def read_and_trim(path):
-    lines = path.read_text().split("\n")
-    for line in lines:
-        yield line
+    return [line.rstrip() for line in path.open().readlines()]
 
 
 @contextlib.contextmanager
@@ -132,8 +132,9 @@ def check_golden_nodec(fn):
         with save_config(narrow_output=False, no_id=True):
 
             got_std, _got_err = list(get_all_comp_outputs(fn))
+
             gold_path = pathlib.Path(fn.__code__.co_filename).with_suffix(".nc")
-            gold_data = list(read_and_trim(gold_path))
+            gold_data = read_and_trim(gold_path)
 
             if "--gif" in sys.argv or got_std != gold_data:
                 writelines(fn, got_std)
@@ -214,5 +215,9 @@ def want(*text, narrow_output=True, errors=[], no_id=True):
 def pytest_sessionfinish(session, exitstatus):
     print()
     print()
-    print(f"{100 - (100.0 *session.testsfailed /  session.testscollected):0.1f}")
+    try:
+        print(f"{100 - (100.0 *session.testsfailed /       session.testscollected):0.1f}")
+    except ZeroDivisionError:
+        print("{session.testsfailed} {session.testscollected}")
+
     print()

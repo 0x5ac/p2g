@@ -1,9 +1,9 @@
 [tool.poetry]
-version = "0.3.7"
+version = "0.3.13"
 name = "p2g"
 description = "Transpile python into cnc gcode."
 authors = ["sac <sac@0x5ac.com>"]
-readme = "README.MD"
+readme = "readme.md"
 license = "MIT"
 keywords = ["cnc", "gcode", "mill", "haas", "g-code", "probe", "vf"]
 classifiers = [
@@ -17,10 +17,8 @@ repository = 'https://github.com/0x5ac/p2g'
 homepage = 'https://github.com/0x5ac/p2g'
 packages = [
     { include = "p2g", format = "sdist"},
-
 ]
-include = [ "p2g/docs/*"]
-exclude = [ ".*got" ]
+include = [ "p2g/docs/*.org","*","p2g","p2g/*","p2g/docs/*", "p2g/examples/*"]
 [tool.poetry.scripts]
 p2g = "p2g.main:main"
 
@@ -28,8 +26,6 @@ p2g = "p2g.main:main"
 python = ">= 3.10, < 4.0"
 typeguard = "^3.0.2"
 docopt = "^0.6.2"
-
-
 
 [tool.poetry.group.dev.dependencies]
 typeguard = "^3.0.2"
@@ -49,10 +45,11 @@ tox = "^4.6.4"
 pytest-cov = "^4.1.0"
 wrapt = "^1.15.0"
 dill = "^0.3.6"
+semver = "^3.0.1"
 
-
-[tool.deptry]
-exclude = ['(examples|tests)/*']
+[[tool.poetry.source]]
+name = "PyPI"
+priority = "primary"
 
 [tool.pyright]
 
@@ -77,7 +74,6 @@ in-place=true
 ignore_missing_imports = true
 check_untyped_defs = true
 explicit_package_bases = true
-
 
 [build-system]
 requires = ["poetry-core"]

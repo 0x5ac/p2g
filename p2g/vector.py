@@ -207,7 +207,7 @@ class MemVec(Vec):
             stat.append_set(self[idx], sel)
 
     def __repr__(self):
-        return f"(array  {self._addr} {self._size})"
+        return f"(array {self._addr} {self._size})"
 
 
 def wrap(thing) -> typing.Union[Vec, scalar.Scalar]:

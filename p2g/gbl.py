@@ -173,7 +173,7 @@ def make_fake_node(filename, lineno, offset, end_offset):
     return fake_node
 
 
-astnone = make_fake_node("empty", 1, 0, 0)
+ASTNONE = make_fake_node(None, 1, 0, 0)
 
 
 class PerTranslation:
@@ -185,7 +185,7 @@ class PerTranslation:
         self.ebss = 100
 
         self.varrefs = {}
-        self.last_node = astnone
+        self.last_node = ASTNONE
 
     def next_bss(self, size):
         addr = self.ebss

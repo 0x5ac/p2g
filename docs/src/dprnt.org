@@ -85,7 +85,7 @@ def dprnt_painless():
 ⇨ ~p2g dprnt_painless.py~ ⇨
 #+RESULTS: dprnt_painless
 #+begin_example
-O0001 (dprnt_painless: 0.3.10)
+O00001 (dprnt_painless: 0.3.13)
   #101= 0.                        ( for idx in range[10]:         )
 N1000
   IF [#101 GE 10.] GOTO 1002      ( for idx in range[10]:         )
@@ -114,7 +114,7 @@ def dprnt_std_python():
 ⇨ ~p2g dprnt_std_python.py~ ⇨
 #+results: dprnt_std_python
 #+begin_example
-O0001 (dprnt_std_python: 0.3.10)
+O00001 (dprnt_std_python: 0.3.13)
   #100= 32.                       ( x = Var[32]                   )
   #101= 27.                       ( y = Var[27]                   )
   #103= 0.                        ( for q in range[10]:           )

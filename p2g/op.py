@@ -84,19 +84,8 @@ def get_unop(node):
     return None
 
 
-def get_nelements(node):
-    if isinstance(node, vector.Vec):
-        return node.nelements()
-
-    return 1
-
-
 def hashop(arg):
     return Unop(allops["#"], arg)
-
-
-# make sure that whatever expression is in node
-# ends up in a macro variable on
 
 
 def reload(node: scalar.Scalar):
@@ -127,7 +116,6 @@ class Binop(scalar.Scalar):
     def to_gcode(self, modi: nd.NodeModifier) -> str:
 
         if modi == nd.NodeModifier.ARGUMENT:
-
             return parensif(True, self.to_gcode(nd.NodeModifier.EMPTY))
 
         if self.opfo.g_func:
@@ -141,17 +129,13 @@ class Binop(scalar.Scalar):
 
         outer_prec = self.opfo.prec
 
-        def handle_term(node):
+        def term(node):
             return parensif(
                 get_prec(node) < outer_prec,
                 nd.to_gcode(node, modi),
             )
 
-        res.append(handle_term(self.lhs))
-        res.append(self.opfo.gname)
-        res.append(handle_term(self.rhs))
-
-        return " ".join(res)
+        return f"{term(self.lhs)} {self.opfo.gname} {term(self.rhs)}"
 
     def __repr__(self):
         return f"({self.lhs}{self.opfo.pyn}{self.rhs})"
@@ -225,8 +209,7 @@ def make_vec_binop(opfo, lhs, rhs=None, force_ourtype=False):
     lhs = vector.wrap(lhs)
 
     if rhs is None:
-        # actually unop.
-
+        # turns out this binop wasn't.
         return vector.sorv_from_list(
             [make_scalar_unop(opfo, el) for el in lhs.everything()]
         )
@@ -313,16 +296,16 @@ not_compop = {
 
 
 def opt_not(_nd, arg) -> OptRes:
+    #  not k becomes elided
     if arg.is_constant:
         return scalar.Constant(not arg.value)
 
-    # got not(comop, turn into (inverted compop))
+    # not (a < b) becomes   a >= b
 
     if notted := not_compop.get(arg.opfo.pyn):
         return make_scalar_binop(allops[notted], arg.lhs, arg.rhs)
 
-    rhs = scalar.Constant(0)
-    return make_scalar_binop(allops["!="], arg, rhs)
+    return make_scalar_binop(allops["!="], arg, scalar.Constant(0))
 
 
 def opt_plus(_, arg) -> OptRes:
@@ -335,11 +318,10 @@ def opt_invert(_, arg) -> OptRes:
     return make_scalar_binop(allops["^"], arg, rhs)
 
 
-# turn a1 > a2  == 0
-# => (a1 <= a2)
-
-
+# handles eq and ne
 def opt_eq(opfo, lhs: scalar.Scalar, rhs: scalar.Scalar) -> OptRes:
+
+    # identities are easy to compare
     if gbl.same(lhs, rhs):
         return scalar.Constant(opfo.pyn == "==")
 
@@ -347,6 +329,7 @@ def opt_eq(opfo, lhs: scalar.Scalar, rhs: scalar.Scalar) -> OptRes:
         return None
 
     if isinstance(lhs, Binop):
+        #  (a1 > a2) == 0 becomes a1 <= a2
         if rev := not_compop.get(lhs.opfo.pyn):
             if opfo.pyn == "==":
                 return make_scalar_binop(
@@ -365,9 +348,13 @@ def opt_matmul(_opfo, _lhs, _rhs) -> OptRes:  # no cover
 def opt_add(opfo, lhs, rhs) -> OptRes:
     if (res := opt_fold(opfo, lhs, rhs)) is not None:
         return res
+
+    # x + (-y) becomes x - y
     if isinstance(rhs, Unop) and rhs.opfo.pyn == "un-":
         return make_scalar_binop(allops["-"], lhs, rhs.child)
 
+    # x + (-k) becomes x - k
+    # x + 0    becomes x
     if isinstance(rhs, scalar.Constant):
         rhsv = rhs.to_float()
         if rhsv < 0.0:
@@ -409,8 +396,8 @@ def make_slice(low, high, step):
     )
 
 
-# breakpoint()
-# vector.MemVec.make_hashop = make_hashop
+# install opfo methods into classes for Vec and Scalar.
+# new dunder methods implement magic math.
 
 
 def nd_install(opfo: nd.Opinfo):

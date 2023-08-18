@@ -11,18 +11,15 @@ from p2g import vector
 
 
 def flatten(args):
-    res = []
     for el in args:
         for subel in el.everything():
-            res.append(subel)
-    return res
+            yield subel
 
 
 def unpack(args, kwargs) -> vector.TupleV:
     resmap: typing.Dict[int, scalar.Scalar] = {}
     if args:
-        args = map(vector.wrap, args)
-        args = flatten(args)
+        args = list(flatten(map(vector.wrap, args)))
         for idx, value in enumerate(args):
             resmap[idx] = value
     # can have x=1,y=1 or xy=(somthing)

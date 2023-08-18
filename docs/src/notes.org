@@ -64,7 +64,7 @@ def cool():
 ⇨ =p2g cool.py= ⇨
 #+results: cool
 #+begin_example
-O0001 (cool: 0.3.10)
+O00001 (cool: 0.3.13)
 ( You can do surprising things. )
   #100= 100.                      ( avariable_scalar = Var[100]   )
   #101= 7.                        ( another_xandy = Var[7, 8]     )
@@ -110,7 +110,7 @@ def beware0():
 ⇨ =p2g beware0.py= ⇨
 #+results: beware0
 #+begin_example
-O0001 (beware0: 0.3.10)
+O00001 (beware0: 0.3.13)
 ( this moves contents of macro var 200 into 100 )
 ( it doesn't rewrite a.                         )
   #100= #200                      ( a =  b[0]                     )

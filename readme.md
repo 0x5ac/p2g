@@ -5,17 +5,15 @@
 <img src="https://github.com/0x5ac/p2g/actions/workflows/make.yml/badge.svg" alt="">
 
 
-## Demo.
+## Demo
 
-<a href="https://youtu.be/PX818-iRb1Q">
-<img src="https://github.com/0x5ac/p2g/blob/main/docs/png/vicecenter1.png" alt="link to youtube.">
-</a>
+[![img](https://github.com/0x5ac/p2g/blob/main/docs/png/vicecenter1.png)](https://youtu.be/PX818-iRb1Q)
 
 
 ## Introduction
 
 
-### Version 0.3.10
+### Version 0.3.13
 
 P2G makes it simple to ensure that parts are in fixtures correctly, coordinate systems are adjusted to deal with stock placement and cope with movement and rotation of workpieces through multiple operations.
 
@@ -43,7 +41,7 @@ $ pip install p2g
 1.  fetch dependencies, rebuild and install with pip
 
     ```
-    $ git clone https://github.com/0x5ac/attempt1 p2g
+    $ git clone https://github.com/0x5ac/p2g p2g
     $ cd p2g
     $ make install
     ```
@@ -51,7 +49,7 @@ $ pip install p2g
 2.  fetch dependencies and rebuild
 
     ```
-    $ git clone https://github.com/0x5ac/attempt1 p2g
+    $ git clone https://github.com/0x5ac/p2g p2g
     $ cd p2g
     $ make
     ```
@@ -59,19 +57,14 @@ $ pip install p2g
 
 ## Usage
 
-```python
-
-```
-
 ```
 p2g - Turn Python into G-Code.
 
 Usage:
   p2g [options]  <srcfile> [<dstfile>]
   p2g help [ all | topics | maint | version | location | <topic> ]
-  p2g examples <dstdir>
+  p2g build-examples <dstdir>
 
-   For bare p2g:
        p2g tram-rotary.py ~/_nc_/O{countdown}tr.nc
         Makes an output of the form ~/_nc_/O1234tr.nc
 
@@ -79,9 +72,8 @@ Usage:
         Read from stdin, look for the 'thisone' function and write to
         to stdout.
 
-
 Arguments:
-  <srcfile>   Source python file. [default: stdin]
+  <srcfile>   Source python file.
   <dstfile>   Destination G-Code file. [default: stdout]
                {countdown} in file name creates a decrementing prefix
                for the output file which makes looking for the .nc in
@@ -91,13 +83,9 @@ Arguments:
   <topic>      [ all | topics | maint | version | location | <topic> ]
          all      Print all readme.
          topics   List all topics.
-         maint    Print maintenance options.
          version  Show version
-         location Show absdir of main
+         location Show absdir of main module.
          <topic>  Print from readme starting at topic.
-
-
-
 
 Options:
      --job=<jobname>      Olabel for output code.
@@ -107,6 +95,7 @@ Options:
                            makes text fit more easily into
                            a narrow program window.
      --short-filenames    Emit just the lsb of filenames.
+
 ```
 
 
@@ -138,7 +127,7 @@ def simple_demo():
 " ⇨ `directly` ⇨
 
 ```
-O0001 (simple_demo: 0.3.10)
+O00001 (simple_demo: 0.3.13)
   #100= 199.                      (   x = Var[199]                )
   #102= 0.                        (   for y in range[10]:         )
 N1000
@@ -165,7 +154,7 @@ import p2g
 def maxflutes():
 
     mx_flutes = p2g.Var(p2g.haas.TOOL_TBL_FLUTES[0])
-    for n_flutes in p2g.haas.TOOL_TBL_FLUTES:
+    for n_flutes in p2g.haas.TOOL_TBL_FLUTES[1:]:
         if n_flutes > mx_flutes:
             mx_flutes = n_flutes
 
@@ -176,11 +165,11 @@ def maxflutes():
 ⇨ `p2g maxflutes.py` ⇨
 
 ```
-O0001 (maxflutes: 0.3.10)
+O00001 (maxflutes: 0.3.13)
   #100= #1601                     ( mx_flutes = Var[haas.TOOL_TBL_FLUTES[0]])
-  #101= 1601.                     ( for n_flutes in haas.TOOL_TBL_FLUTES:)
+  #101= 1602.                     ( for n_flutes in haas.TOOL_TBL_FLUTES[1:]:)
 N1000
-  IF [#101 GE 1801.] GOTO 1002    ( for n_flutes in haas.TOOL_TBL_FLUTES:)
+  IF [#101 GE 1801.] GOTO 1002    ( for n_flutes in haas.TOOL_TBL_FLUTES[1:]:)
   IF [#[#101] LE #100] GOTO 1003  (     if n_flutes > mx_flutes:  )
   #100= #[#101]                   (         mx_flutes = n_flutes  )
   GOTO 1004
@@ -244,7 +233,7 @@ def less_trivial():
 ⇨ `p2g less_trival.py` ⇨
 
 ```
-O0001 (less_trivial: 0.3.10)
+O00001 (less_trivial: 0.3.13)
   #100= 2.                        ( cursor = Var[3][2, 3, 4]      )
   #101= 3.
   #102= 4.
@@ -280,6 +269,7 @@ N1001
 -   [DPRNT](https://github.com/0x5ac/p2g/blob/main/docs/howto.md#dprnt)
 -   [Symbol Tables](https://github.com/0x5ac/p2g/blob/main/docs/howto.md#symbol-table)
 -   [Notes](https://github.com/0x5ac/p2g/blob/main/docs/howto.md#notes)
+-   [Internal Options](https://github.com/0x5ac/p2g/blob/main/docs/howto.md#maitenance-options)
 -   [Authors](https://github.com/0x5ac/p2g/blob/main/docs/howto.md#authors)
 -   [Thanks](https://github.com/0x5ac/p2g/blob/main/docs/howto.md#thanks)
 

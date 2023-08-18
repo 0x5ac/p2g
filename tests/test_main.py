@@ -7,7 +7,7 @@ import sys
 import p2g
 
 from conftest import want
-from p2g.main import main
+from p2g.main import main, main
 
 
 std = [
@@ -41,6 +41,25 @@ def check_version_str(vstr):
     assert parts[0].isdigit()
 
 
+def test_native_err1(capfd):
+    assert main([]) == 0
+    got = capfd.readouterr()
+
+    assert "Usage:" in got.out
+
+
+def test_native_err2(capfd):
+    assert main(["--verbose"]) != 0
+    got = capfd.readouterr()
+    assert "Need" in got.err
+
+
+def test_native_err3(capfd):
+    assert main(["a", "b", "c"]) != 0
+    got = capfd.readouterr()
+    assert "Too many filenames" in got.err
+
+
 def test_bad_syntax(capfd, tmpdir):
     tmpfile = write_func(tmpdir, bad)
 
@@ -56,7 +75,7 @@ def test_location(capfd):
 
 def test_native_job_capfd_tmpdir_stdout(capfd, tmpdir):
     tmpfile = write_func(tmpdir, std)
-    main(["--job=O123", "--narrow", str(tmpfile), "-"])
+    main(["--job=O123", "--narrow", str(tmpfile)])
     tmpdata = capfd.readouterr()
     assert "O123" in tmpdata.out
 
@@ -96,8 +115,14 @@ def make_inout(tmpdir):
 
 
 def test_native_cli_tmpdir_examples(tmpdir):
-    main(["examples", str(tmpdir)])
+    main(["build-examples", str(tmpdir)])
     assert (tmpdir / "vicecenter.py").exists()
+
+
+def test_native_cli_examples_fail(capfd):
+    main(["build-examples"])
+    res = capfd.readouterr()
+    assert "Need des" in res.err
 
 
 def gentwinfuncs(fnname, inout):
@@ -161,9 +186,7 @@ def test_native_capfd_tmpdir_stdout0(capfd, tmpdir):
     main(
         [
             "--job=O123",
-            "--no-id",
             str(tmpfile),
-            "-",
         ]
     )
     tmpdata = capfd.readouterr()
@@ -202,15 +225,17 @@ def test_native_capfd_help(capfd):
 
 
 def test_native_capfd_doc0(capfd):
+
     main(["help", "all"])
     got = capfd.readouterr()
+
     assert "Stumpy" in got.out
 
 
 def test_native_capfd_doc1(capfd):
     main(["help", "maint"])
     got = capfd.readouterr()
-    assert "--break" in got.out
+    assert "--bp" in got.out
 
 
 def test_native_doc_no_where(capfd):

@@ -7,6 +7,7 @@ from p2g import gbl
 def code_context_node(node: ast.AST):
 
     file_name = gbl.ast_file_name(node)
+
     file_path = pathlib.Path(file_name).absolute()
     reportable_line = node.lineno
 
@@ -49,7 +50,7 @@ class CompilerError(Exception):
     message: str
     report_line: bool
 
-    def __init__(self, message, report_line=True, node=gbl.astnone):
+    def __init__(self, message, report_line=True, node=gbl.ASTNONE):
         super().__init__()
 
         if gbl.config.bp_on_error:
@@ -57,7 +58,7 @@ class CompilerError(Exception):
 
         self.report_line = report_line
         self.message = message
-        self.node = gbl.iface.last_node if node is gbl.astnone else node
+        self.node = gbl.iface.last_node if node is gbl.ASTNONE else node
 
     def get_report_lines(self):
 
@@ -83,6 +84,6 @@ class CompilerError(Exception):
         return [line_prefix + source_line, source_context, message]
 
 
-def compiler(message: str = "", node=gbl.astnone, exn=None):
+def compiler(message: str = "", node=gbl.ASTNONE, exn=None):
 
     raise CompilerError(message, node=node) from exn

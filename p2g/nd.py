@@ -21,12 +21,6 @@ class Opinfo(typing.NamedTuple):
     g_func: bool = False
     opt: typing.Callable = opt_null
 
-    # def rtl_get_arg_(self, _idx):
-    #     return self.pyn
-
-    # def rtl_arg_info_(self):
-    #     return ["opinfo"]
-
 
 const_nd = Opinfo(astc=ast.Constant, pyn="konstant", gname="", prec=20)
 
@@ -112,3 +106,11 @@ def to_gcode(thing, modifier=NodeModifier.EMPTY) -> str:
         return to_gcode_from_float(thing, modifier)
 
     return thing.to_gcode(modifier)
+
+
+def get_nelements(node):
+    mth = getattr(node, "nelements", None)
+    if mth:
+        return mth()
+
+    return 1

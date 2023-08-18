@@ -33,7 +33,7 @@ def start():
 ⇨ ~p2g when_lookahead.py~ ⇨
 #+RESULTS: when_lookahead
 #+begin_example
-O0001 (start: 0.3.10)
+O00001 (start: 0.3.13)
 
 ( turn  off lookahead before the probe )
   M97 P123                        ( with sys.Lookahead[lookahead = False] :)

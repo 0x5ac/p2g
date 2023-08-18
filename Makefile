@@ -1,70 +1,42 @@
-.RECIPEPREFIX=>
-export MAKEFLAGS=-Otarget --no-print-directory -r -R --warn
+.RECIPEPREFIX   = >
+export MAKEFLAGS=-Otarget --no-print-directory -r -R --warn #-j30
 export COLUMNS=40
 
+PATH         := $(HOME)/.local/bin:/usr/bin
 
-# topj:
-# > @ make -j 3 default
-PATH             := $(HOME)/.local/bin:/usr/bin
-EMACS            := emacs
-POETRY           := poetry
-PR               := $(POETRY) run
+LOG_DIR      := log
+DIST_DIR     := dist
+DOCS_DIR     := docs
+STAGING_DIR  := staging
 
-RUN_MODVERSION   := $(PR) python tools/modversion.py
-RUN_MAKESTDVARS  := $(PR) python tools/makestdvars.py
-RUN_COVERAGE     := $(PR) coverage
-RUN_PYTEST       := $(PR) pytest
+VERSION_FILE := p2g/VERSION
+VERSION      := $(shell cat $(VERSION_FILE))
+DIST_FILE    := dist/p2g-$(VERSION).tar.gz
 
-LOG_DIR          := log
-DOCS_DIR          := docs
-VERSION_FILE     := p2g/VERSION
+LOG_POETRY   := $(LOG_DIR)/poetry.log
+LOG_COVERAGE := $(LOG_DIR)/coverage.log
+LOG_TESTS    := $(LOG_DIR)/pytest.log
+LOG_LINTS    := $(LOG_DIR)/lints.log
 
-LINTS            := pyright mypy pylint ruff flake8
-LOG_LINTS        := $(patsubst %,$(LOG_DIR)/%.llog, $(LINTS))
+LINTS        := pyright mypy pylint ruff flake8
 
-DISTDIFFS_ERROR  := $(LOG_DIR)/distdiffs-error
-LOG_DISTDIFFS    := $(LOG_DIR)/distdiffs.log
-LOG_DISTGOT      := $(LOG_DIR)/distgot.log
-LOG_DISTWANT     := $(LOG_DIR)/distwant.log
+POETRY       := poetry
+PR           := $(POETRY) run
 
-LOG_DIST         := $(LOG_DIR)/FILES-IN-DIST.LOG
-LOG_DOC          := $(LOG_DIR)/doc.log
-LOG_EXAMPLES     := $(LOG_DIR)/examples.log
-LOG_LINT         := $(LOG_DIR)/ALL-LINTS.LOG
-LOG_POETRY       := $(LOG_DIR)/poetry.log
-LOG_COVERAGE     := $(LOG_DIR)/coverage.log
-LOG_TESTS        := $(LOG_DIR)/pytest.log
-THIS_VERSION     := $(shell cat $(VERSION_FILE))
-LOG_TOX          := $(LOG_DIR)/tox.log
-VERSION_STAMP    := $(LOG_DIR)/version-$(THIS_VERSION).log
+default      : dist
 
-
-.PHONY           : lint test start finish examples docs poetry version  dist
-default          : start | finish
-docs             : $(LOG_DOC)
-examples         : $(LOG_EXAMPLES)
-lint             : $(LOG_LINT)
-poetry           : $(LOG_POETRY)
-tests            : $(LOG_TESTS)
-version          : $(VERSION_STAMP)
-tox              : $(LOG_TOX)
-dist             : $(LOG_DIST)
-
-# only need this if rebuilding doc.
-OX_GFM_DIR       = ~/.emacs.d/straight/build/ox-gfm
-
-HR               = @ echo "*******"
+H0               = @ echo "*"
 H1               = @ echo "***"
 H2               = @ echo "*****"
-HW               = @ echo "newer deps " $?
+HR               = @ echo "*******"
+
 ######################################################################
 # files used, should only appear once.
-P2G_GEN_SRC       :=            \
-  p2g/haas.py
 
-ALL_P2G_SRC       :=            \
+ALL_P2G_SRC     :=              \
   p2g/__init__.py               \
   p2g/__main__.py               \
+  p2g/abandon.py                \
   p2g/axis.py                   \
   p2g/builtin.py                \
   p2g/coords.py                 \
@@ -72,6 +44,7 @@ ALL_P2G_SRC       :=            \
   p2g/fstring.py                \
   p2g/gbl.py                    \
   p2g/goto.py                   \
+  p2g/haas.py                   \
   p2g/main.py                   \
   p2g/nd.py                     \
   p2g/op.py                     \
@@ -84,13 +57,13 @@ ALL_P2G_SRC       :=            \
   p2g/walkexpr.py               \
   p2g/walkfunc.py               \
   p2g/walkstat.py               \
-  $(P2G_GEN_SRC)
 
-TOOL_SRC          :=            \
+TOOL_SRC        :=              \
   tools/modversion.py           \
-  tools/makestdvars.py
+  tools/makestdvars.py          \
+  tools/fakeorg.py
 
-FUNC_TEST_FILES   :=            \
+FUNC_TEST_FILES :=              \
   tests/test_assert.py          \
   tests/test_axes.py            \
   tests/test_badpytest.py       \
@@ -127,18 +100,31 @@ FUNC_TEST_FILES   :=            \
   tests/test_vars.py            \
   tests/test_vector.py
 
-READMEMD          := readme.md
-DIST_DOC          :=            \
+DIST_DOC        :=              \
   docs/howto.md                 \
   docs/howto.txt                \
   docs/haas.txt                 \
-  docs/pytest.svg               \
   docs/coverage.svg             \
+  docs/pytest.svg               \
   docs/mit.svg                  \
-  $(READMEMD)
+  readme.md
 
-INCLUDED_ORGS     :=            \
-  docs/src/authors.org          \
+
+EXAMPLES        :=              \
+  examples/probecalibrate.nc    \
+  examples/vicecenter.nc        \
+  examples/maxflutes.nc         \
+  examples/maxflutes.py         \
+  examples/probecalibrate.py    \
+  examples/usrlib.py            \
+  examples/vicecenter.py        \
+
+ALL_TEST_SRC    :=              \
+  $(FUNC_TEST_FILES)            \
+  tests/conftest.py
+
+ALL_ORGS        :=              \
+docs/src/authors.org            \
   docs/src/axes.org             \
   docs/src/badges.org           \
   docs/src/coordinates.org      \
@@ -147,10 +133,14 @@ INCLUDED_ORGS     :=            \
   docs/src/expressions.org      \
   docs/src/goto.org             \
   docs/src/haas.org             \
+  docs/src/howto.org            \
   docs/src/install.org          \
   docs/src/introduction.org     \
   docs/src/license.org          \
+  docs/src/maint.org            \
+  docs/src/maintopt.org         \
   docs/src/notes.org            \
+  docs/src/readme.org           \
   docs/src/release.org          \
   docs/src/symboltables.org     \
   docs/src/thanksto.org         \
@@ -161,85 +151,35 @@ INCLUDED_ORGS     :=            \
   docs/src/when.org             \
   docs/src/why.org
 
-COMPILED_EXAMPLES :=            \
-  examples/probecalibrate.nc    \
-  examples/vicecenter.nc        \
-  examples/maxflutes.nc
 
-EXAMPLE_SRC       :=            \
-  examples/maxflutes.py         \
-  examples/probecalibrate.py    \
-  examples/usrlib.py            \
-  examples/vicecenter.py        \
-
-ALL_TEST_SRC      :=            \
-  $(FUNC_TEST_FILES)            \
-  $(EXAMPLE_SRC)                \
-  tests/conftest.py
-
-
-
-######################################################################
-ALL_EXAMPLES    := $(EXAMPLE_SRC) $(COMPILED_EXAMPLES)
-DIST_FILE       := dist/p2g-$(THIS_VERSION).tar.gz
-ALL_PY          := $(ALL_P2G_SRC) $(TOOL_SRC) $(ALL_TEST_SRC)
 LINTABLE_SRC    := $(ALL_P2G_SRC) $(TOOL_SRC)
-CONTROL_FILES   := Makefile pyproject.toml .scrutinizer.yml
+VERSIONED_FILES := p2g/__init__.py pyproject.toml docs/src/introduction.org
+IN_DIST         := $(EXAMPLES) $(DIST_DOC) $(ALL_P2G_SRC) $(VERSION_FILE)
 
 
-VERSIONED_FILES = p2g/__init__.py pyproject.toml  docs/src/introduction.org
-IN_DIST         := $(ALL_EXAMPLES) $(DIST_DOC) $(ALL_P2G_SRC) $(VERSION_FILE)
-
-.PRECIOUS: $(LOG_POETRY)
-.PRECIOUS: $(IN_DIST)
-.PRECIOUS: $(LOG_DOC)
-.PRECIOUS: $(LOG_TESTS)
-.PRECIOUS: $(LOG_LINT)
-.PRECIOUS: $(DIST_FILE)
-DEFAULT_DEPS    :=          \
-  $(LOG_POETRY)       \
-  $(IN_DIST)                \
-  $(LOG_DOC)                \
-  $(LOG_TESTS)              \
-  $(LOG_LINT)               \
-  $(DIST_FILE)
 
 ######################################################################
-.EXTRA_PREREQS:= .mkdirs
+.EXTRA_PREREQS := $(LOG_POETRY)
 
-.mkdirs:
->mkdir -p $(LOG_DIR)  $(DOCS_DIR)/obj
-> touch $@
-
-$(DOCS_DIR)/obj $(LOG_DIR):
->	mkdir -p $@
-
-start           :
+dist           : tests lint $(DIST_FILE)
 > $(HR)
-> $(H1)  $$(python --version) p2g $(THIS_VERSION)
-
-
-finish          : $(DEFAULT_DEPS) $(LOG_DISTDIFFS)
-> $(HR)
+> $(H1)  $$(python --version) p2g $(VERSION)
 > $(H1) Package in $(DIST_FILE)
 
-
-install         : $(DIST_FILE)
+install        : $(DIST_FILE)
 > pip install --user $<
 
 ######################################################################
 # Init environment
 
-$(VERSION_STAMP) : $(VERSION_FILE) $(LOG_POETRY)
-> $(RUN_MODVERSION)             \
-  --truth $(VERSION_FILE)       \
-  --names $(VERSIONED_FILES)    \
-  --stdout >	$@
+$(VERSIONED_FILES) &: $(VERSION_FILE)  $(LOG_POETRY)
+> $(PR) python tools/modversion.py     \
+  --truth $(VERSION_FILE)               \
+  --victims $(VERSIONED_FILES)
 
-$(VERSIONED_FILES) : $(VERSION_STAMP)
-
-.PRECIOUS: $(LOG_POETRY)
-$(LOG_POETRY)    :
+.PRECIOUS          : $(LOG_POETRY)
+$(LOG_POETRY)      :
+> mkdir -p $(LOG_DIR) $(DIST_DIR)
 > # take opportunity to make dest directories.
 > $(HR)
 > which poetry || curl -sSL https://install.python-poetry.org | python3
@@ -248,259 +188,168 @@ $(LOG_POETRY)    :
 > $(HR)
 > $(POETRY) install
 > $(POETRY) update
-> $(POETRY) export --without-hashes > requirements.txt
+> #$(POETRY) export --without-hashes > requirements.txt
 > $(POETRY) --version > $(LOG_POETRY)
+> # make the log file old - things don't depend on
+> # when poetry was installed, just that it was.
+> @touch  -t 200001010101 $(LOG_POETRY)
+
 
 ######################################################################
-#   examples
-#$(LOG_EXAMPLES) : $(COMPILED_EXAMPLES)
-#n
-#examples/%.nc:examples/%.py
-#> $(PR) p2g $<  $@ | tee -a $(LOG_EXAMPLES)
+
+examples/%.nc: examples/%.py
+>	poetry run p2g --no-id $< $@
 
 ######################################################################
 # machine generated code
-p2g/haas.py            : tools/makestdvars.py $(LOG_POETRY)
-> $(RUN_MAKESTDVARS)  --py=$@
+p2g/haas.py  : tools/makestdvars.py $(LOG_POETRY)
+> $(PR) python tools/makestdvars.py  --py=$@
 
 docs/haas.txt  : tools/makestdvars.py $(LOG_POETRY)
-> $(RUN_MAKESTDVARS)  --txt=$@
+> $(PR) python tools/makestdvars.py  --txt=$@
 
 docs/haas.html : tools/makestdvars.py $(LOG_POETRY)
-> $(RUN_MAKESTDVARS)  --html=$@
+> $(PR) python tools/makestdvars.py  --html=$@
+
+#######################################################################
+# lints
+
+LINTOUTS     = $(patsubst %,$(LOG_DIR)/%.lintout, $(LINTS))
+
+$(LOG_DIR)/%.lintout : $(LINTABLE_SRC)
+> @ # run lint over p2g directory
+> $(PR) $* p2g tools | tee $@
+
+# use all lintlogs to make one big one.
+$(LOG_LINTS) : $(LINTOUTS)
+> cat $^ > $@
+
+lint         : $(LOG_LINTS)
+> cat $(LOG_LINTS)
 
 ######################################################################
-# emacs path
-# only make docs if there's an emacs.
-ifeq ($(shell which $(EMACS)),)
-$(LOG_DOC) :
->   echo "DOC not being rebuilt, needs emacs." | tee $@
->   touch $(DIST_DOC)
-EVAL=@ echo "NO EMACS"
+# Tests
+
+$(LOG_COVERAGE) $(LOG_TESTS) &: $(ALL_P2G_SRC) $(ALL_TEST_SRC) $(EXAMPLES)
+> $(HR)
+> $(H1) pytest.
+> $(PR) pytest | tee $(LOG_TESTS)
+> $(PR) coverage lcov -q
+> $(PR) coverage report | tee $(LOG_COVERAGE)
+> $(HR)
+
+tests: $(LOG_TESTS)
+> cat $(LOG_TESTS)
+
+######################################################################
+# build release from a dummy tree
+# copy only things explicityly named here.
+
+$(DIST_FILE) : $(IN_DIST)
+> rm -rf $(STAGING_DIR)
+> mkdir -p $(STAGING_DIR)
+> tar cf - $(IN_DIST) | tar -C $(STAGING_DIR)  -xf -
+> mv $(STAGING_DIR)/docs $(STAGING_DIR)/p2g
+> mv $(STAGING_DIR)/examples $(STAGING_DIR)/p2g
+> cp pyproject.toml $(STAGING_DIR)
+> (cd $(STAGING_DIR); poetry build)
+> mv $(STAGING_DIR)/dist/* dist
+
+tox          : $(DIST_FILE)
+> $(PR)	tox --installpkg $(DIST_FILE)
+
+##########
+
+release:
+> gh release create v$(VERSION) --notes="release v$(VERSION)"
+
+######################################################################
+# cleanup stuff
+
+isort:$(LINTABLE_SRC)
+> $(PR) isort $^
+
+ssort:$(LINTABLE_SRC)
+> - $(PR) ssort  $^
+
+autopep8:$(LINTABLE_SRC)
+> $(PR) autopep8 --in-place $^
+
+black:$(LINTABLE_SRC)
+> $(PR) black $^
+
+autoflake:$(LINTABLE_SRC)
+>  $(PR) autoflake --ignore-init-module-imports  --remove-all-unused-imports  -i -v $^
+
+cleanup: isort ssort black autopep8
+######################################################################
+# utils
+
+clean:
+> if [  $$(which p2g) ] ; then rm -f $$(which p2g); fi
+> git clean -fdx
+
+
+######################################################################
+# DOC
+
+# for rebuilding doc, may never need it
+EMACS     := emacs
+OX_GFM    := ~/.emacs.d/straight/build/ox-gfm/ox-gfm.el
+
+CAN_EMACS := YES
+
+ifeq ($(wildcard $(OX_GFM)),)
+CAN_EMACS := NO
+endif
+ifeq ($(wildcard $(shell which $(EMACS))),)
+CAN_EMACS := NO
+endif
+
+ifeq ($(CAN_EMACS),NO)
+docs/%.txt docs/%.md: docs/src/%.org $(ALLORGS)
+> $(HR)
+> $(HR)
+> $(H0) "DOC not being rebuilt, needs emacs and ox-gfm."
+> touch $@
 else
-ifeq ($(wildcard $(OX_GFM_DIR)),)
-$(LOG_DOC) :
->@   echo "EMACS installed, but still need" \
-    "github markdown org export." \
-|   tee $@
->   touch $(DIST_DOC)
-EVAL=@ echo NEED GITHUB MARKDOWN EXPORT"
-else
-# run emacs in batch to expand and include files
-# which make up the final doc.  Sed out the
-# loquacity.
-EVAL =                                      \
-  emacs $(abspath $<)                       \
+# readme.md and howto.md from .org
+EVAL      =                                 \
+  $(EMACS) $(abspath $<)                    \
   -q -Q                                     \
   --chdir $(dir $(abspath $<))              \
-  -L $(OX_GFM_DIR)                          \
+  -L $(dir $(OX_GFM))                       \
   --batch                                   \
   --load $(abspath tools/org-to-x.el)       \
   -f org-to-any                             \
-  $(abspath $@)                             \
-  2>&1 | sed                                \
-  -e  '/Code block.*/d'                     \
-  -e  's:executing Python code block::g' ;  \
-  test -s $@ || echo "EMPTY FILE"; \
-  test -s $@
+  $(abspath $@)
 
-######################################################################
-# the readme md includes some of the exorgs and the toc., see what changed.
-TMP_ORGS   = $(patsubst docs/src/%,docs/obj/%,$(INCLUDED_ORGS))
-ORG_DIFFS  = $(patsubst %.org, %.diff,$(TMP_ORGS))
-$(LOG_DOC) : $(DIST_DOC) $(ORG_DIFFS)
-> @ cat $(ORG_DIFFS) | tee $@.error
-> if test  -s $@.error ; then                       \
-  echo "DOC HAS DIFFERENCES"            ;           \
-  echo "maybe cp docs/obj/*.org docs/src"    ;      \
-  exit 1;                                           \
-fi
-> mv $@.error $@
-
-endif
-
-
-######################################################################
-# tmp orgs are org files with includes and evaluation.
-
-VPATH            = docs/src
-
-docs/obj/%.org:%.org $(VERSION_STAMP)
+docs/howto.txt : docs/src/howto.org $(ALL_ORGS) docs/haas.txt
+> $(PR) python tools/fakeorg.py $(dir $<)
 > $(EVAL)
 
-
-docs/obj/%.diff:docs/obj/%.org
-> - diff  docs/src/$*.org $< > $@
-
-%.md:%.org $(TMP_ORGS)
-> $(EVAL)
-
-$(READMEMD)        : readme.org $(TMP_ORGS)
-> $(EVAL)
-
-$(INCLUDED_ORGS) : $(VERSION_STAMP)
-
-docs/howto.txt docs/howto.md:  docs/obj/howto.org $(TMP_ORGS)
+%.md docs/%.md: docs/src/%.org docs/howto.txt docs/haas.txt
 > $(EVAL)
 
 endif
 
 ######################################################################
 # badges
-
-STYLE=?style=plastic
-
-
 docs/coverage.svg: docs/src/coverage.in.svg $(LOG_COVERAGE)
-> inside=$$(grep TOTAL log/coverage.log  | sed  -E "s:.* ([0-9]+)%:\1%:g"); sed -E s:100%:$$inside:g $< >$@
+> $(H1) Make $@
+> @ inside=$$(grep TOTAL $(LOG_COVERAGE)  | sed  -E "s:.* ([0-9]+)%:\1%:g"); sed -E s:100%:$$inside:g $< >$@
 
 docs/pytest.svg: docs/src/pytest.in.svg $(LOG_TESTS)
-> inside=$$(grep "^[0-9]" $(LOG_TESTS)); sed -E s:XXX:$$inside:g $< >$@
+> $(H1) Make $@
+> @ inside=$$(grep "^[0-9]" $(LOG_TESTS)); sed -E s:XXX:$$inside:g $< >$@
 
 docs/mit.svg: docs/src/mit.in.svg
-> cp $< $@
-
-
-
-#######################################################################
-# lints
-
-$(LOG_DIR)/%.llog : $(LINTABLE_SRC)
-> @ # run lint over p2g directory
-> $(PR) $* p2g | tee $@
-
-# use all lintlogs to make one big one.
-$(LOG_LINT)      : $(LOG_LINTS)
-> @ cat $^ > $@
+> $(H1) Make $@
+> @ cp $< $@
 
 ######################################################################
-# Tests
-
-$(LOG_TESTS):  $(ALL_P2G_SRC) $(ALL_TEST_SRC) $(ALL_EXAMPLES)
-> $(HR)
-> $(H1) pytest.
-> $(RUN_PYTEST) | tee $(LOG_TESTS)
-
-$(LOG_COVERAGE): $(LOG_TESTS)
-> $(RUN_COVERAGE) lcov -q
-> $(RUN_COVERAGE) report | tee $@
-> $(HR)
-
-######################################################################
-# make a release : build the distribution .tar for pip
-# test it for sanity
-
-# want to distribute docs and examples, so copy
-# into src tree just while the packager is busy.
-$(DIST_FILE) $(LOG_DIST) &: $(IN_DIST)
-> $(HR)
-> $(H1) "Make dist"
-> rsync  docs/*.*   p2g/docs
-> rsync examples/* p2g/examples
-> $(POETRY) build
-> rm -rf p2g/examples
-> rm -rf p2g/docs
-> tar ztvf  $(DIST_FILE) > $(LOG_DIST)
 
 
-
-
-######################################################################$
-
-
-# make sure everything in dist is in makefile and viceversa.
-# a dist tar file has elements like this:
-# -rwxr-xr-x 0/0            9790 2023-07-22 22:06 p2g-0.2.220/p2g/walkstat.py
-# dist with doc in top/p2g/doc, but in the tree as top/doc etc.
-# we mess with the paths to make them match up with our tree.
-# and remove junk, then compare with what we have.
-# any differences need to be investigated.
-
-$(LOG_DISTGOT)  : $(DIST_FILE)
-> $(HR)
-> $(H1)  Comparing expected and actual distribution.
-> tar tzvf $(DIST_FILE)                                 \
-| sed -E 'sX.*[0-9][0-9]:[[:digit:]]{2} [^/]+/XXg'      \
-| egrep -v "(pyproject.toml|PKG-INFO)"                  \
-| sort > $(LOG_DISTGOT)
-
-
-$(LOG_DISTWANT) : $(IN_DIST)
-> $(H2) Make $(LOG_DISTWANT)
-> echo $(IN_DIST)                                       \
-| sed -E "s:(examples|docs)/:p2g/\\1/:g"                \
-| xargs -n 1                                            \
-| sort > $(LOG_DISTWANT)
-
-$(LOG_DISTDIFFS) : $(LOG_DISTWANT) $(LOG_DISTGOT)
-> $(H1) Compare want with got
-> $(H2) "BOTH COLUMNS SHOULD BE SAME" > $(DISTDIFFS_ERROR)
-> @ printf "%9s%40s\n" "***WANT***" "***GOT***" >> $(DISTDIFFS_ERROR)
-> @ sdiff -w 70 $(LOG_DISTWANT) $(LOG_DISTGOT) >>  $(DISTDIFFS_ERROR)
-> diff -u $(LOG_DISTWANT) $(LOG_DISTGOT)
-> $(H1) All OK
-> mv $(DISTDIFFS_ERROR) $(LOG_DISTDIFFS)
-> $(HR)
-
-
-$(LOG_TOX) : $(DIST_FILE)
-> $(PR)	tox --installpkg $(DIST_FILE) | tee $@
-
-##########
-
-release:
->	gh release create v$(THIS_VERSION) --notes="release v$(THIS_VERSION)"
-
-newwork:
-> git fetch origin
-> - git branch -C dev$(THIS_VERSION) origin/main
-> git push origin dev$(THIS_VERSION)
-tagit:
-> git fetch origin
-> git tag -a v$(THIS_VERSION) -m "release v$(THIS_VERSION)"
-> git push origin v$(THIS_VERSION)
-
-togithub   :
-> git commit --allow-empty -m v$(THIS_VERSION) -a
-#> git tag  v$(THIS_VERSION)
-> git push $(T)
-> git push --tags $(T) --force
-
-
-######################################################################
-# cleanup stuff
-##########
-.PHONY:
-isort:$(LINTABLE_SRC)
-> $(PR) isort $^
-##########
-.PHONY:
-ssort:$(LINTABLE_SRC)
-> -	$(PR) ssort  $^
-##########
-.PHONY:
-autopep8:$(LINTABLE_SRC)
-> $(PR) autopep8 --in-place $^
-##########
-.PHONY:
-black:$(LINTABLE_SRC)
-> $(PR) black $^
-##########
-.PHONY:
-autoflake:$(LINTABLE_SRC)
->  $(PR) autoflake --ignore-init-module-imports  --remove-all-unused-imports  -i -v $^
-##########
-.PHONY:
-cleanup: isort ssort  black
-######################################################################
-# utils
-.PHONY:
-clean:
-> if [  $$(which p2g) ] ; then rm -f $$(which p2g); fi
-> git clean -fdx
-
-######################################################################
-######################################################################
 #for my machine.
 
 telnet:
@@ -564,8 +413,11 @@ help:
 > python -m p2g   -
 msv:
 > python tools/makestdvars.py --dpy=-
-example:
-> python -m p2g  examples/fasterviceceneter.py
+
+.PHONY:aexample pdb
+aexample:
+> echo HIU
+> python -m p2g help version #--job=O123 examples/vicecenter.py
 
 apytest:
 > poetry run pytest tests/test_dprnt.py
@@ -580,6 +432,8 @@ mtest:
 
 tmodversion:
 > python  tools/modversion.py --truth $(VERSION_FILE)  --top . --out .build --names $(VERSIONED_FILES)
+fakeorg:
+> python  docs/src/fakeorg.py docs/src/fish.org
 >
 justt:
 > poetry run p2g t.py
@@ -589,15 +443,9 @@ justt:
 #pdb: btest
 #pdb: mdc
 #pdb: fakeorg
-pdb:example
+pdb: aexample
 
 
-# T=tests/test_assert.py
-# T=tests/test_badpytest.py
-# T=tests/test_vector.py
-# T=tests/test_axis.py
-ARGS=--pdb
-RUNNER=poetry run pytest
 
 
 sxpdb:
@@ -612,3 +460,20 @@ p:
 # Local Variables:
 # makefile-backslash-column:20
 # End:
+
+
+######################################################################
+newwork:
+> git fetch origin
+> - git branch -C dev$(VERSION) origin/main
+> git push origin dev$(VERSION)
+tagit:
+> git fetch origin
+> git tag -a v$(VERSION) -m "release v$(VERSION)"
+> git push origin v$(VERSION)
+
+togithub   :
+> git commit --allow-empty -m v$(VERSION) -a
+#> git tag  v$(VERSION)
+> git push $(T)
+> git push --tags $(T) --force

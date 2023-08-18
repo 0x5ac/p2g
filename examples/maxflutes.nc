@@ -1,8 +1,8 @@
 O00001 (maxflutes)
   #100= #1601                     ( mx_flutes = Var[haas.TOOL_TBL_FLUTES[0]])
-  #101= 1601.                     ( for n_flutes in haas.TOOL_TBL_FLUTES:)
+  #101= 1602.                     ( for n_flutes in haas.TOOL_TBL_FLUTES[1:]:)
 N1000
-  IF [#101 GE 1801.] GOTO 1002    ( for n_flutes in haas.TOOL_TBL_FLUTES:)
+  IF [#101 GE 1801.] GOTO 1002    ( for n_flutes in haas.TOOL_TBL_FLUTES[1:]:)
   IF [#[#101] LE #100] GOTO 1003  (     if n_flutes > mx_flutes:  )
   #100= #[#101]                   (         mx_flutes = n_flutes  )
   GOTO 1004

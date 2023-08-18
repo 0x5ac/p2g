@@ -1,5 +1,4 @@
 *
-
   * [[https://github.com/0x5ac/p2g/blob/main/docs/howto.md#introduction][Introduction]]
   * [[https://github.com/0x5ac/p2g/blob/main/docs/howto.md#variables][Variables]]
   * [[https://github.com/0x5ac/p2g/blob/main/docs/howto.md#coordinates][Coordinates]]
@@ -10,5 +9,6 @@
   * [[https://github.com/0x5ac/p2g/blob/main/docs/howto.md#dprnt][DPRNT]]
   * [[https://github.com/0x5ac/p2g/blob/main/docs/howto.md#symbol-table][Symbol Tables]]
   * [[https://github.com/0x5ac/p2g/blob/main/docs/howto.md#notes][Notes]]
+  * [[https://github.com/0x5ac/p2g/blob/main/docs/howto.md#maitenance-options][Internal Options]]
   * [[https://github.com/0x5ac/p2g/blob/main/docs/howto.md#authors][Authors]]
   * [[https://github.com/0x5ac/p2g/blob/main/docs/howto.md#thanks][Thanks]]

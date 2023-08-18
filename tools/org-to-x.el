@@ -7,7 +7,12 @@
 
 (defun sc/execute ()
   (require 'ob-python)
-  (org-babel-execute-buffer))
+  (message "ERRRORRR")
+
+  ;; do the executing in fakeorg.py now
+  ;;
+  ;;  (org-babel-execute-buffer)
+  )
 
 (defun sc/tomd ()
   (org-gfm-export-as-markdown))
@@ -15,6 +20,7 @@
 (defun sc/fnfromext (ext)
   (cdr (assoc ext
               '(("org" . sc/execute)
+                ("torg" . sc/execute)
                 ("md" . sc/tomd)
                 ("txt" . org-ascii-export-as-ascii)
                 ("html" . org-html-export-as-html)))))

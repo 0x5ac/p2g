@@ -1,5 +1,5 @@
 [tool.poetry]
-version = "0.3.10"
+version = "0.3.13"
 name = "p2g"
 description = "Transpile python into cnc gcode."
 authors = ["sac <sac@0x5ac.com>"]
@@ -18,10 +18,7 @@ homepage = 'https://github.com/0x5ac/p2g'
 packages = [
     { include = "p2g", format = "sdist"},
 ]
-#include = [ "p2g/docs/*.org"]
-#exclude = [ "p2g/examples/*.got" ,
-#            "p2g/docs/*.tmp" ]
-
+include = [ "p2g/docs/*.org","*","p2g","p2g/*","p2g/docs/*", "p2g/examples/*"]
 [tool.poetry.scripts]
 p2g = "p2g.main:main"
 
@@ -48,6 +45,7 @@ tox = "^4.6.4"
 pytest-cov = "^4.1.0"
 wrapt = "^1.15.0"
 dill = "^0.3.6"
+semver = "^3.0.1"
 
 [[tool.poetry.source]]
 name = "PyPI"

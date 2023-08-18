@@ -96,7 +96,3 @@ class Table:
         cls.name_to_thing = collections.defaultdict(list)
         cls.addrs_used = set()
         gbl.Control.symbol_table = False
-
-
-class TSUB:
-    pass
